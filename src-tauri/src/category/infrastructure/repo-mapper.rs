@@ -11,7 +11,7 @@ pub struct CategoryRepoMapper {}
 impl IRepoMapper<CategoryAggregate, CategoryDO> for CategoryRepoMapper {
     fn do_to_aggregate(category_do: CategoryDO) -> CategoryAggregate {
         CategoryAggregate {
-            id: CategoryID::parse(category_do.id.unwrap().id.to_string()),
+            id: CategoryID::parse(category_do.id.unwrap().to_string()),
             title: category_do.title,
             description: category_do.description,
             auth: category_do.auth,
