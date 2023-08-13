@@ -3,10 +3,8 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { SnackbarProvider } from 'notistack';
 import { Box, MantineProvider, Button, Header, AppShell } from '@mantine/core';
 import { invoke } from '@tauri-apps/api/tauri';
-import { CategoryAPI, CategoryResDto } from '@api/category';
 import { MainNavbar } from '@components/navbar';
 import { CategoriesPage } from './pages/category';
-import reactLogo from './assets/react.svg';
 import './App.css';
 
 const queryClient = new QueryClient();

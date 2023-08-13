@@ -1,3 +1,5 @@
+import { InvokeArgs } from '@tauri-apps/api/tauri';
+
 export interface CategoryResDto {
     id: string,
 
@@ -12,4 +14,14 @@ export interface CategoryResDto {
     created_at: string,
 
     updated_at: string,
+}
+
+export interface CategoryCreateDto {
+    title: string,
+
+    description: string;
+}
+
+export interface CategoryUpdateDto extends Partial<CategoryCreateDto> {
+    id: string;
 }
