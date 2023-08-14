@@ -1,4 +1,6 @@
 use surrealdb::sql::Thing;
+use surrealdb::sql::Datetime;
+use chrono::{DateTime, Utc};
 
 use crate::common::domain::ID;
 use crate::common::infrastructure::IRepoMapper;
@@ -15,8 +17,8 @@ impl IRepoMapper<CategoryAggregate, CategoryDO> for CategoryRepoMapper {
             title: category_do.title,
             description: category_do.description,
             auth: category_do.auth,
-            created_at: category_do.created_at,
-            updated_at: category_do.updated_at,
+            created_at: category_do.created_at.0,
+            updated_at: category_do.updated_at.0,
         }
     }
     
@@ -26,8 +28,8 @@ impl IRepoMapper<CategoryAggregate, CategoryDO> for CategoryRepoMapper {
             title: aggregate.title,
             description: aggregate.description,
             auth: aggregate.auth,
-            created_at: aggregate.created_at,
-            updated_at: aggregate.updated_at,
+            created_at: Datetime(aggregate.created_at),
+            updated_at: Datetime(aggregate.updated_at),
         }
     }
 }

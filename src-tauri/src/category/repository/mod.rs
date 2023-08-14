@@ -5,7 +5,7 @@ pub use query::{CATEGORY_QUERY_REPOSITORY, CategoryQueryRepository};
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
-use surrealdb::sql::Thing;
+use surrealdb::sql::{Thing, Datetime};
 
 use crate::common::infrastructure::IRepoMapper;
 use crate::common::repository::env;
@@ -25,8 +25,8 @@ pub struct CategoryDO {
     pub title: String,
     pub description: String,
     pub auth: bool,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: Datetime,
+    pub updated_at: Datetime,
 }
 /**
  * Repository */

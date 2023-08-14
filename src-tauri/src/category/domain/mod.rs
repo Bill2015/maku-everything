@@ -1,4 +1,5 @@
 use serde::Serialize;
+use chrono::{DateTime, Utc};
 use crate::common::domain::ID;
 
 mod id;
@@ -10,8 +11,8 @@ pub struct CategoryAggregate {
     pub title: String,
     pub description: String,
     pub auth: bool,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 impl CategoryAggregate {
@@ -21,8 +22,8 @@ impl CategoryAggregate {
             title: title,
             description: description,
             auth: false,
-            created_at: String::from("Create"),
-            updated_at: String::from("Update"),
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
         }
     }
 
