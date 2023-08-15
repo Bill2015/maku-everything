@@ -125,6 +125,10 @@ fn main() {
             category::application::update_category,
             category::application::get_all_category,
             category::application::get_category_by_id,
+            subject::application::create_subject,
+            subject::application::update_subject,
+            subject::application::get_all_subject,
+            subject::application::get_subject_by_id,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

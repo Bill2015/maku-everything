@@ -1,5 +1,5 @@
-use std::{path::Path};
 use serde::Serialize;
+use chrono::{DateTime, Utc};
 use crate::common::domain::ID;
 use crate::category::domain::CategoryID;
 
@@ -13,28 +13,36 @@ pub struct SubjectAggregate {
     pub description: String,
     pub belong_category: CategoryID,
     pub auth: bool,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 impl SubjectAggregate {
-    pub fn new(name: String, description: String, belong_category: CategoryID, auth: bool) -> Self {
+    pub fn new(name: String, description: String, belong_category: CategoryID) -> Self {
         SubjectAggregate {
             id: SubjectID::parse(String::from("")),
             name: name,
             description: description,
             belong_category: belong_category,
-            auth: auth,
-            created_at: String::from("Create"),
-            updated_at: String::from("Update"),
+            auth: false,
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
         }
     }
 
     pub fn change_name(&mut self, new_name: String) {
         if new_name.len() <= 0 {
-            print!("Name can't be empty");
+            println!("Name can't be empty");
         }
 
         self.name = new_name;
+    }
+
+    pub fn change_description(&mut self, new_description: String) {
+        if new_description.len() <= 0 {
+            println!("Description can't be empty")
+        }
+
+        self.description = new_description;
     }
 }
