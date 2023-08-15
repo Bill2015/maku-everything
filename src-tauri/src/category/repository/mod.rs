@@ -5,15 +5,12 @@ pub use query::{CATEGORY_QUERY_REPOSITORY, CategoryQueryRepository};
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
-use surrealdb::sql::{Thing, Datetime};
+use surrealdb::sql::{Thing, Datetime, thing};
 
 use crate::common::infrastructure::IRepoMapper;
-use crate::common::repository::env;
+use crate::common::repository::{env, tablens};
 use crate::category::domain::CategoryAggregate;
 use crate::category::infrastructure::CategoryRepoMapper;
-
-/** Database Namespace (aka table name) */
-pub const CATEGORY_DB_NAMESPACE: &str = "category";
 
 pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::init(&env::DB);
 
@@ -21,7 +18,8 @@ pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::ini
  * Category Data Object */
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CategoryDO {
-    pub id: Option<Thing>,
+    #[serde(skip_serializing)]
+    pub id: Thing,
     pub title: String,
     pub description: String,
     pub auth: bool,
@@ -39,9 +37,10 @@ impl<'a> CategoryRepository<'a> {
         CategoryRepository { db: db }
     }
 
-    pub async fn is_exist(&self, id: &String) -> bool {
+    pub async fn is_exist(&self, id: String) -> bool {
+        let thing_id = thing(id.as_str()).unwrap();
         let result: Option<CategoryDO> = self.db
-            .select((CATEGORY_DB_NAMESPACE, id))
+            .select(thing_id)
             .await
             .unwrap_or(None);
 
@@ -52,8 +51,9 @@ impl<'a> CategoryRepository<'a> {
     }
 
     pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<CategoryAggregate>> {
+        let thing_id = thing(id).unwrap();
         let result: Option<CategoryDO> = self.db
-            .select((CATEGORY_DB_NAMESPACE, id))
+            .select(thing_id)
             .await?;
 
         let aggregate: Option<CategoryAggregate> = match result {
@@ -64,25 +64,24 @@ impl<'a> CategoryRepository<'a> {
     }
 
     pub async fn save(&self, data: CategoryAggregate) -> surrealdb::Result<CategoryAggregate> {
-        let mut category_do = CategoryRepoMapper::aggregate_to_do(data);
-        let id = category_do.id.clone().unwrap();
+        let category_do = CategoryRepoMapper::aggregate_to_do(data);
+        let id = category_do.id.clone();
 
-        let is_exist: Option<CategoryDO> = self.db
-            .select(id)
-            .await?;
+        let is_new: bool = id.id.to_raw().is_empty();
 
-        let result: Option<CategoryDO> = match is_exist {
-            Some(value) => {
+        // save data
+        let result: Option<CategoryDO> = match is_new {
+            true => {
+                // let db auto generate the id
                 self.db
-                    .update(value.id.unwrap())
+                    .create(tablens::CATEGORY)
                     .content(category_do)
                     .await?
+
             }
-            None => {
-                // let db auto generate the id
-                category_do.id = None;
+            false => {
                 self.db
-                    .create(CATEGORY_DB_NAMESPACE)
+                    .update(id)
                     .content(category_do)
                     .await?
             }
@@ -93,9 +92,10 @@ impl<'a> CategoryRepository<'a> {
         Ok(aggregate)
     }
 
-    pub async fn delete(&self, id: String) -> surrealdb::Result<Option<CategoryAggregate>> {
+    pub async fn delete(&self, id: &String) -> surrealdb::Result<Option<CategoryAggregate>> {
+        let thing_id = thing(id).unwrap();
         let result: Option<CategoryDO> = self.db
-            .delete((CATEGORY_DB_NAMESPACE, id))
+            .delete(thing_id)
             .await?;
 
         let aggregate: Option<CategoryAggregate> = match result {

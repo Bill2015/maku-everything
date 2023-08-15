@@ -3,10 +3,8 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::{Thing, thing};
 
-use crate::common::repository::env;
+use crate::common::repository::{env, tablens};
 use crate::category::application::dto::CategoryResDto;
-
-use super::CATEGORY_DB_NAMESPACE;
 
 pub static CATEGORY_QUERY_REPOSITORY: CategoryQueryRepository<'_> = CategoryQueryRepository::init(&env::DB);
 
@@ -21,7 +19,7 @@ impl<'a> CategoryQueryRepository<'a> {
     pub async fn get_all(&self) -> surrealdb::Result<Vec<CategoryResDto>> {
         let mut response = self.db
             .query("SELECT *, array::len(<-resource_belong.in) AS resource_num FROM type::table($table)")
-            .bind(("table", &CATEGORY_DB_NAMESPACE))
+            .bind(("table", &tablens::CATEGORY))
             .await?;
 
         let result: Vec<CategoryResDto> = response
