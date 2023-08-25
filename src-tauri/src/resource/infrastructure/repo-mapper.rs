@@ -1,3 +1,4 @@
+use surrealdb::sql::Datetime;
 use surrealdb::sql::Thing;
 use surrealdb::sql::thing;
 
@@ -28,8 +29,8 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             file_type: resource_do.file_type,
             auth: resource_do.auth,
             tags: tags,
-            created_at: resource_do.created_at,
-            updated_at: resource_do.updated_at,
+            created_at: resource_do.created_at.0,
+            updated_at: resource_do.updated_at.0,
         }
     }
     
@@ -53,8 +54,8 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             file_type: aggregate.file_type,
             auth: aggregate.auth,
             tags: tags,
-            created_at: aggregate.created_at,
-            updated_at: aggregate.updated_at,
+            created_at: Datetime(aggregate.created_at),
+            updated_at: Datetime(aggregate.updated_at),
         }
     }
 }

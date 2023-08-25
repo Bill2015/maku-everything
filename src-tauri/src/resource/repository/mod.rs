@@ -1,3 +1,7 @@
+#[path ="./query-repository.rs"]
+mod query;
+pub use query::{RESOURCE_QUERY_REPOSITORY,ResourceQueryRepository};
+
 use serde::{Deserialize, Serialize};
 use serde_json::error::Category;
 use surrealdb::{Surreal, sql};
@@ -11,7 +15,7 @@ use crate::common::repository::tablens;
 use crate::resource::domain::ResourceAggregate;
 use crate::resource::infrastructure::ResourceRepoMapper;
 
-pub static RESOURSE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(&env::DB);
+pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(&env::DB);
 /**
  * Resource Data Object */
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -25,17 +29,24 @@ pub struct ResourceDO {
     pub file_path: String,
     pub file_type: String,
     pub auth: bool,
-    pub tags: Vec<String>,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: Datetime,
+    pub updated_at: Datetime,
 
     #[serde(skip_serializing)]
     #[serde(default = "default_resource")]
     pub belong_category: String,
+
+    #[serde(skip_serializing)]
+    #[serde(default = "default_vec")]
+    pub tags: Vec<String>,
 }
 
 fn default_resource() -> String {
     "/".to_string()
+}
+
+fn default_vec() -> Vec<String> {
+    Vec::new()
 }
 /**
  * Repository */

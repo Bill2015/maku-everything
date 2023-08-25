@@ -1,4 +1,5 @@
 use std::{path::Path};
+use chrono::{DateTime, Utc};
 use serde::Serialize;
 use crate::category::domain::CategoryID;
 use crate::tag::domain::TagID;
@@ -21,26 +22,26 @@ pub struct ResourceAggregate {
     pub file_type: String,
     pub auth: bool,
     pub tags: Vec<TagID>,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 impl ResourceAggregate {
 
-    pub fn new(title: String, description: String, belong_category: CategoryID, file_id: String, file_name: String, file_path: String, file_type: String, auth: bool) -> Self {
+    pub fn new(title: String, description: String, belong_category: CategoryID, file_path: String) -> Self {
         ResourceAggregate {
             id: ResourceID::parse(String::from("")),
             title: title,
             description: description,
             belong_category: belong_category,
-            file_id: file_id,
-            file_name: file_name,
+            file_id: String::from("file_id"),
+            file_name: String::from("file_name"),
             file_path: file_path,
-            file_type: file_type,
-            auth: auth,
+            file_type: String::from("file_type"),
+            auth: false,
             tags: Vec::new(),
-            created_at: String::from("Create"),
-            updated_at: String::from("Update"),
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
         }
     }
 
