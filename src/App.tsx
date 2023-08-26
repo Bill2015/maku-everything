@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
+import { Provider } from 'react-redux';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { SnackbarProvider } from 'notistack';
 import { Box, MantineProvider, Button, Header, AppShell } from '@mantine/core';
 import { invoke } from '@tauri-apps/api/tauri';
+
 import { MainNavbar } from '@components/navbar';
+import { store } from '@store/store';
 import { CategoriesPage } from './pages/category';
 import './App.css';
 
@@ -31,33 +34,35 @@ function App() {
     }
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <SnackbarProvider anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
-                <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: theme ? 'dark' : 'light' }}>
-                    <AppShell
-                        padding="md"
-                        navbar={<MainNavbar />}
-                        header={<Header height={60} p="xs">{/* Header content */}</Header>}
-                        styles={(theme) => ({ main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] } })}
-                    >
-                        <Box>
-                            <Button onClick={() => setTheme(!theme)}>Theme</Button>
-                            { isConnected && <h1>Database Connected！</h1> }
+        <Provider store={store}>
+            <QueryClientProvider client={queryClient}>
+                <SnackbarProvider anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
+                    <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: theme ? 'dark' : 'light' }}>
+                        <AppShell
+                            padding="md"
+                            navbar={<MainNavbar />}
+                            header={<Header height={60} p="xs">{/* Header content */}</Header>}
+                            styles={(theme) => ({ main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] } })}
+                        >
+                            <Box>
+                                <Button onClick={() => setTheme(!theme)}>Theme</Button>
+                                { isConnected && <h1>Database Connected！</h1> }
 
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    dbTest();
-                                }}
-                            >
-                                DB Test
-                            </button>
-                            <CategoriesPage />
-                        </Box>
-                    </AppShell>
-                </MantineProvider>
-            </SnackbarProvider>
-        </QueryClientProvider>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        dbTest();
+                                    }}
+                                >
+                                    DB Test
+                                </button>
+                                <CategoriesPage />
+                            </Box>
+                        </AppShell>
+                    </MantineProvider>
+                </SnackbarProvider>
+            </QueryClientProvider>
+        </Provider>
     );
 }
 
