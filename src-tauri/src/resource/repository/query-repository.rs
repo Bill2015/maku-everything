@@ -21,8 +21,8 @@ impl<'a> ResourceQueryRepository<'a> {
 
     pub async fn get_all(&self) -> surrealdb::Result<Vec<ResourceResDto>> {
         let mut response = self.db
-            .query("SELECT *, array::len(<-resource_belong.in) AS resource_num FROM type::table($table)")
-            .bind(("table", &tablens::CATEGORY))
+            .query("SELECT * FROM type::table($table)")
+            .bind(("table", &tablens::RESOURCE))
             .await?;
 
         let result: Vec<ResourceResDto> = response
@@ -34,7 +34,8 @@ impl<'a> ResourceQueryRepository<'a> {
 
     pub async fn get_by_id(&self, id: &String) -> surrealdb::Result<Option<ResourceResDto>> {
         let mut response = self.db
-            .query("SELECT *, array::len(<-resource_belong.in) AS resource_num FROM resource WHERE id == $id")
+            .query("SELECT * FROM type::table($table) WHERE id == $id")
+            .bind(("table", &tablens::RESOURCE))
             .bind(("id", thing(id.as_str())))
             .await?;
 

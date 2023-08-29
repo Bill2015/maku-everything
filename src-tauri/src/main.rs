@@ -131,6 +131,8 @@ fn main() {
             subject::application::get_subject_by_id,
             resource::application::create_resource,
             resource::application::update_resource,
+            resource::application::get_all_resource,
+            resource::application::get_resource_by_id,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
