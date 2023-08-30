@@ -35,3 +35,13 @@ pub async fn get_resource_by_id(id: String) -> Result<Option<ResourceResDto>, St
 
     Ok(result)
 }
+
+// Related Problem https://github.com/tauri-apps/tauri/issues/4062#issuecomment-1118394619
+#[tauri::command(rename_all = "snake_case")]
+pub async fn explore_the_file(file_path: String) -> Result<(), String> {
+    let _ = RESOURCE_SERVICE
+        .expore_the_file(file_path)
+        .await?;
+
+    Ok(())
+}

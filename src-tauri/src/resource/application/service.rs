@@ -1,4 +1,5 @@
-
+use std::path::Path;
+use std::process::Command;
 use crate::category::application::command::UpdateCategoryCommand;
 use crate::category::repository::CategoryRepository;
 use crate::common::application::{ICommandHandler, IQueryHandler};
@@ -96,5 +97,20 @@ impl<'a> ResourceService<'a> {
         let res = handler.query(query).await?;
 
         Ok(res)
+    }
+
+    pub async fn expore_the_file(&self, file_path: String) -> Result<(), String> {
+        let path = Path::new(file_path.as_str());
+
+        if path.exists() == false {
+            return Err(String::from("File Not Existed"));
+        }
+        // TODO: For now, Windows Only 
+        Command::new("explorer")
+            .args(["/select,", file_path.as_str()]) // The comma after select is not a typo
+            .spawn()
+            .unwrap();
+
+        Ok(())
     }
 }
