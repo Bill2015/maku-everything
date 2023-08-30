@@ -36,7 +36,7 @@ impl<'a> ResourceQueryRepository<'a> {
         let mut response = self.db
             .query("SELECT * FROM type::table($table) WHERE id == $id")
             .bind(("table", &tablens::RESOURCE))
-            .bind(("id", thing(id.as_str())))
+            .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
         let result: Option<ResourceResDto> = response
