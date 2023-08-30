@@ -1,3 +1,13 @@
+export interface ResourceFileDto {
+    uuid: string,
+
+    name: string,
+
+    path: string,
+
+    ext: string,
+}
+
 export interface ResourceResDto {
     id: string,
 
@@ -5,13 +15,7 @@ export interface ResourceResDto {
 
     description: string,
 
-    file_id: string,
-
-    file_name: string,
-
-    file_path: string,
-
-    file_type: string,
+    file: ResourceFileDto,
 
     created_at: string,
 
