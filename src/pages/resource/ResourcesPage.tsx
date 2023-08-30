@@ -3,18 +3,28 @@ import { Box, Stack, Grid, Title, Button, Container, Skeleton } from '@mantine/c
 import { useDisclosure } from '@mantine/hooks';
 
 import { useActiveCategoryRedux } from '@store/global';
-import { ResourceCreateDto, ResourceMutation, ResourceQuery } from '@api/resource';
+import { useResourceDetailNavigate } from '@router/navigateHook';
+
+import { ResourceCreateDto, ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
 import { ResourceCard } from './components/ResourceCard';
 import { CreateResourceModal } from './components/ResourceModal';
 
 export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
+    const navigateResourceTo = useResourceDetailNavigate();
     const { data: resourceData, isFetching: isResourceFetching, refetch: resourceRefetch } = ResourceQuery.useGetAll();
     const [opened, { open, close }] = useDisclosure(false);
 
     const createResource = ResourceMutation.useCreate();
 
-    const resourceItems = resourceData.map((val) => <ResourceCard key={val.id} data={val} onDetailClick={() => {}} />);
+    // When Resource Detail Click
+    const handleResoruceDetail = useCallback(async (data: ResourceResDto) => {
+        if (activeCategory) {
+            navigateResourceTo(activeCategory.title, data.id);
+        }
+    }, [activeCategory, navigateResourceTo]);
+
+    const resourceItems = resourceData.map((val) => <ResourceCard key={val.id} data={val} onDetailClick={handleResoruceDetail} />);
 
     const handleCreateConfirm = useCallback(async (data: ResourceCreateDto) => {
         const _ = await createResource.mutateAsync(data);
