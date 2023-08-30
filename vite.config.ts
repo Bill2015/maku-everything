@@ -11,11 +11,12 @@ export default defineConfig(async () => ({
         alias: {
             '@':           path.resolve(__dirname, './src'),
             '@assets':     path.resolve(__dirname, './src/assets'),
-            '@store':      path.resolve(__dirname, 'src/store'),
-            '@router':     path.resolve(__dirname, 'src/router'),
+            '@store':      path.resolve(__dirname, './src/store'),
+            '@router':     path.resolve(__dirname, './src/router'),
+            '@modals':     path.resolve(__dirname, './src/modals'),
             '@api':        path.resolve(__dirname, './src/api'),
             '@pages':      path.resolve(__dirname, './src/pages'),
-            '@components': path.resolve(__dirname, 'src/components'),
+            '@components': path.resolve(__dirname, './src/components'),
         },
     },
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
