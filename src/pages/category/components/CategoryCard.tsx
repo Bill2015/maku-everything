@@ -3,10 +3,11 @@ import { CategoryResDto } from '@api/category';
 
 export interface CategoryCardProps {
     data: CategoryResDto;
+    onLoadClick: (data: CategoryResDto) => void;
 }
 
 export function CategoryCard(props: CategoryCardProps) {
-    const { data } = props;
+    const { data, onLoadClick } = props;
 
     return (
         <Grid.Col span={4}>
@@ -32,7 +33,7 @@ export function CategoryCard(props: CategoryCardProps) {
                 </Group>
 
                 <Group position="right">
-                    <Button>Load</Button>
+                    <Button onClick={() => onLoadClick(data)}>Load</Button>
                 </Group>
             </Card>
         </Grid.Col>

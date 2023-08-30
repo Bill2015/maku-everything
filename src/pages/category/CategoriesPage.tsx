@@ -1,23 +1,37 @@
 import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Grid, Stack, Skeleton, Container, Title, Button } from '@mantine/core';
-import { CategoryCreateDto, CategoryMutation, CategoryQuery } from '@api/category';
+import { useSnackbar } from 'notistack';
+
+import { CategoryCreateDto, CategoryMutation, CategoryQuery, CategoryResDto } from '@api/category';
+import { useActiveCategoryRedux } from '@store/global';
+import { useCategoryNavigate } from '@router/navigateHook';
+
 import { CategoryCard, CreateCategoryModal } from './components';
 
 export function CategoriesPage() {
     const { data: categories, isLoading: isCategoriesLoading, refetch: categoriesRefetch } = CategoryQuery.useGetAll();
+    const { enqueueSnackbar } = useSnackbar();
+    const { setActiveCategory } = useActiveCategoryRedux();
+    const navigateCategoryTo = useCategoryNavigate();
     const createCategory = CategoryMutation.useCreate();
 
     const [opened, { open, close }] = useDisclosure(false);
 
-    const categoryItems = categories.map((val) => <CategoryCard key={val.id} data={val} />);
+    // When Load clicked
+    const handleCateogryLoadClick = useCallback(async (data: CategoryResDto) => {
+        enqueueSnackbar(`Success Load ${data.title}`, { variant: 'info' });
+        setActiveCategory({ id: data.id, title: data.title });
+        navigateCategoryTo(data.title);
+    }, [enqueueSnackbar, setActiveCategory, navigateCategoryTo]);
 
+    const categoryItems = categories.map((val) => <CategoryCard key={val.id} data={val} onLoadClick={handleCateogryLoadClick} />);
+
+    // When Create Confirm
     const handleCreateConfirm = useCallback(async (data: CategoryCreateDto) => {
-        const result = await createCategory.mutateAsync(data);
+        const _ = await createCategory.mutateAsync(data);
         close();
         categoriesRefetch();
-        console.log(data);
-        console.log(result);
     }, [categoriesRefetch, close, createCategory]);
 
     return (
@@ -31,9 +45,9 @@ export function CategoriesPage() {
                         <Button onClick={open}>Create Category</Button>
                     </Grid.Col>
                 </Grid>
-                <Container fluid>
+                <Container fluid style={{ textAlign: 'start', margin: 0 }}>
                     <Skeleton visible={isCategoriesLoading}>
-                        <Grid>
+                        <Grid align="flex-start">
                             {categoryItems}
                         </Grid>
                     </Skeleton>
