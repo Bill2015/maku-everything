@@ -54,7 +54,7 @@ impl<'a> ResourceService<'a> {
 
         let handler = CreateResourceHandler::register(self.resource_repository);
 
-        let _ = handler.execute(command);
+        let _ = handler.execute(command).await?;
 
         Ok(String::from("Ok"))
     }
@@ -69,7 +69,7 @@ impl<'a> ResourceService<'a> {
 
         let handler = UpdateResourceHandler::register(self.resource_repository);
         
-        let _  = handler.execute(command);
+        let _  = handler.execute(command).await?;
 
         Ok(String::from("Ok"))
     }

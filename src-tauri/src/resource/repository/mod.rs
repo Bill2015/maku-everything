@@ -16,6 +16,15 @@ use crate::resource::domain::ResourceAggregate;
 use crate::resource::infrastructure::ResourceRepoMapper;
 
 pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(&env::DB);
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ResourceFileDo {
+    pub uuid: String,
+    pub name: String,
+    pub path: String,
+    pub ext: String,
+}
+
 /**
  * Resource Data Object */
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -24,10 +33,7 @@ pub struct ResourceDO {
     pub id: Thing,
     pub title: String,
     pub description: String,
-    pub file_id: String,
-    pub file_name: String,
-    pub file_path: String,
-    pub file_type: String,
+    pub file: Option<ResourceFileDo>,
     pub auth: bool,
     pub created_at: Datetime,
     pub updated_at: Datetime,
@@ -61,14 +67,12 @@ impl<'a> ResourceRepository<'a> {
 
     async fn return_aggregate_by_id(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {
         let sql = "SELECT *, type::string((->resource_belong.out)[0]) AS belong_category FROM type::table($table) WHERE id == $id";
-        dbg!(&id);
 
         let mut response = self.db
             .query(sql)
             .bind(("table", tablens::RESOURCE))
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
-        dbg!(&response);
 
         let result: Vec<ResourceDO> = response
             .take(0)?;
@@ -90,7 +94,7 @@ impl<'a> ResourceRepository<'a> {
         let _ = self.db
             .query(sql)
             .bind(("resource", thing(self_id).unwrap()))
-            .bind(("category", Thing::from((String::from(tablens::CATEGORY), format!("{}", category_id)))))
+            .bind(("category", thing(category_id).unwrap()))
             .await?;
         Ok(())
     }
@@ -116,9 +120,9 @@ impl<'a> ResourceRepository<'a> {
     }
 
     pub async fn save(&self, data: ResourceAggregate) -> surrealdb::Result<ResourceAggregate> {
-        let mut resource_do = ResourceRepoMapper::aggregate_to_do(data);
+        let resource_do = ResourceRepoMapper::aggregate_to_do(data);
         let id: Thing = resource_do.id.clone();
-
+        
         let belong_category = resource_do.belong_category.clone();
 
         let is_new: bool = id.id.to_raw().is_empty();

@@ -45,9 +45,13 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
             file_path,
         } = command;
 
-        // create new resource
-        let new_resource = ResourceAggregate::new(title, description, belong_category, file_path);
 
+        // create new resource
+        let new_resource = match ResourceAggregate::new(title, description, belong_category, file_path) {
+            Ok(value) => value,
+            _ => return Err(String::from("ResourceError::Create()")),
+        };
+        
         // save
         let result = self.resource_repo
             .save(new_resource)

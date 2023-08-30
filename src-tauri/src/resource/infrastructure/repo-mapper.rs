@@ -3,7 +3,9 @@ use surrealdb::sql::Thing;
 use surrealdb::sql::thing;
 
 use crate::category::domain::CategoryID;
+use crate::resource::domain::ResourceFileAggregate;
 use crate::resource::domain::{ResourceAggregate, ResourceID};
+use crate::resource::repository::ResourceFileDo;
 use crate::tag::domain::TagID;
 use crate::common::domain::ID;
 use crate::common::repository::tablens;
@@ -18,15 +20,23 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             .iter()
             .map(|x|  TagID { id: x.to_string() })
             .collect();
+
+        let file = match resource_do.file {
+            Some(value) => Some(ResourceFileAggregate::from_do(
+                value.uuid, 
+                value.name, 
+                value.path,
+                value.ext, 
+            )),
+            None => None,
+        };
+
         ResourceAggregate {
             id: ResourceID::parse(resource_do.id.to_string()),
             title: resource_do.title,
             description: resource_do.description,
             belong_category: CategoryID::parse(resource_do.belong_category),
-            file_id: resource_do.file_id,
-            file_name: resource_do.file_name,
-            file_path: resource_do.file_path,
-            file_type: resource_do.file_type,
+            file: file,
             auth: resource_do.auth,
             tags: tags,
             created_at: resource_do.created_at.0,
@@ -43,15 +53,23 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             Ok(value) => value,
             _ => Thing::from((tablens::RESOURCE, ""))
         };
+
+        let file = match aggregate.file {
+            Some(value) => Some(ResourceFileDo {
+                uuid: value.uuid,
+                name: value.name,
+                path: value.path,
+                ext: value.ext,
+            }),
+            None => None,
+        };
+
         ResourceDO {
             id: id,
             title: aggregate.title,
             description: aggregate.description,
             belong_category: aggregate.belong_category.to_string(),
-            file_id: aggregate.file_id,
-            file_name: aggregate.file_name,
-            file_path: aggregate.file_path,
-            file_type: aggregate.file_type,
+            file: file,
             auth: aggregate.auth,
             tags: tags,
             created_at: Datetime(aggregate.created_at),
