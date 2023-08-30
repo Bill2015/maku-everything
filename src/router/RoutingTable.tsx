@@ -1,8 +1,8 @@
-import { Navigate, RouteObject, Outlet } from 'react-router-dom';
-import { Box } from '@mantine/core';
+import React from 'react';
+import { RouteObject } from 'react-router-dom';
 
-import { CategoriesPage } from '@pages/category';
-import { ResourcesPage } from '@pages/resource';
+const CategoriesPage = React.lazy(() => import(/* webpackChunkName: "category-page" */ '@pages/category/CategoriesPage'));
+const ResourcePage = React.lazy(() => import(/* webpackChunkName: "resources-page" */ '@pages/resource/ResourcesPage'));
 
 export const ROUTE_OBJECTS: RouteObject[] = [
     {
@@ -11,7 +11,7 @@ export const ROUTE_OBJECTS: RouteObject[] = [
     },
     {
         path:    'category/:categoryName',
-        element: <ResourcesPage />,
+        element: <ResourcePage />,
     },
 ];
 

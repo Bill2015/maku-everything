@@ -7,7 +7,7 @@ import { ResourceCreateDto, ResourceMutation, ResourceQuery } from '@api/resourc
 import { ResourceCard } from './components/ResourceCard';
 import { CreateResourceModal } from './components/ResourceModal';
 
-export function ResourcesPage() {
+export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const { data: resourceData, isFetching: isResourceFetching, refetch: resourceRefetch } = ResourceQuery.useGetAll();
     const [opened, { open, close }] = useDisclosure(false);
@@ -17,7 +17,7 @@ export function ResourcesPage() {
     const resourceItems = resourceData.map((val) => <ResourceCard key={val.id} data={val} onDetailClick={() => {}} />);
 
     const handleCreateConfirm = useCallback(async (data: ResourceCreateDto) => {
-        const result = await createResource.mutateAsync(data);
+        const _ = await createResource.mutateAsync(data);
         close();
         resourceRefetch();
     }, [resourceRefetch, close, createResource]);

@@ -9,7 +9,7 @@ import { useCategoryNavigate } from '@router/navigateHook';
 
 import { CategoryCard, CreateCategoryModal } from './components';
 
-export function CategoriesPage() {
+export default function CategoriesPage() {
     const { data: categories, isLoading: isCategoriesLoading, refetch: categoriesRefetch } = CategoryQuery.useGetAll();
     const { enqueueSnackbar } = useSnackbar();
     const { setActiveCategory } = useActiveCategoryRedux();
