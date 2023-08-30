@@ -1,18 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Provider } from 'react-redux';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { SnackbarProvider } from 'notistack';
-import { Box, MantineProvider, Button, Header, AppShell } from '@mantine/core';
+import { Box, MantineProvider, Header, AppShell } from '@mantine/core';
+import { useRoutes } from 'react-router-dom';
+
 import { invoke } from '@tauri-apps/api/tauri';
 
 import { MainNavbar } from '@components/navbar';
 import { store } from '@store/store';
-import { CategoriesPage } from './pages/category';
+import { ROUTE_OBJECTS } from './router/RoutingTable';
 import './App.css';
 
 const queryClient = new QueryClient();
 
 function App() {
+    const routes = useRoutes(ROUTE_OBJECTS);
     const [theme, setTheme] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -44,20 +47,9 @@ function App() {
                             header={<Header height={60} p="xs">{/* Header content */}</Header>}
                             styles={(theme) => ({ main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] } })}
                         >
-                            <Box>
-                                <Button onClick={() => setTheme(!theme)}>Theme</Button>
-                                { isConnected && <h1>Database Connected！</h1> }
-
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        dbTest();
-                                    }}
-                                >
-                                    DB Test
-                                </button>
-                                <CategoriesPage />
-                            </Box>
+                            <Suspense fallback={<Box>FallBack</Box>}>
+                                {routes}
+                            </Suspense>
                         </AppShell>
                     </MantineProvider>
                 </SnackbarProvider>
