@@ -6,6 +6,7 @@
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
+        "plugin:import/typescript",
         "plugin:react/recommended",
         "airbnb",
         "airbnb/hooks"
@@ -20,9 +21,7 @@
             "@typescript-eslint/parser": [".ts", ".tsx"]
         },
         "import/resolver": {
-            "typescript": {
-                "project": "./tsconfig.json"
-            }
+            "typescript": {}
         }
     },
     "plugins": [
