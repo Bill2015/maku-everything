@@ -24,6 +24,8 @@
 			"@assets/*": ["src/assets/*"],
 			"@api/*": ["src/api/*"],
 			"@store/*": ["src/store/*"],
+			"@pages/*": ["src/pages/*"],
+			"@router/*": ["src/router/*"],
 			"@components/*": ["src/components/*"]
 		}
 	},
