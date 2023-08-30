@@ -9,4 +9,10 @@ export namespace ResourceMutation {
 
         return useMutation({ mutationFn: mutationFn });
     }
+
+    export function useExporeFile() {
+        const mutationFn = (filePath: string) => ResourceAPI.exporeTheFile(filePath);
+
+        return useMutation({ mutationFn: mutationFn });
+    }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { InvokeArgs, invoke } from '@tauri-apps/api/tauri';
 import { ResourceCreateDto, ResourceResDto } from './Dto';
 
@@ -13,5 +14,9 @@ export namespace ResourceAPI {
 
     export function create(data: ResourceCreateDto) {
         return invoke<string>('create_resource', data as unknown as InvokeArgs);
+    }
+
+    export function exporeTheFile(file_path: string) {
+        return invoke('explore_the_file', { file_path: file_path });
     }
 }
