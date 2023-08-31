@@ -18,7 +18,7 @@ impl<'a> CategoryQueryRepository<'a> {
 
     pub async fn get_all(&self) -> surrealdb::Result<Vec<CategoryResDto>> {
         let mut response = self.db
-            .query("SELECT *, array::len(<-resource_belong.in) AS resource_num FROM type::table($table)")
+            .query("SELECT *, array::len(<-belong<-resource) AS resource_num FROM type::table($table)")
             .bind(("table", &tablens::CATEGORY))
             .await?;
 
@@ -31,7 +31,7 @@ impl<'a> CategoryQueryRepository<'a> {
 
     pub async fn get_by_id(&self, id: &String) -> surrealdb::Result<Option<CategoryResDto>> {
         let mut response = self.db
-            .query("SELECT *, array::len(<-resource_belong.in) AS resource_num FROM category WHERE id == $id")
+            .query("SELECT *, array::len(<-belong<-resource) AS resource_num FROM category WHERE id == $id")
             .bind(("id", thing(id.as_str())))
             .await?;
 
