@@ -10,11 +10,14 @@ use surrealdb::engine::remote::ws::Client;
 use crate::common::infrastructure::IRepoMapper;
 use crate::common::repository::env;
 use crate::common::repository::tablens;
+use crate::common::repository::{CommonRepository, COMMON_REPOSITORY};
 use crate::common::repository::relatens;
 use crate::tag::domain::TagAggregate;
 use crate::tag::infrastructure::TagRepoMapper;
 
-pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB);
+use super::domain::TagID;
+
+pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB, &COMMON_REPOSITORY);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TagDO {
@@ -43,11 +46,15 @@ fn default_ref() -> String {
  * Repository */
  pub struct TagRepository<'a> {
     db: &'a Surreal<Client>,
+    common_repo: &'a CommonRepository<'a>,
 }
 
 impl<'a> TagRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
-        TagRepository { db: db }
+    pub const fn init(db: &'a Surreal<Client>, common_repo: &'a CommonRepository<'a>) -> Self {
+        TagRepository {
+            db: db,
+            common_repo: common_repo,
+        }
     }
 
     async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<TagAggregate>> {
@@ -92,32 +99,12 @@ impl<'a> TagRepository<'a> {
         Ok(result)
     }
 
-    async fn create_belong_category_relation(&self, self_id: &String, category_id: &String) -> surrealdb::Result<()> {
-        let sql: String = format!("RELATE $tag->{}->$category", relatens::TAG_BELONG);
-        let _ = self.db
-            .query(sql)
-            .bind(("tag", thing(self_id).unwrap()))
-            .bind(("category", thing(category_id).unwrap()))
-            .await?;
-        Ok(())
-    }
-
-    async fn create_belong_subject_relation(&self, self_id: &String, subject_id: &String) -> surrealdb::Result<()> {
-        let sql: String = format!("RELATE $tag->{}->$subject", relatens::TAG_BELONG_SUBJECT);
-        let _ = self.db
-            .query(sql)
-            .bind(("tag", thing(self_id).unwrap()))
-            .bind(("subject", thing(subject_id).unwrap()))
-            .await?;
-        Ok(())
-    }
-
     pub async fn save(&self, data: TagAggregate) -> surrealdb::Result<TagAggregate> {
+        let belong_category = data.belong_category.clone();
+        let belong_subject = data.belong_subject.clone();
+
         let tag_do = TagRepoMapper::aggregate_to_do(data);
         let id: Thing = tag_do.id.clone();
-
-        let belong_category = tag_do.belong_category.clone();
-        let belong_subject = tag_do.belong_subject.clone();
 
         let is_new: bool = id.id.to_raw().is_empty();
 
@@ -139,12 +126,16 @@ impl<'a> TagRepository<'a> {
             }
         };
 
-        let new_id = (&result).as_ref().unwrap().id.to_string();
+        let new_id = &result.unwrap().id.to_string();
         // create relation
         if is_new == true {
-            self.create_belong_category_relation(&new_id, &belong_category)
+            let tag_id = TagID::from(new_id);
+            self.common_repo
+                .tag_belong_category(&tag_id, &belong_category)
                 .await?;
-            self.create_belong_subject_relation(&new_id, &belong_subject)
+    
+            self.common_repo
+                .tag_belong_subject(&tag_id, &belong_subject)
                 .await?;
         }
 

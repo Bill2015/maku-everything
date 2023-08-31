@@ -8,11 +8,13 @@ use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
 use crate::common::infrastructure::IRepoMapper;
-use crate::common::repository::{env, relatens, tablens};
+use crate::common::repository::{env, tablens, CommonRepository, COMMON_REPOSITORY};
 use crate::subject::domain::SubjectAggregate;
 use crate::subject::infrastructure::SubjectRepoMapper;
 
-pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&env::DB);
+use super::domain::SubjectID;
+
+pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&env::DB, &COMMON_REPOSITORY);
 
 /**
  * Subject Data Object */
@@ -38,11 +40,15 @@ fn default_ref() -> String {
  * Repository */
 pub struct SubjectRepository<'a> {
     db: &'a Surreal<Client>,
+    common_repo: &'a CommonRepository<'a>,
 }
 
 impl<'a> SubjectRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
-        SubjectRepository { db: db }
+    pub const fn init(db: &'a Surreal<Client>, common_repo: &'a CommonRepository) -> Self {
+        SubjectRepository {
+            db: db,
+            common_repo: common_repo,
+        }
     }
 
     async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<SubjectAggregate>> {
@@ -81,16 +87,6 @@ impl<'a> SubjectRepository<'a> {
         }
     }
 
-    async fn create_belong_category_relation(&self, self_id: &String, category_id: &String) -> surrealdb::Result<()> {
-        let sql: String = format!("RELATE $subject->{}->$category", relatens::SUBJECT_BELONG);
-        let _ = self.db
-            .query(sql)
-            .bind(("subject", thing(self_id).unwrap()))
-            .bind(("category", thing(category_id).unwrap()))
-            .await?;
-        Ok(())
-    }
-
     pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<SubjectAggregate>> {
         let result = self.return_aggregate_by_id(id)
             .await?;
@@ -99,10 +95,11 @@ impl<'a> SubjectRepository<'a> {
     }
 
     pub async fn save(&self, data: SubjectAggregate) -> surrealdb::Result<SubjectAggregate> {
+        let belong_category = data.belong_category.clone();
+
         let subject_do = SubjectRepoMapper::aggregate_to_do(data);
         let id: Thing = subject_do.id.clone();
 
-        let belong_category = subject_do.belong_category.clone();
 
         let is_new: bool = id.id.to_raw().is_empty();
 
@@ -124,10 +121,12 @@ impl<'a> SubjectRepository<'a> {
             }
         };
 
-        let new_id = (&result).as_ref().unwrap().id.to_string();
+        let new_id = &result.unwrap().id.to_string();
         // create relation
         if is_new == true {
-            self.create_belong_category_relation(&new_id, &belong_category)
+            let subject_id = SubjectID::from(new_id);
+            self.common_repo
+                .subject_belong_category(&subject_id, &belong_category)
                 .await?;
         }
 

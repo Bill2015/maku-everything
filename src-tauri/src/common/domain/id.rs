@@ -29,5 +29,17 @@ macro_rules! impl_domain_id {
                 self.id == other.id
             }
         }
+
+        impl From<String> for $id_type {
+            fn from(s: String) -> Self {
+                Self { id: s.to_string() }
+            }
+        }
+
+        impl From<&String> for $id_type {
+            fn from(s: &String) -> Self {
+                Self { id: s.to_string() }
+            }
+        }
     };
 }

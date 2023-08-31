@@ -9,13 +9,15 @@ use surrealdb::sql::{Datetime, Thing, Value, thing};
 use surrealdb::engine::remote::ws::Client;
 
 use crate::common::infrastructure::IRepoMapper;
-use crate::common::repository::env;
+use crate::common::repository::{env, CommonRepository, COMMON_REPOSITORY};
 use crate::common::repository::relatens;
 use crate::common::repository::tablens;
 use crate::resource::domain::ResourceAggregate;
 use crate::resource::infrastructure::ResourceRepoMapper;
 
-pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(&env::DB);
+use super::domain::ResourceID;
+
+pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(&env::DB, &COMMON_REPOSITORY);
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResourceFileDo {
@@ -58,11 +60,15 @@ fn default_vec() -> Vec<String> {
  * Repository */
 pub struct ResourceRepository<'a> {
     db: &'a Surreal<Client>,
+    common_repo: &'a CommonRepository<'a>,
 }
 
 impl<'a> ResourceRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
-        ResourceRepository { db: db }
+    pub const fn init(db: &'a Surreal<Client>, common_repo: &'a CommonRepository) -> Self {
+        ResourceRepository {
+            db: db,
+            common_repo: common_repo,
+        }
     }
 
     async fn return_aggregate_by_id(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {
@@ -89,16 +95,6 @@ impl<'a> ResourceRepository<'a> {
         Ok(aggregate)
     }
 
-    async fn create_belong_category_relation(&self, self_id: &String, category_id: &String) -> surrealdb::Result<()> {
-        let sql: String = format!("RELATE $resource->{}->$category", relatens::RESOURCE_BELONG);
-        let _ = self.db
-            .query(sql)
-            .bind(("resource", thing(self_id).unwrap()))
-            .bind(("category", thing(category_id).unwrap()))
-            .await?;
-        Ok(())
-    }
-
     pub async fn is_exist(&self, id: String) -> bool {
         let thing_id = thing(id.as_str()).unwrap();
         let result: Option<ResourceDO> = self.db
@@ -120,10 +116,10 @@ impl<'a> ResourceRepository<'a> {
     }
 
     pub async fn save(&self, data: ResourceAggregate) -> surrealdb::Result<ResourceAggregate> {
+        let belong_category = data.belong_category.clone(); 
         let resource_do = ResourceRepoMapper::aggregate_to_do(data);
         let id: Thing = resource_do.id.clone();
         
-        let belong_category = resource_do.belong_category.clone();
 
         let is_new: bool = id.id.to_raw().is_empty();
 
@@ -145,14 +141,16 @@ impl<'a> ResourceRepository<'a> {
             }
         };
 
-        let new_id = (&result).as_ref().unwrap().id.to_string();
+        let new_id = &result.unwrap().id.to_string();
         // create relation
         if is_new == true {
-            self.create_belong_category_relation(&new_id, &belong_category)
+            let resource_id = ResourceID::from(new_id);
+            self.common_repo
+                .resource_belong_category(&resource_id, &belong_category)
                 .await?;
         }
 
-        let final_result = self.return_aggregate_by_id(new_id)
+        let final_result = self.return_aggregate_by_id(new_id.to_string())
             .await?;
 
         Ok(final_result.unwrap())
