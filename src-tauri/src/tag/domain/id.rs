@@ -8,10 +8,4 @@ pub struct TagID {
     pub id: String,
 }
 
-impl TagID {
-    fn new(s: String) -> Self {
-        TagID { id: s }
-    }
-}
-
 impl_domain_id!(TagID);

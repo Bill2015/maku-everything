@@ -16,34 +16,12 @@ pub mod tablens {
 }
 
 pub mod relatens {
-    /// Resource is belong Category \
-    /// Relation Namespace
-    /// 
-    /// ## Relation
-    /// resource -> RESOURCE_BELONG -> category
-    pub const RESOURCE_BELONG: &str = "resource_belong";
-
-    /// Subject is belong Category
+    /// entity is belong another entity
     /// Relation Namespace
     ///    
     /// ## Relation
-    /// subject -> SUBJECT_BELONG -> category
-    pub const SUBJECT_BELONG: &str = "subject_belong";
-
-    
-    /// Tag is belong Subject
-    /// Relation Namespace
-    ///    
-    /// ## Relation
-    /// tag -> TAG_BELONG_SUBJECT -> subject
-    pub const TAG_BELONG_SUBJECT: &str = "tag_belong_subject";
-
-    /// Tag is belong Category
-    /// Relation Namespace
-    ///    
-    /// ## Relation
-    /// tag -> TAG_BELONG -> category
-    pub const TAG_BELONG: &str = "tag_belong";
+    /// entity -> BELONG -> entity
+    pub const BELONG: &str = "belong";
 
     /// Resource is belong Category
     /// Relation Namespace

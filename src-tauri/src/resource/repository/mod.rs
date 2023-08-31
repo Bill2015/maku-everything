@@ -3,9 +3,8 @@ mod query;
 pub use query::{RESOURCE_QUERY_REPOSITORY,ResourceQueryRepository};
 
 use serde::{Deserialize, Serialize};
-use serde_json::error::Category;
-use surrealdb::{Surreal, sql};
-use surrealdb::sql::{Datetime, Thing, Value, thing};
+use surrealdb::Surreal;
+use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
 use crate::common::infrastructure::IRepoMapper;

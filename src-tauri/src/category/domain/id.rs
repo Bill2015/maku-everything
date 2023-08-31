@@ -7,11 +7,4 @@ pub struct CategoryID {
     id: String,
 }
 
-impl CategoryID {
-    fn new(s: String) -> Self {
-        CategoryID { id: s }
-    }
-}
-
-
 impl_domain_id!(CategoryID);
