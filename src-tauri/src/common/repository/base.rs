@@ -30,6 +30,21 @@ pub mod relatens {
     /// subject -> SUBJECT_BELONG -> category
     pub const SUBJECT_BELONG: &str = "subject_belong";
 
+    
+    /// Tag is belong Subject
+    /// Relation Namespace
+    ///    
+    /// ## Relation
+    /// tag -> TAG_BELONG_SUBJECT -> subject
+    pub const TAG_BELONG_SUBJECT: &str = "tag_belong_subject";
+
+    /// Tag is belong Category
+    /// Relation Namespace
+    ///    
+    /// ## Relation
+    /// tag -> TAG_BELONG -> category
+    pub const TAG_BELONG: &str = "tag_belong";
+
     /// Resource is belong Category
     /// Relation Namespace
     /// 

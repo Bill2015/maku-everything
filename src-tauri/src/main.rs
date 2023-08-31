@@ -134,6 +134,10 @@ fn main() {
             resource::application::get_all_resource,
             resource::application::get_resource_by_id,
             resource::application::explore_the_file,
+            tag::application::create_tag,
+            tag::application::update_tag,
+            tag::application::get_all_tag,
+            tag::application::get_tag_by_id,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
