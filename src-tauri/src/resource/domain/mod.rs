@@ -72,6 +72,8 @@ pub struct ResourceAggregate {
     pub file: Option<ResourceFileAggregate>,
     pub auth: bool,
     pub tags: Vec<TagID>,
+    pub new_tags: Vec<TagID>,
+    pub del_tags: Vec<TagID>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -87,6 +89,8 @@ impl ResourceAggregate {
             file: ResourceFileAggregate::new(file_path)?,
             auth: false,
             tags: Vec::new(),
+            new_tags: Vec::new(),
+            del_tags: Vec::new(),
             created_at: Utc::now(),
             updated_at: Utc::now(),
         })
@@ -117,22 +121,22 @@ impl ResourceAggregate {
         self.auth = flag;
     }
 
-    pub fn add_tag(&mut self, tag_id: TagID) {
+    pub fn add_tag(&mut self, tag_id: TagID) -> Result<(), String> {
         if self.tags.contains(&tag_id) {
-            println!("Cannot Add same tags");
+            return Err(String::from("Cannot Add same tags"));
         }
-        else {
-            self.tags.push(tag_id);
-        }
+
+        self.new_tags.push(tag_id);
+
+        Ok(())
     }
 
-    pub fn remove_tag(&mut self, tag_id: TagID) {
+    pub fn del_tag(&mut self, tag_id: TagID) -> Result<(), String> {
         if let Some(index) = self.tags.iter().position(|x| x == &tag_id) {
             self.tags.remove(index);
+            return Ok(());
         }
-        else {
-            println!("Cannot remove not existed tags");
-        }
+        Err(String::from("Cannot remove not existed tags"))
     }
 
 }

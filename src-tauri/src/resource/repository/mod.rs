@@ -2,6 +2,10 @@
 mod query;
 pub use query::{RESOURCE_QUERY_REPOSITORY,ResourceQueryRepository};
 
+#[path ="./relation-repository.rs"]
+mod relation;
+pub use relation::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationRepository};
+
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
@@ -16,7 +20,11 @@ use crate::resource::infrastructure::ResourceRepoMapper;
 
 use super::domain::ResourceID;
 
-pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(&env::DB, &COMMON_REPOSITORY);
+pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(
+    &env::DB,
+    &COMMON_REPOSITORY, 
+    &RESOURCE_TAG_RELATION_REPOSITORY
+);
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResourceFileDo {
@@ -60,13 +68,19 @@ fn default_vec() -> Vec<String> {
 pub struct ResourceRepository<'a> {
     db: &'a Surreal<Client>,
     common_repo: &'a CommonRepository<'a>,
+    tag_relation_repo: &'a ResourceTagRelationRepository<'a> 
 }
 
 impl<'a> ResourceRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>, common_repo: &'a CommonRepository) -> Self {
+    pub const fn init(
+        db: &'a Surreal<Client>,
+        common_repo: &'a CommonRepository,
+        tag_relation_repo: &'a ResourceTagRelationRepository
+    ) -> Self {
         ResourceRepository {
             db: db,
             common_repo: common_repo,
+            tag_relation_repo: tag_relation_repo,
         }
     }
 
@@ -116,10 +130,12 @@ impl<'a> ResourceRepository<'a> {
 
     pub async fn save(&self, data: ResourceAggregate) -> surrealdb::Result<ResourceAggregate> {
         let belong_category = data.belong_category.clone(); 
+        let new_tags = data.new_tags.clone();
+        let del_tags = data.del_tags.clone();
+
         let resource_do = ResourceRepoMapper::aggregate_to_do(data);
         let id: Thing = resource_do.id.clone();
         
-
         let is_new: bool = id.id.to_raw().is_empty();
 
         // save data
@@ -141,9 +157,16 @@ impl<'a> ResourceRepository<'a> {
         };
 
         let new_id = &result.unwrap().id.to_string();
+
+        // tag adding
+        let resource_id = ResourceID::from(new_id);
+        self.tag_relation_repo
+            .save(&resource_id, new_tags, del_tags)
+            .await?;
+
+
         // create relation
         if is_new == true {
-            let resource_id = ResourceID::from(new_id);
             self.common_repo
                 .resource_belong_category(&resource_id, &belong_category)
                 .await?;

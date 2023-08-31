@@ -1,37 +1,56 @@
 use std::path::Path;
 use std::process::Command;
-use crate::category::application::command::UpdateCategoryCommand;
-use crate::category::repository::CategoryRepository;
 use crate::common::application::{ICommandHandler, IQueryHandler};
-use crate::resource::domain::ResourceAggregate;
+use crate::category::repository::CategoryRepository;
 use crate::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, ResourceQueryRepository, RESOURCE_QUERY_REPOSITORY};
 use crate::category::repository::CATEGORY_REPOSITORY;
+use crate::tag::repository::{TagRepository, TAG_REPOSITORY};
 
-use super::command::{CreateResourceCommand, CreateResourceHandler, UpdateResourceHandler, UpdateResourceCommand};
-use super::dto::ResourceResDto;
-use super::query::{GetByIdResourceQuery, GetByIdResourceHandler, GetAllResourceQuery, GetAllResourceHandler};
+use super::command::{
+    CreateResourceCommand,
+    CreateResourceHandler,
+    UpdateResourceHandler,
+    UpdateResourceCommand,
+    ResourceAddTagCommand,
+    ResourceAddTagHandler,
+    ResourceRemoveTagCommand,
+    ResourceRemoveTagHandler
+};
+use super::dto::{ResourceResDto, ResourceDetailDto};
+use super::query::{
+    GetByIdResourceQuery, 
+    GetByIdResourceHandler, 
+    GetAllResourceQuery, 
+    GetAllResourceHandler, 
+    ResourceDetailQuery, 
+    ResourceDetailHandler
+};
 
 pub static RESOURCE_SERVICE: ResourceService = ResourceService::init(
     &RESOURCE_REPOSITORY, 
     &RESOURCE_QUERY_REPOSITORY, 
-    &CATEGORY_REPOSITORY
+    &CATEGORY_REPOSITORY,
+    &TAG_REPOSITORY,
 );
 
 pub struct ResourceService<'a> {
     resource_repository: &'a ResourceRepository<'a>,
     resource_query_repo: &'a ResourceQueryRepository<'a>,
     category_repository: &'a CategoryRepository<'a>,
+    tag_respository: &'a TagRepository<'a>,
 }
 impl<'a> ResourceService<'a> {
     pub const fn init(
         resource_repository: &'a ResourceRepository<'_>,
-        resource_query_repo: &'a ResourceQueryRepository<'a>,
+        resource_query_repo: &'a ResourceQueryRepository<'_>,
         category_repository: &'a CategoryRepository<'_>,
+        tag_respository: &'a TagRepository<'_>,
     ) -> Self {
         ResourceService { 
             resource_repository: resource_repository,
             resource_query_repo: resource_query_repo,
             category_repository: category_repository,
+            tag_respository: tag_respository,
         }
     }
 
@@ -75,9 +94,55 @@ impl<'a> ResourceService<'a> {
         Ok(String::from("Ok"))
     }
 
-    pub async fn add_tag(resource_id: String, tag_id: String) {
-        // do add tags
+    pub async fn add_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, String> {
+        // Category
+        let tag = self.tag_respository
+            .find_by_id(&tag_id)
+            .await
+            .unwrap_or(None);
+
+        if tag.is_none() {
+            println!("Tag Not Exist");
+            return Err(String::from("Tag Not Exist"));
+        }
+        
+        let command = ResourceAddTagCommand {
+            id: resource_id,
+            tag_id: tag.unwrap().id,
+        };
+
+        let handler = ResourceAddTagHandler::register(self.resource_repository);
+        
+        let _  = handler.execute(command).await?;
+
+        Ok(String::from("Ok"))
     }
+
+    pub async fn remove_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, String> {
+        // Category
+        let tag = self.tag_respository
+            .find_by_id(&tag_id)
+            .await
+            .unwrap_or(None);
+
+        if tag.is_none() {
+            println!("Tag Not Exist");
+            return Err(String::from("Tag Not Exist"));
+        }
+        
+        let command = ResourceRemoveTagCommand {
+            id: resource_id,
+            tag_id: tag.unwrap().id,
+        };
+
+        let handler = ResourceRemoveTagHandler::register(self.resource_repository);
+        
+        let _  = handler.execute(command).await?;
+
+        Ok(String::from("Ok"))
+    }
+
+
 
     pub async fn get_resource_by_id(&self, resource_id: String) -> Result<Option<ResourceResDto>, String> {
         let query = GetByIdResourceQuery { id: resource_id };
@@ -93,6 +158,16 @@ impl<'a> ResourceService<'a> {
         let query = GetAllResourceQuery {};
 
         let handler = GetAllResourceHandler::register(self.resource_query_repo);
+
+        let res = handler.query(query).await?;
+
+        Ok(res)
+    }
+
+    pub async fn resource_detail(&self, resource_id: String) -> Result<Option<ResourceDetailDto>, String> {
+        let query = ResourceDetailQuery { id: resource_id };
+
+        let handler = ResourceDetailHandler::register(self.resource_query_repo);
 
         let res = handler.query(query).await?;
 

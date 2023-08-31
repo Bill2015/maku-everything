@@ -1,4 +1,4 @@
-use super::{service::RESOURCE_SERVICE, dto::ResourceResDto};
+use super::{service::RESOURCE_SERVICE, dto::{ResourceResDto, ResourceDetailDto}};
 
 #[tauri::command(rename_all = "snake_case")]
 pub async fn create_resource(title: &str, description: &str, file_path: &str, belong_category: &str) -> Result<String, String> {
@@ -18,6 +18,26 @@ pub async fn update_resource(id: String, title: Option<String>, description: Opt
     Ok(result)
 }
 
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn add_resource_tag(id: String, tag_id: String) -> Result<String, String> {
+    let result = RESOURCE_SERVICE
+        .add_resource_tag(id, tag_id)
+        .await?;
+
+    Ok(result)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn remove_resource_tag(id: String, tag_id: String) -> Result<String, String> {
+    let result = RESOURCE_SERVICE
+        .remove_resource_tag(id, tag_id)
+        .await?;
+
+    Ok(result)
+}
+
+
 #[tauri::command]
 pub async fn get_all_resource() -> Result<Vec<ResourceResDto>, String> {
     let result = RESOURCE_SERVICE
@@ -31,6 +51,15 @@ pub async fn get_all_resource() -> Result<Vec<ResourceResDto>, String> {
 pub async fn get_resource_by_id(id: String) -> Result<Option<ResourceResDto>, String> {
     let result = RESOURCE_SERVICE
         .get_resource_by_id(id)
+        .await?;
+
+    Ok(result)
+}
+
+#[tauri::command]
+pub async fn get_resource_detail(id: String) -> Result<Option<ResourceDetailDto>, String> {
+    let result = RESOURCE_SERVICE
+        .resource_detail(id)
         .await?;
 
     Ok(result)

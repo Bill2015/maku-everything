@@ -39,6 +39,8 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             file: file,
             auth: resource_do.auth,
             tags: tags,
+            new_tags: Vec::new(),
+            del_tags: Vec::new(),
             created_at: resource_do.created_at.0,
             updated_at: resource_do.updated_at.0,
         }
