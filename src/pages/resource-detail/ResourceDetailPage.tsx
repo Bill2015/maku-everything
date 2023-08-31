@@ -7,14 +7,15 @@ import { Box, Grid, Image, Title, Text, Button, Flex } from '@mantine/core';
 import { useActiveCategoryRedux } from '@store/global';
 import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
-import { useCreateSubjectModel } from '@store/modal';
+import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
 
 export default function ResourcesDetailPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const { resourceId } = useParams<ResourceDetailParam>();
     const exporeFile = ResourceMutation.useExporeFile();
     const { data: resourceData } = ResourceQuery.useGetById(resourceId as string);
-    const { open } = useCreateSubjectModel();
+    const { open: openSubject } = useCreateSubjectModel();
+    const { open: openTag } = useCreateTagModel();
 
     const handleExporeClick = useCallback(() => {
         if (resourceData) {
@@ -45,8 +46,14 @@ export default function ResourcesDetailPage() {
                     </Grid.Col>
 
                     <Grid.Col lg={12}>
-                        <Button onClick={() => open()} variant="subtle" compact p={0} fz="1.45em">
-                            Open
+                        <Button onClick={() => openSubject()} variant="subtle" compact p={0} fz="1.45em">
+                            Open Subject
+                        </Button>
+                    </Grid.Col>
+
+                    <Grid.Col lg={12}>
+                        <Button onClick={() => openTag()} variant="subtle" compact p={0} fz="1.45em">
+                            Open Tag
                         </Button>
                     </Grid.Col>
                 </Grid>
