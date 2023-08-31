@@ -23,7 +23,7 @@ pub struct TagAggregate {
 impl TagAggregate {
     pub fn new(name: String, description: String, belong_category: CategoryID, belong_subject: SubjectID) -> Self {
         TagAggregate {
-            id: TagID::parse(String::from("")),
+            id: TagID::new(),
             name: name,
             belong_category: belong_category,
             belong_subject: belong_subject,

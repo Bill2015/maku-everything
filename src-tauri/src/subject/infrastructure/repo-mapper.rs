@@ -13,10 +13,10 @@ pub struct SubjectRepoMapper {}
 impl IRepoMapper<SubjectAggregate, SubjectDO> for SubjectRepoMapper {
     fn do_to_aggregate(subject_do: SubjectDO) -> SubjectAggregate {
         SubjectAggregate {
-            id: SubjectID::parse(subject_do.id.to_string()),
+            id: SubjectID::from(subject_do.id.to_string()),
             name: subject_do.name,
             description: subject_do.description,
-            belong_category: CategoryID::parse(subject_do.belong_category.to_string()),
+            belong_category: CategoryID::from(subject_do.belong_category.to_string()),
             auth: subject_do.auth,
             created_at: subject_do.created_at.0,
             updated_at: subject_do.updated_at.0,

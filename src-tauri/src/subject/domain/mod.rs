@@ -20,7 +20,7 @@ pub struct SubjectAggregate {
 impl SubjectAggregate {
     pub fn new(name: String, description: String, belong_category: CategoryID) -> Self {
         SubjectAggregate {
-            id: SubjectID::parse(String::from("")),
+            id: SubjectID::new(),
             name: name,
             description: description,
             belong_category: belong_category,

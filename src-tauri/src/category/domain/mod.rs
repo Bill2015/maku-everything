@@ -18,7 +18,7 @@ pub struct CategoryAggregate {
 impl CategoryAggregate {
     pub fn new(title: String, description: String) -> Self {
         CategoryAggregate {
-            id: CategoryID::parse(String::from("")),
+            id: CategoryID::new(),
             title: title,
             description: description,
             auth: false,

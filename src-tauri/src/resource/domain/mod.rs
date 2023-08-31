@@ -80,7 +80,7 @@ impl ResourceAggregate {
 
     pub fn new(title: String, description: String, belong_category: CategoryID, file_path: String) -> Result<Self, String> {
         Ok(ResourceAggregate {
-            id: ResourceID::parse(String::from("")),
+            id: ResourceID::new(),
             title: title,
             description: description,
             belong_category: belong_category,

@@ -32,10 +32,10 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
         };
 
         ResourceAggregate {
-            id: ResourceID::parse(resource_do.id.to_string()),
+            id: ResourceID::from(resource_do.id.to_string()),
             title: resource_do.title,
             description: resource_do.description,
-            belong_category: CategoryID::parse(resource_do.belong_category),
+            belong_category: CategoryID::from(resource_do.belong_category),
             file: file,
             auth: resource_do.auth,
             tags: tags,

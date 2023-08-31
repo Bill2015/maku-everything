@@ -14,11 +14,11 @@ pub struct TagRepoMapper {}
 impl IRepoMapper<TagAggregate, TagDO> for TagRepoMapper {
     fn do_to_aggregate(tag_do: TagDO) -> TagAggregate {
         TagAggregate {
-            id: TagID::parse(tag_do.id.to_string()),
+            id: TagID::from(tag_do.id.to_string()),
             name: tag_do.name,
             description: tag_do.description,
-            belong_category: CategoryID::parse(tag_do.belong_category),
-            belong_subject: SubjectID::parse(tag_do.belong_subject),
+            belong_category: CategoryID::from(tag_do.belong_category),
+            belong_subject: SubjectID::from(tag_do.belong_subject),
             auth: tag_do.auth,
             created_at: tag_do.created_at.0,
             updated_at: tag_do.updated_at.0,
