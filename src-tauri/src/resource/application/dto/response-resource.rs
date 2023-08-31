@@ -26,3 +26,37 @@ pub struct ResourceResDto {
 
     pub updated_at: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ResourceTagDto {
+    pub id: Thing,
+
+    pub name: String,
+
+    pub description: String,
+
+    pub belong_subject: Thing,
+
+    pub subject_name: String,
+
+    pub created_at: String,
+
+    pub updated_at: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ResourceDetailDto {
+    pub id: Thing,
+
+    pub title: String,
+
+    pub description: String,
+
+    pub file: ResourceFileDto,
+
+    pub created_at: String,
+
+    pub updated_at: String,
+
+    pub tags: Vec<ResourceTagDto>,
+}

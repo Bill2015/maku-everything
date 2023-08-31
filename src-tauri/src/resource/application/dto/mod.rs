@@ -1,3 +1,3 @@
 #[path ="./response-resource.rs"]
 mod response;
-pub use response::ResourceResDto;
+pub use response::*;

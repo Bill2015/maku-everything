@@ -5,6 +5,7 @@ use surrealdb::sql::{Thing, thing};
 
 use crate::common::repository::{env, tablens};
 use crate::resource::application::dto::ResourceResDto;
+use crate::resource::application::dto::ResourceDetailDto;
 
 pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQueryRepository::init(&env::DB);
 
@@ -42,6 +43,34 @@ impl<'a> ResourceQueryRepository<'a> {
         let result: Option<ResourceResDto> = response
             .take(0)
             .unwrap_or(None);
+
+        Ok(result) 
+    }
+
+    // TODO: need more data to measure response time
+    pub async fn detail(&self, id: &String)  -> surrealdb::Result<Option<ResourceDetailDto>> {
+        let sql = r#"
+            SELECT 
+            *,
+            (SELECT 
+                *,
+                (->belong->subject.id)[0] AS belong_subject,
+                (->belong->subject.name)[0] AS subject_name
+                FROM tag 
+                WHERE ->tagging->resource.id CONTAINS $parent.id
+            ) AS tags
+            FROM resource
+            WHERE id == $id"#;
+        
+        let mut response = self.db
+            .query(sql)
+            // .bind(("table", &tablens::RESOURCE))
+            .bind(("id", thing(id.as_str()).unwrap()))
+            .await?;
+
+        let result: Option<ResourceDetailDto> = response
+            .take(0)
+            .unwrap();
 
         Ok(result) 
     }
