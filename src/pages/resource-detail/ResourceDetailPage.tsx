@@ -56,7 +56,6 @@ export default function ResourcesDetailPage() {
                         <ResourceTagStack>
                             {resourceTagData.map(({ subjectId, subjectName, tags }) => (
                                 <ResourceTagStack.Group
-                                    resourceId={resourceData.id}
                                     key={subjectId}
                                     subjectId={subjectId}
                                     subjectName={subjectName}
@@ -87,9 +86,7 @@ export default function ResourcesDetailPage() {
                     </Grid.Col>
 
                     <Grid.Col lg={12}>
-                        {
-                            taglist.map((val) => <Badge>{val.name}</Badge>)
-                        }
+                        {taglist.map((val) => <Badge key={val.id}>{val.name}</Badge>)}
                     </Grid.Col>
                 </Grid>
             </Grid.Col>
