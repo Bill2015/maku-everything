@@ -132,11 +132,15 @@ impl ResourceAggregate {
     }
 
     pub fn del_tag(&mut self, tag_id: TagID) -> Result<(), String> {
-        if let Some(index) = self.tags.iter().position(|x| x == &tag_id) {
-            self.tags.remove(index);
-            return Ok(());
+        dbg!(&tag_id);
+        dbg!(&self.tags);
+        if self.tags.contains(&tag_id) == false {
+            return Err(String::from("Cannot remove not existed tags"));
         }
-        Err(String::from("Cannot remove not existed tags"))
+    
+        self.del_tags.push(tag_id);
+        
+        Ok(())
     }
 
 }

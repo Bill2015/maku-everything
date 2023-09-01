@@ -47,9 +47,9 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
     }
     
     fn aggregate_to_do(aggregate: ResourceAggregate) -> ResourceDO {
-        let tags: Vec<String> = aggregate.tags
+        let tags: Vec<Thing> = aggregate.tags
             .iter()
-            .map(|x| x.id.clone())
+            .map(|x| thing(x.to_str()).unwrap())
             .collect();
         let id = match thing(aggregate.id.to_str()) {
             Ok(value) => value,

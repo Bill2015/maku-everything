@@ -53,14 +53,14 @@ pub struct ResourceDO {
 
     #[serde(skip_serializing)]
     #[serde(default = "default_vec")]
-    pub tags: Vec<String>,
+    pub tags: Vec<Thing>,
 }
 
 fn default_resource() -> String {
     "/".to_string()
 }
 
-fn default_vec() -> Vec<String> {
+fn default_vec() -> Vec<Thing> {
     Vec::new()
 }
 /**
@@ -85,7 +85,13 @@ impl<'a> ResourceRepository<'a> {
     }
 
     async fn return_aggregate_by_id(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {
-        let sql = "SELECT *, type::string((->resource_belong.out)[0]) AS belong_category FROM type::table($table) WHERE id == $id";
+        let sql = r#"
+            SELECT 
+                *, 
+                type::string((->resource_belong.out)[0]) AS belong_category,
+                <-tagging.in as tags
+            FROM type::table($table) 
+            WHERE id == $id"#;
 
         let mut response = self.db
             .query(sql)
