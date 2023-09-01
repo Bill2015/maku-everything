@@ -141,6 +141,7 @@ fn main() {
             tag::application::update_tag,
             tag::application::get_all_tag,
             tag::application::get_tag_by_id,
+            tag::application::list_tags,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

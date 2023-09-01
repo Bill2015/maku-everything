@@ -9,9 +9,15 @@ pub struct TagResDto {
 
     pub description: String,
 
-    pub belong_category: String,
+    pub belong_category: Thing,
 
-    pub belong_subject: String,
+    pub category_name: String,
+
+    pub tag_nums: i64,
+
+    pub belong_subject: Thing,
+
+    pub subject_name: String,
 
     pub auth: bool,
 

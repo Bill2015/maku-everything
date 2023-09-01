@@ -107,4 +107,29 @@ impl<'a> TagService<'a> {
 
         Ok(res)
     }
+
+    pub async fn list_tags(
+        &self, 
+        id: Option<String>,
+        name: Option<String>,
+        belong_category: Option<String>, 
+        belong_subject: Option<String>,
+        tagging_resource: Option<String>,
+        order_by: Option<String>,
+    ) -> Result<Vec<TagResDto>, String> {
+        let query = ListTagQuery { 
+            id,
+            name,
+            belong_category,
+            belong_subject,
+            tagging_resource,
+            order_by
+        };
+        
+        let handler = ListTagHandler::register(self.tag_queryrepo);
+
+        let res = handler.query(query).await?;
+
+        Ok(res)
+    }
 }
