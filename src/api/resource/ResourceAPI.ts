@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { InvokeArgs, invoke } from '@tauri-apps/api/tauri';
-import { ResourceCreateDto, ResourceResDto } from './Dto';
+import { ResourceCreateDto, ResourceDetailDto, ResourceResDto, ResourceTagOperateDto } from './Dto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace ResourceAPI {
@@ -12,11 +12,23 @@ export namespace ResourceAPI {
         return invoke<ResourceResDto>('get_resource_by_id', { id: id });
     }
 
+    export function getDetail(id: string) {
+        return invoke<ResourceDetailDto>('get_resource_detail', { id: id });
+    }
+
     export function create(data: ResourceCreateDto) {
         return invoke<string>('create_resource', data as unknown as InvokeArgs);
     }
 
-    export function exporeTheFile(file_path: string) {
-        return invoke('explore_the_file', { file_path: file_path });
+    export function exporeTheFile(filePath: string) {
+        return invoke('explore_the_file', { file_path: filePath });
+    }
+
+    export function addTag(data: ResourceTagOperateDto) {
+        return invoke('add_resource_tag', data as unknown as InvokeArgs);
+    }
+
+    export function removeTag(data: ResourceTagOperateDto) {
+        return invoke('add_resource_tag', data as unknown as InvokeArgs);
     }
 }

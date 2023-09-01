@@ -4,16 +4,16 @@ import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { FcOpenedFolder } from 'react-icons/fc';
 import { Box, Grid, Image, Title, Text, Button, Flex } from '@mantine/core';
 
-import { useActiveCategoryRedux } from '@store/global';
 import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
+import { ResourceTagStack } from './components';
 
 export default function ResourcesDetailPage() {
-    const { activeCategory } = useActiveCategoryRedux();
     const { resourceId } = useParams<ResourceDetailParam>();
     const exporeFile = ResourceMutation.useExporeFile();
-    const { data: resourceData } = ResourceQuery.useGetById(resourceId as string);
+    const addTag = ResourceMutation.useAddTag();
+    const { data: resourceData, tagMapData: resourceTagData } = ResourceQuery.useGetDetail(resourceId as string);
     const { open: openSubject } = useCreateSubjectModel();
     const { open: openTag } = useCreateTagModel();
 
@@ -46,6 +46,19 @@ export default function ResourcesDetailPage() {
                     </Grid.Col>
 
                     <Grid.Col lg={12}>
+                        <ResourceTagStack>
+                            {resourceTagData.map(({ subjectId, subjectName, tags }) => (
+                                <ResourceTagStack.Group
+                                    key={subjectId}
+                                    subjectId={subjectId}
+                                    subjectName={subjectName}
+                                    tagData={tags}
+                                />
+                            ))}
+                        </ResourceTagStack>
+                    </Grid.Col>
+
+                    <Grid.Col lg={12}>
                         <Button onClick={() => openSubject()} variant="subtle" compact p={0} fz="1.45em">
                             Open Subject
                         </Button>
@@ -55,6 +68,9 @@ export default function ResourcesDetailPage() {
                         <Button onClick={() => openTag()} variant="subtle" compact p={0} fz="1.45em">
                             Open Tag
                         </Button>
+                    </Grid.Col>
+                    <Grid.Col>
+                        <Button onClick={() => addTag.mutateAsync({ id: resourceData.id, tag_id: 'tag:qb906aknxzwzkkgdttxq' })}>add Tag</Button>
                     </Grid.Col>
                 </Grid>
             </Grid.Col>

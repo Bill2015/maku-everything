@@ -31,3 +31,41 @@ export interface ResourceCreateDto {
 
     file_path: string,
 }
+
+export interface ResourceTagOperateDto {
+    id: string;
+
+    tag_id: string;
+}
+
+export interface ResourceTagDto {
+    id: string,
+
+    name: string,
+
+    description: string,
+
+    belong_subject: string,
+
+    subject_name: string,
+
+    created_at: string,
+
+    updated_at: string,
+}
+
+export interface ResourceDetailDto {
+    id: string,
+
+    title: string,
+
+    description: string,
+
+    file: ResourceFileDto,
+
+    created_at: string,
+
+    updated_at: string,
+
+    tags: ResourceTagDto[],
+}
