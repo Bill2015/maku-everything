@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ResourceAPI } from './ResourceAPI';
 import { ResourceTagDto } from './Dto';
@@ -50,6 +50,10 @@ export namespace ResourceQuery {
                 initialData:     null,
             },
         );
+
+        useEffect(() => {
+            console.log("change");
+        }, [resourceData]);
 
         // Mapping the tag by subjectName
         const resourceTagData: IResourceTagGroup[] = useMemo(() => {

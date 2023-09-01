@@ -29,6 +29,6 @@ export namespace ResourceAPI {
     }
 
     export function removeTag(data: ResourceTagOperateDto) {
-        return invoke('add_resource_tag', data as unknown as InvokeArgs);
+        return invoke('remove_resource_tag', data as unknown as InvokeArgs);
     }
 }

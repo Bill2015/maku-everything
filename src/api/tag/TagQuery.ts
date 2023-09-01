@@ -7,9 +7,26 @@ export namespace TagQuery {
         const queryfn = () => TagAPI.getAll();
 
         return useQuery(
-            ['subjects'],
+            ['tag'],
             queryfn,
             {
+                placeholderData: [],
+                initialData:     [],
+            },
+        );
+    }
+
+    export function useGetSubjectTags(categoryId: string, subjectId: string) {
+        const queryfn = () => TagAPI.query({
+            belong_category: categoryId,
+            belong_subject:  subjectId,
+        });
+
+        return useQuery(
+            ['tag', 'query', categoryId],
+            queryfn,
+            {
+                enabled:         !!categoryId,
                 placeholderData: [],
                 initialData:     [],
             },
