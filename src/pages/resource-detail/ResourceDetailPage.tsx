@@ -2,14 +2,14 @@ import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { FcOpenedFolder } from 'react-icons/fc';
-import { Box, Grid, Image, Title, Text, Button, Flex, Badge } from '@mantine/core';
+import { Box, Grid, Image, Title, Text, Button, Flex } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { ResourceMutation, ResourceQuery } from '@api/resource';
-import { TagQuery } from '@api/tag';
 import { ResourceDetailParam } from '@router/params';
 import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
-import { ResourceTagStack } from './components';
+import { SubjectQuery } from '@api/subject';
+import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
 
 export default function ResourcesDetailPage() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -19,8 +19,13 @@ export default function ResourcesDetailPage() {
     const addResourceTag = ResourceMutation.useAddTag();
     const removeResourceTag = ResourceMutation.useRemoveTag();
 
-    const { data: resourceData, tagMapData: resourceTagData, refetch: resourceRefetch } = ResourceQuery.useGetDetail(resourceId as string);
-    const { data: taglist } = TagQuery.useGetSubjectTags(activeCategory?.id, '');
+    const {
+        data: resourceData,
+        subjects: existedSubject,
+        tagMapData: resourceTagData,
+        refetch: resourceRefetch,
+    } = ResourceQuery.useGetDetail(resourceId as string);
+    const { data: subjects } = SubjectQuery.useGetByCategory(activeCategory?.id);
     const { open: openSubject } = useCreateSubjectModel();
     const { open: openTag } = useCreateTagModel();
 
@@ -86,7 +91,14 @@ export default function ResourcesDetailPage() {
                     </Grid.Col>
 
                     <Grid.Col lg={12}>
-                        {taglist.map((val) => <Badge key={val.id}>{val.name}</Badge>)}
+                        <ResourceAddSubjectSelect
+                            subjects={subjects}
+                            exclude={existedSubject}
+                            onSelectNewTag={async (tag) => {
+                                await addResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
+                                resourceRefetch();
+                            }}
+                        />
                     </Grid.Col>
                 </Grid>
             </Grid.Col>

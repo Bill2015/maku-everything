@@ -1,12 +1,12 @@
 import { PropsWithChildren, useState, useMemo } from 'react';
 import {
-    ActionIcon, Badge, Flex, Group, Select, Stack, Text, createStyles, rem,
+    ActionIcon, Badge, Flex, Group, Stack, Text, createStyles, rem,
 } from '@mantine/core';
 import { RxCross1 } from 'react-icons/rx';
-import { IoIosAddCircleOutline } from 'react-icons/io';
 import { ResourceTagDto } from '@api/resource';
-import { TagQuery } from '@api/tag';
+import { TagQuery, TagResDto } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
+import { ResourceTagSelect } from './ResourceTagSelect';
 
 const useSelectStyle = createStyles((_theme) => ({
     root: {
@@ -44,14 +44,12 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
     const { subjectName, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
     const { activeCategory } = useActiveCategoryRedux();
     const { classes: selectClasses } = useSelectStyle();
-    const [isSelectFocus, setSelectFocus] = useState<boolean>(false);
     const [selectInput, setSelectInput] = useState<string>('');
     const { data: subjectTags } = TagQuery.useGetSubjectTags(activeCategory!.id, subjectId);
 
-    const handleSelectChange = (tagName: string) => {
-        const tag = subjectTags.find((val) => val.name === tagName);
-        if (tag) {
-            onSelectNewTag({ id: tag.id, name: tag.name });
+    const handleTagSelect = (value: TagResDto | undefined) => {
+        if (value) {
+            onSelectNewTag({ id: value.id, name: value.name });
             setSelectInput('');
         }
     };
@@ -82,28 +80,19 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
     ));
 
     const selectableTags = useMemo(() => subjectTags
-        .filter((tag) => !tags.find((obj) => obj.id === tag.id))
-        .map((tag) => ({
-            key:   tag.id,
-            value: tag.name,
-            label: tag.name,
-        })), [tags, subjectTags]);
+        .filter((tag) => !tags.find((obj) => obj.id === tag.id)), [tags, subjectTags]);
 
     return (
         <Flex direction="column">
             <Text fz="md" c="indigo">{subjectName}</Text>
             <Group spacing="sm">
                 {itemChip}
-                <Select
-                    searchable
+                <ResourceTagSelect
                     rightSectionWidth={0}
-                    onFocus={() => setSelectFocus(true)}
-                    onBlur={() => setSelectFocus(false)}
-                    icon={!isSelectFocus && <IoIosAddCircleOutline />}
                     classNames={selectClasses}
                     data={selectableTags}
                     value={selectInput}
-                    onChange={handleSelectChange}
+                    onItemSelect={handleTagSelect}
                 />
             </Group>
         </Flex>

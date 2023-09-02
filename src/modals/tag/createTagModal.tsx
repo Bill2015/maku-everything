@@ -4,10 +4,12 @@ import { TagMutation } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateTagModel } from '@store/modal';
 import { SubjectSelect } from '@components/input';
+import { SubjectQuery } from '@api/subject';
 
 export function CreateTagModal() {
     const { activeCategory } = useActiveCategoryRedux();
     const { opened, close } = useCreateTagModel();
+    const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
     const [title, setTitle] = useState<string>('');
     const [belongSubject, setBelongSubject] = useState({ value: '', id: '' });
     const [description, setDescription] = useState<string>('');
@@ -44,7 +46,7 @@ export function CreateTagModal() {
                     Belong Subject:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <SubjectSelect onItemSelect={setBelongSubject} />
+                    <SubjectSelect subjects={subjectData} onItemSelect={setBelongSubject} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Title:

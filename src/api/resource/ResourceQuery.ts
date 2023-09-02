@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ResourceAPI } from './ResourceAPI';
 import { ResourceTagDto } from './Dto';
@@ -51,10 +51,6 @@ export namespace ResourceQuery {
             },
         );
 
-        useEffect(() => {
-            console.log("change");
-        }, [resourceData]);
-
         // Mapping the tag by subjectName
         const resourceTagData: IResourceTagGroup[] = useMemo(() => {
             const map: Map<string, IResourceTagGroup> = new Map();
@@ -76,9 +72,17 @@ export namespace ResourceQuery {
             return Array.from(map.values());
         }, [resourceData]);
 
+        const subjects: Set<string> = useMemo(() => {
+            if (resourceData) {
+                return new Set<string>(resourceData.tags.map((val) => val.belong_subject));
+            }
+            return new Set();
+        }, [resourceData]);
+
         return {
             data:       resourceData,
             tagMapData: resourceTagData,
+            subjects:   subjects,
             ...query,
         };
     }
