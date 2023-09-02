@@ -19,7 +19,6 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const { activeCategory } = useActiveCategoryRedux();
     const [subjectValue, setSubjectValue] = useState<string>('');
-    const [tagValue, setTagValue] = useState<string>('');
     const [selectedSubject, setSelectedSubject] = useState<SubjectSelectItem | null>(null);
     const { data: subjectTags } = TagQuery.useGetSubjectTags(activeCategory!.id, selectedSubject && selectedSubject!.id);
 
@@ -27,17 +26,17 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
 
     const handleTagSelect = (value: TagResDto | undefined) => {
         if (value) {
-            setTagValue('');
             setSelectedSubject(null);
+            setSubjectValue('');
             onSelectNewTag(value);
         }
     };
 
-    const handleItemSelect = useCallback((data: SubjectSelectItem) => {
+    const handleSubjectItemSelect = useCallback((data: SubjectSelectItem) => {
         setSelectedSubject(data);
         setTimeout(() => {
             inputRef.current?.focus();
-        }, 1);
+        }, 10);
     }, []);
 
     return (
@@ -45,7 +44,7 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
             <SubjectSelect
                 value={subjectValue}
                 display={selectedSubject ? 'none' : 'unset'}
-                onItemSelect={handleItemSelect}
+                onItemSelect={handleSubjectItemSelect}
                 subjects={visibleSubject}
             />
             <Group display={selectedSubject ? 'flex' : 'none'} spacing="xs">
@@ -57,14 +56,12 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
                     ref={inputRef}
                     rightSectionWidth={0}
                     data={subjectTags}
-                    value={tagValue}
                     onKeyDown={(e) => {
-                        if (e.key === 'Backspace' && !tagValue) {
+                        if (e.key === 'Backspace' && !(inputRef.current!.value)) {
                             setSelectedSubject(null);
                             setSubjectValue('');
                         }
                     }}
-                    onInput={(e) => setTagValue(e.currentTarget.value)}
                     onItemSelect={handleTagSelect}
                 />
             </Group>
