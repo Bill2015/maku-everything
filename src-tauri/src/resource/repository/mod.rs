@@ -6,6 +6,7 @@ pub use query::{RESOURCE_QUERY_REPOSITORY,ResourceQueryRepository};
 mod relation;
 pub use relation::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationRepository};
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
@@ -66,14 +67,14 @@ fn default_vec() -> Vec<Thing> {
 /**
  * Repository */
 pub struct ResourceRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
     common_repo: &'a CommonRepository<'a>,
     tag_relation_repo: &'a ResourceTagRelationRepository<'a> 
 }
 
 impl<'a> ResourceRepository<'a> {
     pub const fn init(
-        db: &'a Surreal<Client>,
+        db: &'a Lazy<Surreal<Client>>,
         common_repo: &'a CommonRepository,
         tag_relation_repo: &'a ResourceTagRelationRepository
     ) -> Self {
@@ -152,6 +153,7 @@ impl<'a> ResourceRepository<'a> {
                     .create(tablens::RESOURCE)
                     .content(resource_do)
                     .await?
+                    .pop()
 
             }
             false => {

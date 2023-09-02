@@ -1,3 +1,4 @@
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
@@ -9,10 +10,10 @@ use crate::category::application::dto::CategoryResDto;
 pub static CATEGORY_QUERY_REPOSITORY: CategoryQueryRepository<'_> = CategoryQueryRepository::init(&env::DB);
 
 pub struct CategoryQueryRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
 }
 impl<'a> CategoryQueryRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
+    pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         CategoryQueryRepository { db: db }
     }
 

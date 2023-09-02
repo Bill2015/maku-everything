@@ -2,6 +2,7 @@
 mod query;
 pub use query::{TAG_QUERY_REPOSITORY, TagQueryRepository};
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
@@ -45,12 +46,12 @@ fn default_ref() -> String {
 /**
  * Repository */
  pub struct TagRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
     common_repo: &'a CommonRepository<'a>,
 }
 
 impl<'a> TagRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>, common_repo: &'a CommonRepository<'a>) -> Self {
+    pub const fn init(db: &'a Lazy<Surreal<Client>>, common_repo: &'a CommonRepository<'a>) -> Self {
         TagRepository {
             db: db,
             common_repo: common_repo,
@@ -116,6 +117,7 @@ impl<'a> TagRepository<'a> {
                     .create(tablens::TAG)
                     .content(tag_do)
                     .await?
+                    .pop()
 
             }
             false => {

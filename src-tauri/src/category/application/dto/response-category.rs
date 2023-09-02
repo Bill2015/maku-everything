@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
@@ -13,7 +14,7 @@ pub struct CategoryResDto {
 
     pub auth: bool,
 
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
 
-    pub updated_at: String,
+    pub updated_at: DateTime<Utc>,
 }
