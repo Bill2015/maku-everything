@@ -47,17 +47,11 @@ pub struct ResourceDO {
     pub created_at: Datetime,
     pub updated_at: Datetime,
 
-    #[serde(skip_serializing)]
-    #[serde(default = "default_resource")]
-    pub belong_category: String,
+    pub belong_category: Thing,
 
     #[serde(skip_serializing)]
     #[serde(default = "default_vec")]
     pub tags: Vec<Thing>,
-}
-
-fn default_resource() -> String {
-    "/".to_string()
 }
 
 fn default_vec() -> Vec<Thing> {
@@ -88,7 +82,6 @@ impl<'a> ResourceRepository<'a> {
         let sql = r#"
             SELECT 
                 *, 
-                type::string((->resource_belong.out)[0]) AS belong_category,
                 <-tagging.in as tags
             FROM type::table($table) 
             WHERE id == $id"#;

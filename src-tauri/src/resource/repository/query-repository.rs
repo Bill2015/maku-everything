@@ -54,7 +54,6 @@ impl<'a> ResourceQueryRepository<'a> {
             *,
             (SELECT 
                 *,
-                (->belong->subject.id)[0] AS belong_subject,
                 (->belong->subject.name)[0] AS subject_name
                 FROM tag 
                 WHERE ->tagging->resource.id CONTAINS $parent.id

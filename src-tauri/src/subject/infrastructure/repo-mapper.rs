@@ -24,15 +24,17 @@ impl IRepoMapper<SubjectAggregate, SubjectDO> for SubjectRepoMapper {
     }
     
     fn aggregate_to_do(aggregate: SubjectAggregate) -> SubjectDO {
-        let id = match thing(aggregate.id.to_str()) {
-            Ok(value) => value,
-            _ => Thing::from((tablens::SUBJECT, ""))
-        };
+        let id = thing(aggregate.id.to_str())
+            .unwrap_or(Thing::from((tablens::SUBJECT, "")));
+
+        let belong_category = thing(aggregate.belong_category.to_str())
+            .unwrap_or(Thing::from((tablens::CATEGORY, "")));
+
         SubjectDO {
             id: id,
             name: aggregate.name,
             description: aggregate.description,
-            belong_category: aggregate.belong_category.to_string(),
+            belong_category: belong_category,
             auth: aggregate.auth,
             created_at: Datetime(aggregate.created_at),
             updated_at: Datetime(aggregate.updated_at),

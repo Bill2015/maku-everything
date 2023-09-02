@@ -45,14 +45,14 @@ impl TagQueryBuilder {
 
     pub fn set_belong_category(mut self, category_id: String) -> TagQueryBuilder {
         if !category_id.is_empty() {
-            self.belong_category = Some(format!("->belong.out CONTAINS '{}'", category_id));
+            self.belong_category = Some(format!("belong_category == '{}'", category_id));
         }
         self
     }
 
     pub fn set_belong_subject(mut self, subject_id: String) -> TagQueryBuilder {
         if !subject_id.is_empty() {
-            self.belong_subject = Some(format!("->belong.out CONTAINS {}", subject_id));
+            self.belong_subject = Some(format!("belong_subject == {}", subject_id));
         } 
         self
     }

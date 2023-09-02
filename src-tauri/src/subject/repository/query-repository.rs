@@ -48,8 +48,7 @@ impl<'a> SubjectQueryRepository<'a> {
 
         let sql = format!(
             r#"SELECT 
-                *,
-                (->belong->category.id)[0] as belong_category
+                *
             FROM subject WHERE {}"#
         , query_string);
 

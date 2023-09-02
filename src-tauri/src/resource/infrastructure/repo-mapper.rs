@@ -35,7 +35,7 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             id: ResourceID::from(resource_do.id.to_string()),
             title: resource_do.title,
             description: resource_do.description,
-            belong_category: CategoryID::from(resource_do.belong_category),
+            belong_category: CategoryID::from(resource_do.belong_category.to_string()),
             file: file,
             auth: resource_do.auth,
             tags: tags,
@@ -51,10 +51,12 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             .iter()
             .map(|x| thing(x.to_str()).unwrap())
             .collect();
-        let id = match thing(aggregate.id.to_str()) {
-            Ok(value) => value,
-            _ => Thing::from((tablens::RESOURCE, ""))
-        };
+
+        let id = thing(aggregate.id.to_str())
+            .unwrap_or(Thing::from((tablens::RESOURCE, "")));
+
+        let belong_category = thing(aggregate.belong_category.to_str())
+            .unwrap_or(Thing::from((tablens::CATEGORY, "")));
 
         let file = match aggregate.file {
             Some(value) => Some(ResourceFileDo {
@@ -70,7 +72,7 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             id: id,
             title: aggregate.title,
             description: aggregate.description,
-            belong_category: aggregate.belong_category.to_string(),
+            belong_category: belong_category,
             file: file,
             auth: aggregate.auth,
             tags: tags,

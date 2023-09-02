@@ -54,6 +54,8 @@ pub struct ResourceDetailDto {
 
     pub file: ResourceFileDto,
 
+    pub belong_category: Thing,
+
     pub created_at: String,
 
     pub updated_at: String,

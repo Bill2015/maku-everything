@@ -39,7 +39,7 @@ impl SubjectQueryBuilder {
 
     pub fn set_belong_category(mut self, category_id: String) -> SubjectQueryBuilder {
         if !category_id.is_empty() {
-            self.belong_category = Some(format!("->belong.out CONTAINS '{}'", category_id));
+            self.belong_category = Some(format!("belong_category == '{}'", category_id));
         }
         self
     }
