@@ -89,4 +89,25 @@ impl<'a> SubjectService<'a> {
 
         Ok(res)
     }
+
+    pub async fn list_subjects(
+        &self, 
+        id: Option<String>,
+        name: Option<String>,
+        belong_category: Option<String>, 
+        order_by: Option<String>,
+    ) -> Result<Vec<SubjectResDto>, String> {
+        let query = ListSubjectQuery { 
+            id,
+            name,
+            belong_category,
+            order_by
+        };
+        
+        let handler = ListSubjectHandler::register(self.subject_queryrepo);
+
+        let res = handler.query(query).await?;
+
+        Ok(res)
+    }
 }

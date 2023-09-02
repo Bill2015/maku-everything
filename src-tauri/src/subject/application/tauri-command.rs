@@ -36,3 +36,22 @@ pub async fn get_subject_by_id(id: String) -> Result<Option<SubjectResDto>, Stri
 
     Ok(result)
 }
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn list_subjects(
+    id: Option<String>,
+    name: Option<String>,
+    belong_category: Option<String>, 
+    order_by: Option<String>,
+) -> Result<Vec<SubjectResDto>, String> {
+    let result = SUBJECT_SERVICE
+        .list_subjects(
+            id, 
+            name, 
+            belong_category, 
+            order_by
+        )
+        .await?;
+
+    Ok(result)
+}

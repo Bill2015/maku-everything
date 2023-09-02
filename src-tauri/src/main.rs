@@ -129,6 +129,7 @@ fn main() {
             subject::application::update_subject,
             subject::application::get_all_subject,
             subject::application::get_subject_by_id,
+            subject::application::list_subjects,
             resource::application::create_resource,
             resource::application::update_resource,
             resource::application::get_all_resource,
