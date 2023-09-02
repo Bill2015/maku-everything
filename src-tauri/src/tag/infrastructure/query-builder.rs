@@ -52,7 +52,7 @@ impl TagQueryBuilder {
 
     pub fn set_belong_subject(mut self, subject_id: String) -> TagQueryBuilder {
         if !subject_id.is_empty() {
-            self.belong_category = Some(format!("->belong.out CONTAINS {}", subject_id));
+            self.belong_subject = Some(format!("->belong.out CONTAINS {}", subject_id));
         } 
         self
     }
