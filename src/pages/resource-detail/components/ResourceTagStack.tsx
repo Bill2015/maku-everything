@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState, useMemo } from 'react';
+import { PropsWithChildren, useState, useMemo, useRef, useEffect } from 'react';
 import {
     ActionIcon, Badge, Flex, Group, Stack, Text, createStyles, rem,
 } from '@mantine/core';
@@ -42,15 +42,25 @@ export interface ResourceTagGroupProps {
 
 export function ResourceTagGroup(props: ResourceTagGroupProps) {
     const { subjectName, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
+    const selectRef = useRef<HTMLInputElement>(null);
     const { activeCategory } = useActiveCategoryRedux();
     const { classes: selectClasses } = useSelectStyle();
-    const [selectInput, setSelectInput] = useState<string>('');
+    const [searchValue, setSearchValue] = useState<string>('');
+    const [selectValue, setSelectValue] = useState<string>('');
     const { data: subjectTags } = TagQuery.useGetSubjectTags(activeCategory!.id, subjectId);
+
+    // When created, auto focus the add tag input
+    useEffect(() => {
+        if (selectRef.current) {
+            selectRef.current?.focus();
+        }
+    }, []);
 
     const handleTagSelect = (value: TagResDto | undefined) => {
         if (value) {
             onSelectNewTag({ id: value.id, name: value.name });
-            setSelectInput('');
+            setSelectValue('');
+            setSearchValue('');
         }
     };
 
@@ -88,10 +98,13 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
             <Group spacing="sm">
                 {itemChip}
                 <ResourceTagSelect
+                    ref={selectRef}
                     rightSectionWidth={0}
                     classNames={selectClasses}
                     data={selectableTags}
-                    value={selectInput}
+                    value={selectValue}
+                    searchValue={searchValue}
+                    onSearchChange={(e) => setSearchValue(e)}
                     onItemSelect={handleTagSelect}
                 />
             </Group>
