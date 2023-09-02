@@ -16,9 +16,13 @@ export interface ResourceAddSubjectSelectProps {
 
 export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
     const { subjects, exclude, onSelectNewTag } = props;
-    const inputRef = useRef<HTMLInputElement>(null);
+    const tagInputRef = useRef<HTMLInputElement>(null);
+    const subjectInputRef = useRef<HTMLInputElement>(null);
     const { activeCategory } = useActiveCategoryRedux();
     const [subjectValue, setSubjectValue] = useState<string>('');
+    const [tagValue, setTagValue] = useState<string>('');
+    const [tagSearchValue, setTagSearchValue] = useState<string>('');
+
     const [selectedSubject, setSelectedSubject] = useState<SubjectSelectItem | null>(null);
     const { data: subjectTags } = TagQuery.useGetSubjectTags(activeCategory!.id, selectedSubject && selectedSubject!.id);
 
@@ -34,18 +38,23 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
 
     const handleSubjectItemSelect = useCallback((data: SubjectSelectItem) => {
         setSelectedSubject(data);
+        setTagValue('');
+        setTagSearchValue('');
         setTimeout(() => {
-            inputRef.current?.focus();
+            tagInputRef.current?.focus();
         }, 10);
     }, []);
 
     return (
         <>
             <SubjectSelect
+                ref={subjectInputRef}
+                placeholder="tagging resource here..."
                 value={subjectValue}
                 display={selectedSubject ? 'none' : 'unset'}
                 onItemSelect={handleSubjectItemSelect}
                 subjects={visibleSubject}
+                rightSection={<div />}
             />
             <Group display={selectedSubject ? 'flex' : 'none'} spacing="xs">
                 <Text fw="bolder">
@@ -53,15 +62,19 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
                     :
                 </Text>
                 <ResourceTagSelect
-                    ref={inputRef}
+                    ref={tagInputRef}
                     rightSectionWidth={0}
                     data={subjectTags}
+                    searchValue={tagValue}
+                    value={tagSearchValue}
                     onKeyDown={(e) => {
-                        if (e.key === 'Backspace' && !(inputRef.current!.value)) {
+                        if (e.key === 'Backspace' && !(tagValue)) {
                             setSelectedSubject(null);
                             setSubjectValue('');
+                            setTimeout(() => subjectInputRef.current?.focus(), 10);
                         }
                     }}
+                    onSearchChange={(e) => setTagValue(e)}
                     onItemSelect={handleTagSelect}
                 />
             </Group>

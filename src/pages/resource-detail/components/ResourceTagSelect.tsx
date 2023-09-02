@@ -1,4 +1,4 @@
-import { useState, useMemo, forwardRef } from 'react';
+import React, { useState, useMemo, forwardRef } from 'react';
 import { IoIosAddCircleOutline } from 'react-icons/io';
 import { Select, SelectProps, createStyles } from '@mantine/core';
 import { TagResDto } from '@api/tag';
@@ -27,10 +27,14 @@ export interface ResourceTagSelectProps extends Omit<SelectProps, 'data'|'search
     data: TagResDto[];
 
     onItemSelect?: (value: TagResDto | undefined) => void;
+
+    onFocus?: (e: React.FocusEvent<HTMLInputElement, Element>) => void;
+
+    onBlur?: (e: React.FocusEvent<HTMLInputElement, Element>) => void;
 }
 
 export const ResourceTagSelect = forwardRef<HTMLInputElement, ResourceTagSelectProps>((props: ResourceTagSelectProps, ref) => {
-    const { data, onItemSelect, onChange, ...selectProps } = props;
+    const { data, onItemSelect, onChange, onFocus, onBlur, ...selectProps } = props;
 
     const { classes: selectClasses } = useSelectStyle();
     const [isSelectFocus, setSelectFocus] = useState<boolean>(false);
@@ -58,8 +62,18 @@ export const ResourceTagSelect = forwardRef<HTMLInputElement, ResourceTagSelectP
         <Select
             ref={ref}
             rightSectionWidth={0}
-            onFocus={() => setSelectFocus(true)}
-            onBlur={() => setSelectFocus(false)}
+            onFocus={(e) => {
+                setSelectFocus(true);
+                if (onFocus) {
+                    onFocus(e);
+                }
+            }}
+            onBlur={(e) => {
+                setSelectFocus(false);
+                if (onBlur) {
+                    onBlur(e);
+                }
+            }}
             icon={!isSelectFocus && <IoIosAddCircleOutline />}
             classNames={selectClasses}
             data={selectableTags}

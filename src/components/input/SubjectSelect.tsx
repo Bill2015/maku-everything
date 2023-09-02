@@ -32,7 +32,7 @@ export interface SubjectSelectProps extends Omit<SelectProps, 'itemComponent'|'d
     onItemSelect: (data: SubjectSelectItem) => void;
 }
 
-export function SubjectSelect(props: SubjectSelectProps) {
+export const SubjectSelect = forwardRef<HTMLInputElement, SubjectSelectProps>((props, ref) => {
     const { subjects, onItemSelect, ...selectProps } = props;
 
     const handleChanged = useCallback((value: string) => {
@@ -60,14 +60,15 @@ export function SubjectSelect(props: SubjectSelectProps) {
 
     return (
         <Select
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...selectProps}
+            ref={ref}
             searchable
             placeholder="Select one subject"
             nothingFound="No Subject"
             onChange={handleChanged}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...selectProps}
             data={subjectSelectItem}
             itemComponent={Item}
         />
     );
-}
+});
