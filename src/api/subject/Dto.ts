@@ -31,3 +31,13 @@ export interface SubjectUpdateDto {
 
     auth?: string,
 }
+
+export interface QuerySubjectDto {
+    id?: string;
+
+    name?: string;
+
+    belong_category?: string;
+
+    order_by?: string;
+}
