@@ -1,20 +1,24 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { FcOpenedFolder } from 'react-icons/fc';
-import { Box, Grid, Title, Text, Button, Flex, ScrollArea, Affix, rem } from '@mantine/core';
+import {
+    Box, Grid, Title, Text, Button, Flex, ScrollArea, Affix, rem,
+} from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
 import { SubjectQuery } from '@api/subject';
-import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
 import { ReturnButton } from '@components/input';
+import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
 
 export default function ResourcesDetailPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const { resourceId } = useParams<ResourceDetailParam>();
+    // when new subject group was created, use for auto focus
+    const [newSubjectId, setNewSubjectId] = useState<string>('');
 
     const exporeFile = ResourceMutation.useExporeFile();
     const addResourceTag = ResourceMutation.useAddTag();
@@ -64,6 +68,7 @@ export default function ResourcesDetailPage() {
                                 <ResourceTagStack>
                                     {resourceTagData.map(({ subjectId, subjectName, tags }) => (
                                         <ResourceTagStack.Group
+                                            autoFocus={subjectId === newSubjectId}
                                             key={subjectId}
                                             subjectId={subjectId}
                                             subjectName={subjectName}
@@ -99,7 +104,9 @@ export default function ResourcesDetailPage() {
                                     exclude={existedSubject}
                                     onSelectNewTag={async (tag) => {
                                         await addResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
-                                        resourceRefetch();
+                                        await resourceRefetch();
+                                        // make sure auto focus
+                                        setNewSubjectId(tag.belong_subject);
                                     }}
                                 />
                             </Grid.Col>

@@ -35,13 +35,15 @@ export interface ResourceTagGroupProps {
 
     tags: ResourceTagDto[];
 
+    autoFocus: boolean;
+
     onSelectNewTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
 
     onRemoveExistTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
 }
 
 export function ResourceTagGroup(props: ResourceTagGroupProps) {
-    const { subjectName, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
+    const { subjectName, autoFocus, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
     const selectRef = useRef<HTMLInputElement>(null);
     const { activeCategory } = useActiveCategoryRedux();
     const { classes: selectClasses } = useSelectStyle();
@@ -51,10 +53,10 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
 
     // When created, auto focus the add tag input
     useEffect(() => {
-        if (selectRef.current) {
+        if (autoFocus && selectRef.current) {
             selectRef.current?.focus();
         }
-    }, []);
+    }, [autoFocus]);
 
     const handleTagSelect = (value: TagResDto | undefined) => {
         if (value) {
