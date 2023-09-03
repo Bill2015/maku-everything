@@ -73,6 +73,7 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
             pr={3}
             variant="outline"
             tt="initial"
+            key={val.id}
             rightSection={(
                 <ActionIcon
                     size="xs"
