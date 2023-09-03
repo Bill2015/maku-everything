@@ -3,7 +3,6 @@ import { Group, Text } from '@mantine/core';
 import { SubjectResDto } from '@api/subject';
 import { SubjectSelect, SubjectSelectItem } from '@components/input';
 import { TagQuery, TagResDto } from '@api/tag';
-import { useActiveCategoryRedux } from '@store/global';
 import { ResourceTagSelect } from './ResourceTagSelect';
 
 export interface ResourceAddSubjectSelectProps {
@@ -18,13 +17,12 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
     const { subjects, exclude, onSelectNewTag } = props;
     const tagInputRef = useRef<HTMLInputElement>(null);
     const subjectInputRef = useRef<HTMLInputElement>(null);
-    const { activeCategory } = useActiveCategoryRedux();
     const [subjectValue, setSubjectValue] = useState<string>('');
     const [tagValue, setTagValue] = useState<string>('');
     const [tagSearchValue, setTagSearchValue] = useState<string>('');
 
     const [selectedSubject, setSelectedSubject] = useState<SubjectSelectItem | null>(null);
-    const { data: subjectTags } = TagQuery.useGetSubjectTags(activeCategory!.id, selectedSubject && selectedSubject!.id);
+    const { data: subjectTags } = TagQuery.useGetSubjectTags(selectedSubject && selectedSubject!.id);
 
     const visibleSubject = useMemo(() => subjects.filter((val) => !exclude.has(val.id)), [subjects, exclude]);
 

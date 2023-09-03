@@ -16,17 +16,14 @@ export namespace TagQuery {
         );
     }
 
-    export function useGetSubjectTags(categoryId: string, subjectId: string | null) {
-        const queryfn = () => TagAPI.query({
-            belong_category: categoryId,
-            belong_subject:  subjectId,
-        });
+    export function useGetSubjectTags(subjectId: string | null) {
+        const queryfn = () => TagAPI.query({ belong_subject: subjectId! });
 
         return useQuery(
-            ['tag', 'query', categoryId, subjectId],
+            ['tag', 'query', subjectId],
             queryfn,
             {
-                enabled:         !!categoryId && !!subjectId,
+                enabled:         !!subjectId,
                 placeholderData: [],
                 initialData:     [],
             },

@@ -5,7 +5,6 @@ import {
 import { RxCross1 } from 'react-icons/rx';
 import { ResourceTagDto } from '@api/resource';
 import { TagQuery, TagResDto } from '@api/tag';
-import { useActiveCategoryRedux } from '@store/global';
 import { ResourceTagSelect } from './ResourceTagSelect';
 
 const useSelectStyle = createStyles((_theme) => ({
@@ -45,11 +44,10 @@ export interface ResourceTagGroupProps {
 export function ResourceTagGroup(props: ResourceTagGroupProps) {
     const { subjectName, autoFocus, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
     const selectRef = useRef<HTMLInputElement>(null);
-    const { activeCategory } = useActiveCategoryRedux();
     const { classes: selectClasses } = useSelectStyle();
     const [searchValue, setSearchValue] = useState<string>('');
     const [selectValue, setSelectValue] = useState<string>('');
-    const { data: subjectTags } = TagQuery.useGetSubjectTags(activeCategory!.id, subjectId);
+    const { data: subjectTags } = TagQuery.useGetSubjectTags(subjectId);
 
     // When created, auto focus the add tag input
     useEffect(() => {
