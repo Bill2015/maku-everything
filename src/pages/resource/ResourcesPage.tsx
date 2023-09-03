@@ -20,7 +20,7 @@ export default function ResourcesPage() {
     // When Resource Detail Click
     const handleResoruceDetail = useCallback(async (data: ResourceResDto) => {
         if (activeCategory) {
-            navigateResourceTo(activeCategory.title, data.id);
+            navigateResourceTo(activeCategory.name, data.id);
         }
     }, [activeCategory, navigateResourceTo]);
 
@@ -42,7 +42,7 @@ export default function ResourcesPage() {
                     <Grid.Col span={12}>
                         <Title order={3}>
                             Current Category:
-                            {activeCategory.title}
+                            {activeCategory.name}
                         </Title>
                     </Grid.Col>
                     <Grid.Col span={6}>

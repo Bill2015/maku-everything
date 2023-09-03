@@ -34,7 +34,7 @@ export function CreateResourceModal(props: CreateResourceModalProps) {
                     In:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input disabled value={activeCategory.title} />
+                    <Input disabled value={activeCategory.name} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Title:

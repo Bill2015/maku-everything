@@ -21,7 +21,7 @@ export default function CategoriesPage() {
     // When Load clicked
     const handleCateogryLoadClick = useCallback(async (data: CategoryResDto) => {
         enqueueSnackbar(`Success Load ${data.title}`, { variant: 'info' });
-        setActiveCategory({ id: data.id, title: data.title });
+        setActiveCategory({ id: data.id, name: data.title });
         navigateCategoryTo(data.title);
     }, [enqueueSnackbar, setActiveCategory, navigateCategoryTo]);
 

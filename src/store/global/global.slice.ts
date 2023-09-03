@@ -2,16 +2,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface ActiveCategory {
     id: string,
-    title: string,
+    name: string,
 }
 
 export interface GlobalState {
     activeCategory: ActiveCategory | null;
 }
 
-const initialState: GlobalState = {
-    activeCategory: null,
-};
+const initialState: GlobalState = { activeCategory: null };
 
 const globalSlice = createSlice({
     name:     'global',
