@@ -46,7 +46,7 @@ export function CreateTagModal() {
                     Belong Subject:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <SubjectSelect subjects={subjectData} onItemSelect={setBelongSubject} />
+                    <SubjectSelect withinPortal subjects={subjectData} onItemSelect={setBelongSubject} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Title:
