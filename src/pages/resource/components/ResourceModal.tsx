@@ -11,20 +11,20 @@ export interface CreateResourceModalProps extends ModalProps {
 
 export function CreateResourceModal(props: CreateResourceModalProps) {
     const { activeCategory, onConfirm, ...modelProps } = props;
-    const [title, setTitle] = useState<string>('');
+    const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [filePath, setFilePath] = useState<string>('');
 
     const handleCreateConfirm = useCallback(() => {
-        setTitle('');
+        setName('');
         setDescription('');
         onConfirm({
-            title:           title,
+            name:            name,
             description:     description,
             belong_category: activeCategory.id,
             file_path:       filePath,
         });
-    }, [description, title, filePath, activeCategory, onConfirm]);
+    }, [description, name, filePath, activeCategory, onConfirm]);
 
     return (
         // eslint-disable-next-line react/jsx-props-no-spreading
@@ -37,10 +37,10 @@ export function CreateResourceModal(props: CreateResourceModalProps) {
                     <Input disabled value={activeCategory.name} />
                 </Grid.Col>
                 <Grid.Col span={4}>
-                    Title:
+                    Name:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input placeholder="resource title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Input placeholder="resource name" value={name} onChange={(e) => setName(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Description:

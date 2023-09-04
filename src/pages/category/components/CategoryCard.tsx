@@ -13,7 +13,7 @@ export function CategoryCard(props: CategoryCardProps) {
         <Grid.Col span={4}>
             <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Group position="apart" mt="md" mb="xs">
-                    <Text>{data.title}</Text>
+                    <Text>{data.name}</Text>
                     <Badge color="cyan" variant="light">{data.resource_num}</Badge>
                 </Group>
 

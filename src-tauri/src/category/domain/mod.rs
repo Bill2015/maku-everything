@@ -8,7 +8,7 @@ pub use id::CategoryID;
 #[derive(Debug, Serialize)]
 pub struct CategoryAggregate {
     pub id: CategoryID,
-    pub title: String,
+    pub name: String,
     pub description: String,
     pub auth: bool,
     pub created_at: DateTime<Utc>,
@@ -16,10 +16,10 @@ pub struct CategoryAggregate {
 }
 
 impl CategoryAggregate {
-    pub fn new(title: String, description: String) -> Self {
+    pub fn new(name: String, description: String) -> Self {
         CategoryAggregate {
             id: CategoryID::new(),
-            title: title,
+            name: name,
             description: description,
             auth: false,
             created_at: Utc::now(),
@@ -27,12 +27,12 @@ impl CategoryAggregate {
         }
     }
 
-    pub fn change_title(&mut self, new_title: String) {
-        if new_title.len() <= 0 {
-            print!("Title can't be empty");
+    pub fn change_name(&mut self, new_name: String) {
+        if new_name.len() <= 0 {
+            print!("Name can't be empty");
         }
     
-        self.title = new_title;
+        self.name = new_name;
     }
 
     pub fn change_description(&mut self, new_description: String) {

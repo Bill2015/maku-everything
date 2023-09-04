@@ -61,7 +61,7 @@ export default function ResourcesDetailPage() {
                     <ScrollArea mx="auto" h="100%" type="hover" classNames={{ scrollbar: 'mgra' }}>
                         <Grid w="100%">
                             <Grid.Col lg={12}>
-                                <Title order={2}>{resourceData.title}</Title>
+                                <Title order={2}>{resourceData.name}</Title>
                             </Grid.Col>
 
                             <Grid.Col lg={12}>

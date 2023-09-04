@@ -7,7 +7,7 @@ use crate::common::application::ICommandHandler;
 
 pub struct UpdateResourceCommand {
     pub id: String,
-    pub title: Option<String>,
+    pub name: Option<String>,
     pub description: Option<String>,
     pub auth: Option<bool>,
 }
@@ -27,7 +27,7 @@ impl<'a> UpdateResourceHandler<'a> {
 impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
 
     fn get_name() -> String {
-        String::from("Change Title Resource Command")
+        String::from("Change Resource Command")
     }
 
     type Output = Result<String, String>;
@@ -35,7 +35,7 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
     async fn execute(&self, command: UpdateResourceCommand) -> Self::Output {
         let UpdateResourceCommand { 
             id,
-            title,
+            name,
             description, 
             auth,
         } = command;
@@ -50,9 +50,9 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
             .flatten()
             .ok_or_else(|| String::from("ResourceError::Update(id)"))?;
  
-        // change title
-        if title.is_some() {
-            resource.change_title(title.unwrap());
+        // change name
+        if name.is_some() {
+            resource.change_name(name.unwrap());
         }
 
         // change description

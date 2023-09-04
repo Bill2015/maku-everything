@@ -9,7 +9,7 @@ use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
 
 pub struct CreateResourceCommand {
-    pub title: String,
+    pub name: String,
     pub description: String,
     pub belong_category: CategoryID,
     pub file_path: String,
@@ -39,7 +39,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
 
     async fn execute(&self, command: CreateResourceCommand) -> Self::Output {
         let CreateResourceCommand { 
-            title,
+            name,
             description,
             belong_category, 
             file_path,
@@ -47,7 +47,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
 
 
         // create new resource
-        let new_resource = match ResourceAggregate::new(title, description, belong_category, file_path) {
+        let new_resource = match ResourceAggregate::new(name, description, belong_category, file_path) {
             Ok(value) => value,
             _ => return Err(String::from("ResourceError::Create()")),
         };

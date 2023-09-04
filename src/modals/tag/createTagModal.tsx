@@ -10,7 +10,7 @@ export function CreateTagModal() {
     const { activeCategory } = useActiveCategoryRedux();
     const { opened, close } = useCreateTagModel();
     const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
-    const [title, setTitle] = useState<string>('');
+    const [name, setName] = useState<string>('');
     const [belongSubject, setBelongSubject] = useState({ value: '', id: '' });
     const [description, setDescription] = useState<string>('');
     const createTag = TagMutation.useCreate();
@@ -20,15 +20,15 @@ export function CreateTagModal() {
             return;
         }
         createTag.mutateAsync({
-            name:            title,
+            name:            name,
             description:     description,
             belong_category: activeCategory.id,
             belong_subject:  belongSubject.id,
         });
-        setTitle('');
+        setName('');
         setDescription('');
         close();
-    }, [createTag, description, title, activeCategory, belongSubject, close]);
+    }, [createTag, description, name, activeCategory, belongSubject, close]);
 
     if (activeCategory === null) {
         return null;
@@ -40,7 +40,7 @@ export function CreateTagModal() {
                     Belong Category:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input disabled value={activeCategory.title} />
+                    <Input disabled value={activeCategory.name} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Belong Subject:
@@ -49,10 +49,10 @@ export function CreateTagModal() {
                     <SubjectSelect withinPortal subjects={subjectData} onItemSelect={setBelongSubject} />
                 </Grid.Col>
                 <Grid.Col span={4}>
-                    Title:
+                    Name:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input placeholder="resource title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Input placeholder="resource name" value={name} onChange={(e) => setName(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Description:

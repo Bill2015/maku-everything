@@ -22,7 +22,7 @@ impl<'a> TagQueryRepository<'a> {
             SELECT 
                 *,
                 (->belong->subject.name)[0] as subject_name,
-                (->belong->category.title)[0] as category_name,
+                (->belong->category.name)[0] as category_name,
                 array::len(->tagging.out) as tag_nums
             FROM tag
         "#;
@@ -67,7 +67,7 @@ impl<'a> TagQueryRepository<'a> {
             r#"SELECT 
                 *,
                 (->belong->subject.name)[0] as subject_name,
-                (->belong->category.title)[0] as category_name,
+                (->belong->category.name)[0] as category_name,
                 array::len(->tagging.out) as tag_nums
             FROM tag WHERE {}"#
         , query_string);

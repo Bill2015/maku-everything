@@ -14,7 +14,7 @@ impl IRepoMapper<CategoryAggregate, CategoryDO> for CategoryRepoMapper {
     fn do_to_aggregate(category_do: CategoryDO) -> CategoryAggregate {
         CategoryAggregate {
             id: CategoryID::from(category_do.id.to_string()),
-            title: category_do.title,
+            name: category_do.name,
             description: category_do.description,
             auth: category_do.auth,
             created_at: category_do.created_at.0,
@@ -29,7 +29,7 @@ impl IRepoMapper<CategoryAggregate, CategoryDO> for CategoryRepoMapper {
         };
         CategoryDO {
             id: id,
-            title: aggregate.title,
+            name: aggregate.name,
             description: aggregate.description,
             auth: aggregate.auth,
             created_at: Datetime(aggregate.created_at),

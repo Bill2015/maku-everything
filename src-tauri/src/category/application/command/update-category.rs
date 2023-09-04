@@ -2,13 +2,12 @@ use async_trait::async_trait;
 
 use crate::category;
 use crate::category::application::dto::CategoryError;
-use crate::category::domain::CategoryAggregate;
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 
 pub struct UpdateCategoryCommand {
     pub id: String,
-    pub title: Option<String>,
+    pub name: Option<String>,
     pub description: Option<String>,
     pub auth: Option<bool>,
 }
@@ -28,7 +27,7 @@ impl<'a> UpdateCategoryHandler<'a> {
 impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
 
     fn get_name() -> String {
-        String::from("Change Title Category Command")
+        String::from("Change Category Command")
     }
 
     type Output = Result<String, CategoryError>;
@@ -36,7 +35,7 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
     async fn execute(&self, command: UpdateCategoryCommand) -> Self::Output {
         let UpdateCategoryCommand { 
             id,
-            title,
+            name,
             description, 
             auth,
         } = command;
@@ -51,9 +50,9 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
             .flatten()
             .ok_or_else(|| CategoryError::Update(id))?;
  
-        // change title
-        if title.is_some() {
-            category.change_title(title.unwrap());
+        // change name
+        if name.is_some() {
+            category.change_name(name.unwrap());
         }
 
         // change description

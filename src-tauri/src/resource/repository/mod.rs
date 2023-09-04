@@ -40,7 +40,7 @@ pub struct ResourceFileDo {
 pub struct ResourceDO {
     #[serde(skip_serializing)]
     pub id: Thing,
-    pub title: String,
+    pub name: String,
     pub description: String,
     pub file: Option<ResourceFileDo>,
     pub auth: bool,

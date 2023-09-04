@@ -33,7 +33,7 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
 
         ResourceAggregate {
             id: ResourceID::from(resource_do.id.to_string()),
-            title: resource_do.title,
+            name: resource_do.name,
             description: resource_do.description,
             belong_category: CategoryID::from(resource_do.belong_category.to_string()),
             file: file,
@@ -70,7 +70,7 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
 
         ResourceDO {
             id: id,
-            title: aggregate.title,
+            name: aggregate.name,
             description: aggregate.description,
             belong_category: belong_category,
             file: file,

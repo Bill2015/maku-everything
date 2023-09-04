@@ -16,9 +16,9 @@ pub async fn create_tag(name: &str, description: &str, belong_category: &str, be
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn update_tag(id: String, title: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
+pub async fn update_tag(id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
     let result = TAG_SERVICE
-        .update_tag(id, title, description, auth)
+        .update_tag(id, name, description, auth)
         .await?;
 
     Ok(result)

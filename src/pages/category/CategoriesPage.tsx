@@ -20,9 +20,9 @@ export default function CategoriesPage() {
 
     // When Load clicked
     const handleCateogryLoadClick = useCallback(async (data: CategoryResDto) => {
-        enqueueSnackbar(`Success Load ${data.title}`, { variant: 'info' });
-        setActiveCategory({ id: data.id, name: data.title });
-        navigateCategoryTo(data.title);
+        enqueueSnackbar(`Success Load ${data.name}`, { variant: 'info' });
+        setActiveCategory({ id: data.id, name: data.name });
+        navigateCategoryTo(data.name);
     }, [enqueueSnackbar, setActiveCategory, navigateCategoryTo]);
 
     const categoryItems = categories.map((val) => <CategoryCard key={val.id} data={val} onLoadClick={handleCateogryLoadClick} />);

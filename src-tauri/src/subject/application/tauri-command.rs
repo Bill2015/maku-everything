@@ -11,9 +11,9 @@ pub async fn create_subject(name: &str, description: &str, belong_category: &str
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn update_subject(id: String, title: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
+pub async fn update_subject(id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
     let result = SUBJECT_SERVICE
-        .update_subject(id, title, description, auth)
+        .update_subject(id, name, description, auth)
         .await?;
 
     Ok(result)

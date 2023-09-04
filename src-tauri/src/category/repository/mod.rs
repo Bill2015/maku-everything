@@ -20,7 +20,7 @@ pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::ini
 pub struct CategoryDO {
     #[serde(skip_serializing)]
     pub id: Thing,
-    pub title: String,
+    pub name: String,
     pub description: String,
     pub auth: bool,
     pub created_at: Datetime,

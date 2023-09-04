@@ -66,7 +66,7 @@ impl ResourceFileAggregate {
 #[derive(Debug, Serialize)]
 pub struct ResourceAggregate {
     pub id: ResourceID,
-    pub title: String,
+    pub name: String,
     pub description: String,
     pub belong_category: CategoryID,
     pub file: Option<ResourceFileAggregate>,
@@ -80,10 +80,10 @@ pub struct ResourceAggregate {
 
 impl ResourceAggregate {
 
-    pub fn new(title: String, description: String, belong_category: CategoryID, file_path: String) -> Result<Self, String> {
+    pub fn new(name: String, description: String, belong_category: CategoryID, file_path: String) -> Result<Self, String> {
         Ok(ResourceAggregate {
             id: ResourceID::new(),
-            title: title,
+            name: name,
             description: description,
             belong_category: belong_category,
             file: ResourceFileAggregate::new(file_path)?,
@@ -96,12 +96,12 @@ impl ResourceAggregate {
         })
     }
 
-    pub fn change_title(&mut self, new_title: String) {
-        if new_title.len() <= 0 {
-            println!("Title can't be empty");
+    pub fn change_name(&mut self, new_name: String) {
+        if new_name.len() <= 0 {
+            println!("Name can't be empty");
         }
 
-        self.title = new_title;
+        self.name = new_name;
     }
 
     pub fn change_description(&mut self, new_description: String) {

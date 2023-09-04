@@ -38,7 +38,7 @@ impl<'a> ResourceService<'a> {
         }
     }
 
-    pub async fn create_resource(&self, title: String, description: String, file_path: String, belong_category: String) -> Result<String, String> {
+    pub async fn create_resource(&self, name: String, description: String, file_path: String, belong_category: String) -> Result<String, String> {
         let category = self.category_repository
             .find_by_id(&belong_category)
             .await
@@ -50,7 +50,7 @@ impl<'a> ResourceService<'a> {
         }
         
         let command = CreateResourceCommand {
-            title,
+            name,
             description,
             belong_category: category.unwrap().id,
             file_path,
@@ -63,10 +63,10 @@ impl<'a> ResourceService<'a> {
         Ok(String::from("Ok"))
     }
 
-    pub async fn update_resource(&self, id: String, title: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
+    pub async fn update_resource(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
         let command = UpdateResourceCommand {
             id,
-            title,
+            name,
             description,
             auth,
         };

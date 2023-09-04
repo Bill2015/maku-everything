@@ -11,7 +11,7 @@ export interface ResourceFileDto {
 export interface ResourceResDto {
     id: string,
 
-    title: string,
+    name: string,
 
     description: string,
 
@@ -23,7 +23,7 @@ export interface ResourceResDto {
 }
 
 export interface ResourceCreateDto {
-    title: string,
+    name: string,
 
     description: string,
 
@@ -57,7 +57,7 @@ export interface ResourceTagDto {
 export interface ResourceDetailDto {
     id: string,
 
-    title: string,
+    name: string,
 
     description: string,
 

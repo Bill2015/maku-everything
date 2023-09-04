@@ -27,7 +27,7 @@ impl<'a> UpdateTagHandler<'a> {
 impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
 
     fn get_name() -> String {
-        String::from("Change Title Tag Command")
+        String::from("Change Tag Command")
     }
 
     type Output = Result<String, String>;

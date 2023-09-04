@@ -16,7 +16,7 @@ pub struct ResourceFileDto {
 pub struct ResourceResDto {
     pub id: Thing,
 
-    pub title: String,
+    pub name: String,
 
     pub description: String,
 
@@ -48,7 +48,7 @@ pub struct ResourceTagDto {
 pub struct ResourceDetailDto {
     pub id: Thing,
 
-    pub title: String,
+    pub name: String,
 
     pub description: String,
 

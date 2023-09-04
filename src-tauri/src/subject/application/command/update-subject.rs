@@ -27,7 +27,7 @@ impl<'a> UpdateSubjectHandler<'a> {
 impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
 
     fn get_name() -> String {
-        String::from("Change Title Subject Command")
+        String::from("Change Subject Command")
     }
 
     type Output = Result<String, String>;

@@ -5,7 +5,7 @@ use surrealdb::sql::Thing;
 pub struct CategoryResDto {
     pub id: Thing,
 
-    pub title: String,
+    pub name: String,
 
     pub resource_num: i64,
 
