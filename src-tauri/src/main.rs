@@ -138,6 +138,7 @@ fn main() {
             resource::application::add_resource_tag,
             resource::application::remove_resource_tag,
             resource::application::get_resource_detail,
+            resource::application::list_resource,
             tag::application::create_tag,
             tag::application::update_tag,
             tag::application::get_all_tag,

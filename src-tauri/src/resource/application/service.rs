@@ -6,25 +6,9 @@ use crate::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, Resou
 use crate::category::repository::CATEGORY_REPOSITORY;
 use crate::tag::repository::{TagRepository, TAG_REPOSITORY};
 
-use super::command::{
-    CreateResourceCommand,
-    CreateResourceHandler,
-    UpdateResourceHandler,
-    UpdateResourceCommand,
-    ResourceAddTagCommand,
-    ResourceAddTagHandler,
-    ResourceRemoveTagCommand,
-    ResourceRemoveTagHandler
-};
-use super::dto::{ResourceResDto, ResourceDetailDto};
-use super::query::{
-    GetByIdResourceQuery, 
-    GetByIdResourceHandler, 
-    GetAllResourceQuery, 
-    GetAllResourceHandler, 
-    ResourceDetailQuery, 
-    ResourceDetailHandler
-};
+use super::command::*;
+use super::dto::*;
+use super::query::*;
 
 pub static RESOURCE_SERVICE: ResourceService = ResourceService::init(
     &RESOURCE_REPOSITORY, 
@@ -187,5 +171,26 @@ impl<'a> ResourceService<'a> {
             .unwrap();
 
         Ok(())
+    }
+
+    pub async fn list_resource(
+        &self, 
+        id: Option<String>,
+        name: Option<String>,
+        belong_category: Option<String>, 
+        order_by: Option<String>,
+    ) -> Result<Vec<ResourceResDto>, String> {
+        let query = ListResourceQuery { 
+            id,
+            name,
+            belong_category,
+            order_by
+        };
+        
+        let handler = ListResourceHandler::register(self.resource_query_repo);
+
+        let res = handler.query(query).await?;
+
+        Ok(res)
     }
 }

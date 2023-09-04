@@ -74,3 +74,22 @@ pub async fn explore_the_file(file_path: String) -> Result<(), String> {
 
     Ok(())
 }
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn list_resource(
+    id: Option<String>,
+    name: Option<String>,
+    belong_category: Option<String>, 
+    order_by: Option<String>,
+) -> Result<Vec<ResourceResDto>, String> {
+    let result = RESOURCE_SERVICE
+        .list_resource(
+            id, 
+            name, 
+            belong_category, 
+            order_by
+        )
+        .await?;
+
+    Ok(result)
+}
