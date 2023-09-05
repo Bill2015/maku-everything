@@ -30,11 +30,25 @@ export namespace ResourceQuery {
         const queryfn = () => ResourceAPI.getById(id);
 
         return useQuery(
-            ['resurce', id],
+            ['resource', id],
             queryfn,
             {
                 placeholderData: null,
                 initialData:     null,
+            },
+        );
+    }
+
+    export function useGetByCategory(categoryId: string | null) {
+        const queryfn = () => ResourceAPI.query({ belong_category: categoryId! });
+
+        return useQuery(
+            ['resource', 'belong-category', categoryId],
+            queryfn,
+            {
+                enabled:         !!categoryId,
+                placeholderData: [],
+                initialData:     [],
             },
         );
     }

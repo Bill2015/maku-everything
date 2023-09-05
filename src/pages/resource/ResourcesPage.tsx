@@ -12,7 +12,11 @@ import { CreateResourceModal } from './components/ResourceModal';
 export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const navigateResourceTo = useResourceDetailNavigate();
-    const { data: resourceData, isFetching: isResourceFetching, refetch: resourceRefetch } = ResourceQuery.useGetAll();
+    const {
+        data: resourceData,
+        isFetching: isResourceFetching,
+        refetch: resourceRefetch,
+    } = ResourceQuery.useGetByCategory(activeCategory.id);
     const [opened, { open, close }] = useDisclosure(false);
 
     const createResource = ResourceMutation.useCreate();

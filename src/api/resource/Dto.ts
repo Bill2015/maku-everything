@@ -71,3 +71,13 @@ export interface ResourceDetailDto {
 
     tags: ResourceTagDto[],
 }
+
+export interface QueryResoruceDto {
+    id?: string;
+
+    name?: string;
+
+    belong_category?: string;
+
+    order_by?: string;
+}
