@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Navbar, Stack, UnstyledButton, Tooltip } from '@mantine/core';
+import { Navbar, Stack, UnstyledButton, Tooltip, Image } from '@mantine/core';
 import { IconBaseProps } from 'react-icons/lib';
-import { HiHome } from 'react-icons/hi';
-import { BsGear } from 'react-icons/bs';
+import { BsGear, BsMailbox } from 'react-icons/bs';
+import Logo from '@assets/logo.png';
+import { useHomeNavigate } from '@router/navigateHook';
+
 import { useNavbarStyles } from './Navbar.style';
 
 interface NavbarLinkProps {
@@ -26,16 +28,13 @@ function NavbarLink(props: NavbarLinkProps) {
 }
 
 const mockdata = [
-    {
-        icon: HiHome, label: 'Home',
-    },
-    {
-        icon: BsGear, label: 'Setting',
-    },
+    { icon: BsGear, label: 'Setting' },
+    { icon: BsMailbox, label: 'Contact' },
 ];
 
 export function MainNavbar() {
     const [active, setActive] = useState(2);
+    const navigateToHome = useHomeNavigate();
 
     const navbarItem = mockdata.map((val, index) => (
         <NavbarLink
@@ -43,14 +42,23 @@ export function MainNavbar() {
             label={val.label}
             key={val.label}
             active={index === active}
-            onClick={() => setActive(index)}
+            onClick={() => {
+                setActive(index);
+            }}
         />
     ));
 
     return (
-        <Navbar height={750} width={{ base: 80 }} p="md">
-            <Navbar.Section grow mt={50}>
-                <Stack justify="center" spacing={0}>
+        <Navbar height={750} width={{ base: 50 }} p="xs" pl={0} pr={0}>
+            <Navbar.Section>
+                <Tooltip label="Maku" position="right" transitionProps={{ duration: 0 }}>
+                    <UnstyledButton onClick={navigateToHome}>
+                        <Image p={5} src={Logo} />
+                    </UnstyledButton>
+                </Tooltip>
+            </Navbar.Section>
+            <Navbar.Section grow>
+                <Stack justify="center" spacing={2}>
                     {navbarItem}
                 </Stack>
             </Navbar.Section>
