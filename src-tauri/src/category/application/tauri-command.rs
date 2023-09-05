@@ -1,10 +1,10 @@
 use super::service::CATEGORY_SERVICE;
 use super::dto::{CategoryError, CategoryResDto};
 
-#[tauri::command]
-pub async fn create_category(name: &str, description: &str) -> Result<String, CategoryError> {
+#[tauri::command(rename_all = "snake_case")]
+pub async fn create_category(name: &str, description: &str, root_path: &str) -> Result<String, CategoryError> {
     let result = CATEGORY_SERVICE
-        .create_category(name.to_string(), description.to_string())
+        .create_category(name.to_string(), description.to_string(), root_path.to_string())
         .await?;
 
     Ok(result)

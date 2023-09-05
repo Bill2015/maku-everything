@@ -19,13 +19,19 @@ pub struct ResourceFileAggregate {
 }
 
 impl ResourceFileAggregate {
-    pub fn new(file_path: String) -> Result<Option<Self>, String> {
+    pub fn new(root_path: String, file_path: String) -> Result<Option<Self>, String> {
         
         if file_path.is_empty() {
             return Ok(None);
         }
 
-        let path = Path::new(file_path.as_str());
+        // If path already contain root path
+        // trim it and re-concat it
+        let main_path = file_path.trim_start_matches(&root_path);
+        let full_path = root_path + main_path;
+
+        // concat with root path
+        let path = Path::new(full_path.as_str());
 
         if path.exists() == false {
             return Err(String::from("Path not exist"));
@@ -46,7 +52,7 @@ impl ResourceFileAggregate {
                     uuid: String::from("id"),
                     name: String::from(path.file_name().unwrap().to_str().unwrap()),
                     ext: String::from(ext.to_str().unwrap()),
-                    path: file_path,
+                    path: String::from(main_path),
                 }
             )
         )
@@ -80,13 +86,13 @@ pub struct ResourceAggregate {
 
 impl ResourceAggregate {
 
-    pub fn new(name: String, description: String, belong_category: CategoryID, file_path: String) -> Result<Self, String> {
+    pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String) -> Result<Self, String> {
         Ok(ResourceAggregate {
             id: ResourceID::new(),
             name: name,
             description: description,
             belong_category: belong_category,
-            file: ResourceFileAggregate::new(file_path)?,
+            file: ResourceFileAggregate::new(root_path, file_path)?,
             auth: false,
             tags: Vec::new(),
             new_tags: Vec::new(),
@@ -112,8 +118,8 @@ impl ResourceAggregate {
         self.description = new_description;
     }
 
-    pub fn change_file(&mut self, file_path: String) -> Result<(), String> {
-        self.file = ResourceFileAggregate::new(file_path)?;
+    pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), String> {
+        self.file = ResourceFileAggregate::new(root_path, file_path)?;
         Ok(())
     }
 

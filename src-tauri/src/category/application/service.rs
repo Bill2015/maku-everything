@@ -25,9 +25,10 @@ impl<'a> CategoryService<'a> {
         }
     }
 
-    pub async fn create_category(&self, name: String, description: String) -> Result<String, CategoryError> {
+    pub async fn create_category(&self, name: String, description: String, root_path: String) -> Result<String, CategoryError> {
         let command = CreateCategoryCommand {
             name: name,
+            root_path: root_path,
             description: description,
             auth: false,
         };

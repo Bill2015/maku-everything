@@ -13,6 +13,8 @@ pub struct CategoryResDto {
 
     pub auth: bool,
 
+    pub root_path: String,
+
     pub created_at: String,
 
     pub updated_at: String,

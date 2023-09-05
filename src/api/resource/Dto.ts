@@ -5,6 +5,8 @@ export interface ResourceFileDto {
 
     path: string,
 
+    root: string,
+
     ext: string,
 }
 

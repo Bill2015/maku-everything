@@ -9,6 +9,8 @@ pub struct ResourceFileDto {
 
     pub path: String,
 
+    pub root: String,
+
     pub ext: String,
 }
 

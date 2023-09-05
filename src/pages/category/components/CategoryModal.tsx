@@ -10,12 +10,17 @@ export function CreateCategoryModal(props: CreateCategoryModalProps) {
     const { onConfirm, ...modelProps } = props;
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
+    const [rootPath, setRootPath] = useState<string>('');
 
     const handleCreateConfirm = useCallback(() => {
         setName('');
         setDescription('');
-        onConfirm({ name: name, description: description });
-    }, [description, name, onConfirm]);
+        onConfirm({
+            name:        name,
+            description: description,
+            root_path:   rootPath,
+        });
+    }, [description, rootPath, name, onConfirm]);
 
     return (
         // eslint-disable-next-line react/jsx-props-no-spreading
@@ -32,6 +37,12 @@ export function CreateCategoryModal(props: CreateCategoryModalProps) {
                 </Grid.Col>
                 <Grid.Col span={8}>
                     <Input placeholder="category description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                </Grid.Col>
+                <Grid.Col span={4}>
+                    Root Path:
+                </Grid.Col>
+                <Grid.Col span={8}>
+                    <Input placeholder="root path" value={rootPath} onChange={(e) => setRootPath(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={6}>
                     <Button color="pink">Cancel</Button>

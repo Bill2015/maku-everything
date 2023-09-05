@@ -22,8 +22,14 @@ impl<'a> ResourceQueryRepository<'a> {
     }
 
     pub async fn get_all(&self) -> surrealdb::Result<Vec<ResourceResDto>> {
+       let sql = r#"
+            SELECT 
+                *,
+                (->belong->category.root_path)[0] as file.root
+            FROM type::table($table)"#;
+
         let mut response = self.db
-            .query("SELECT * FROM type::table($table)")
+            .query(sql)
             .bind(("table", &tablens::RESOURCE))
             .await?;
 
@@ -35,6 +41,13 @@ impl<'a> ResourceQueryRepository<'a> {
     }
 
     pub async fn get_by_id(&self, id: &String) -> surrealdb::Result<Option<ResourceResDto>> {
+        let sql = r#"
+            SELECT 
+                *,
+                (->belong->category.root_path)[0] as file.root
+            FROM type::table($table)
+            WHERE id == $id"#;
+
         let mut response = self.db
             .query("SELECT * FROM type::table($table) WHERE id == $id")
             .bind(("table", &tablens::RESOURCE))
@@ -53,6 +66,7 @@ impl<'a> ResourceQueryRepository<'a> {
         let sql = r#"
             SELECT 
             *,
+            (->belong->category.root_path)[0] as file.root,
             (SELECT 
                 *,
                 (->belong->subject.name)[0] AS subject_name
@@ -80,7 +94,8 @@ impl<'a> ResourceQueryRepository<'a> {
 
         let sql = format!(
             r#"SELECT 
-                *
+                *,
+                (->belong->category.root_path)[0] as file.root
             FROM resource WHERE {}"#
         , query_string);
 

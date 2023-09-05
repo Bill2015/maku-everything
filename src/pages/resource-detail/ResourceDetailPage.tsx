@@ -47,7 +47,11 @@ export default function ResourcesDetailPage() {
         <>
             <Grid mah="100%" h="100%">
                 <Grid.Col p={0} lg={6} h="100%" ta="center">
-                    <img alt="Iamge" style={{ maxHeight: '100%', maxWidth: '100%' }} src={convertFileSrc(resourceData.file.path)} />
+                    <img
+                        alt="Iamge"
+                        style={{ maxHeight: '100%', maxWidth: '100%' }}
+                        src={convertFileSrc(resourceData.file.root + resourceData.file.path)}
+                    />
                 </Grid.Col>
                 <Grid.Col p={0} lg={6} h="100%">
                     <Flex gap="xs">

@@ -42,17 +42,14 @@ impl<'a> ResourceService<'a> {
         let category = self.category_repository
             .find_by_id(&belong_category)
             .await
-            .unwrap_or(None);
-
-        if category.is_none() {
-            println!("Category Not Exist");
-            return Err(String::from("Category Not Exist"));
-        }
+            .unwrap_or(None)
+            .ok_or(String::from("Category Not Exist"))?;
         
         let command = CreateResourceCommand {
             name,
             description,
-            belong_category: category.unwrap().id,
+            belong_category: category.id,
+            root_path: category.root_path,
             file_path,
         };
 

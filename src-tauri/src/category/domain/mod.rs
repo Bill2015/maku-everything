@@ -1,30 +1,57 @@
+use std::path::Path;
+
 use serde::Serialize;
 use chrono::{DateTime, Utc};
+
 use crate::common::domain::ID;
 
 mod id;
 pub use id::CategoryID;
+
+use super::application::dto::CategoryError;
 
 #[derive(Debug, Serialize)]
 pub struct CategoryAggregate {
     pub id: CategoryID,
     pub name: String,
     pub description: String,
+    pub root_path: String,
     pub auth: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
 
 impl CategoryAggregate {
-    pub fn new(name: String, description: String) -> Self {
-        CategoryAggregate {
-            id: CategoryID::new(),
-            name: name,
-            description: description,
-            auth: false,
-            created_at: Utc::now(),
-            updated_at: Utc::now(),
+    pub fn new(name: String, description: String, root_path: String) -> Result<Self, CategoryError> {
+        // path can't be empty
+        if root_path.is_empty() {
+            return Err(CategoryError::Create());
         }
+
+        // the path must be end with '\'
+        // TODO: linux path need to impl?
+        let new_path = match  root_path.ends_with("\\") {
+            true => root_path,
+            false => root_path + "\\",
+        };
+
+        // create path object
+        let path = Path::new(new_path.as_str());
+        if path.exists() == false {
+            return Err(CategoryError::Create());
+        }
+        
+        Ok(
+            CategoryAggregate {
+                id: CategoryID::new(),
+                name: name,
+                description: description,
+                root_path: new_path,
+                auth: false,
+                created_at: Utc::now(),
+                updated_at: Utc::now(),
+            }
+        )
     }
 
     pub fn change_name(&mut self, new_name: String) {

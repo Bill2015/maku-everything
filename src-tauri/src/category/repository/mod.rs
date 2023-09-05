@@ -23,6 +23,7 @@ pub struct CategoryDO {
     pub name: String,
     pub description: String,
     pub auth: bool,
+    pub root_path: String,
     pub created_at: Datetime,
     pub updated_at: Datetime,
 }

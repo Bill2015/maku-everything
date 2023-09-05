@@ -24,7 +24,13 @@ export default function ResourcesPage() {
         }
     }, [activeCategory, navigateResourceTo]);
 
-    const resourceItems = resourceData.map((val) => <ResourceCard key={val.id} data={val} onDetailClick={handleResoruceDetail} />);
+    const resourceItems = resourceData.map((val) => (
+        <ResourceCard
+            key={val.id}
+            data={val}
+            onDetailClick={handleResoruceDetail}
+        />
+    ));
 
     const handleCreateConfirm = useCallback(async (data: ResourceCreateDto) => {
         const _ = await createResource.mutateAsync(data);
