@@ -36,7 +36,7 @@ export default function ResourcesDetailPage() {
 
     const handleExporeClick = useCallback(() => {
         if (resourceData) {
-            exporeFile.mutateAsync(resourceData.file.path);
+            exporeFile.mutateAsync(resourceData.file.root + resourceData.file.path);
         }
     }, [exporeFile, resourceData]);
 
@@ -55,6 +55,9 @@ export default function ResourcesDetailPage() {
                 </Grid.Col>
                 <Grid.Col p={0} lg={6} h="100%">
                     <Flex gap="xs">
+                        <Text fz="sm" c="dimmed" lh={2}>
+                            {resourceData.file.root}
+                        </Text>
                         <Text fz="sm" c="dimmed" lh={2}>
                             {resourceData.file.path}
                         </Text>
