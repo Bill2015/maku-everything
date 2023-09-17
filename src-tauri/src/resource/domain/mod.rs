@@ -87,12 +87,25 @@ pub struct ResourceAggregate {
 impl ResourceAggregate {
 
     pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String) -> Result<Self, String> {
+        let file = ResourceFileAggregate::new(root_path, file_path)?;
+        
+        if name.is_empty() && file.is_none() {
+            return Err(String::from("Create Resource Error"));
+        }
+        
+        // if no provide resource name, use file name as default
+        let new_name = match name.is_empty() {
+            true => file.as_ref().unwrap().name.clone(),
+            false => name,
+        };
+
+        
         Ok(ResourceAggregate {
             id: ResourceID::new(),
-            name: name,
+            name: new_name,
             description: description,
             belong_category: belong_category,
-            file: ResourceFileAggregate::new(root_path, file_path)?,
+            file: file,
             auth: false,
             tags: Vec::new(),
             new_tags: Vec::new(),
