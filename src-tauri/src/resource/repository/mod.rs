@@ -34,6 +34,12 @@ pub struct ResourceFileDo {
     pub ext: String,
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ResourceUrlDo {
+    pub host: String,
+    pub full: String,
+}
+
 /**
  * Resource Data Object */
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -43,6 +49,7 @@ pub struct ResourceDO {
     pub name: String,
     pub description: String,
     pub file: Option<ResourceFileDo>,
+    pub url: Option<ResourceUrlDo>,
     pub auth: bool,
     pub created_at: Datetime,
     pub updated_at: Datetime,

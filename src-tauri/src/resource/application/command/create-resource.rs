@@ -14,6 +14,7 @@ pub struct CreateResourceCommand {
     pub belong_category: CategoryID,
     pub root_path: String,
     pub file_path: String,
+    pub url_path: String,
 }
 
 // =====================================
@@ -45,11 +46,12 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
             belong_category, 
             root_path,
             file_path,
+            url_path,
         } = command;
 
 
         // create new resource
-        let new_resource = match ResourceAggregate::new(name, description, belong_category, root_path, file_path) {
+        let new_resource = match ResourceAggregate::new(name, description, belong_category, root_path, file_path, url_path) {
             Ok(value) => value,
             _ => return Err(String::from("ResourceError::Create()")),
         };

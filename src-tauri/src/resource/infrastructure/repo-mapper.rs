@@ -4,8 +4,10 @@ use surrealdb::sql::thing;
 
 use crate::category::domain::CategoryID;
 use crate::resource::domain::ResourceFileAggregate;
+use crate::resource::domain::ResourceUrlAggregate;
 use crate::resource::domain::{ResourceAggregate, ResourceID};
 use crate::resource::repository::ResourceFileDo;
+use crate::resource::repository::ResourceUrlDo;
 use crate::tag::domain::TagID;
 use crate::common::domain::ID;
 use crate::common::repository::tablens;
@@ -31,12 +33,21 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             None => None,
         };
 
+        let url = match resource_do.url {
+            Some(value) => Some(ResourceUrlAggregate::from_do(
+                value.host,
+                value.full,
+            )),
+            None => None,
+        };
+
         ResourceAggregate {
             id: ResourceID::from(resource_do.id.to_string()),
             name: resource_do.name,
             description: resource_do.description,
             belong_category: CategoryID::from(resource_do.belong_category.to_string()),
             file: file,
+            url: url,
             auth: resource_do.auth,
             tags: tags,
             new_tags: Vec::new(),
@@ -68,12 +79,21 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             None => None,
         };
 
+        let url = match aggregate.url {
+            Some(value) => Some(ResourceUrlDo {
+                host: value.host,
+                full: value.full,
+            }),
+            None => None,
+        };
+
         ResourceDO {
             id: id,
             name: aggregate.name,
             description: aggregate.description,
             belong_category: belong_category,
             file: file,
+            url: url,
             auth: aggregate.auth,
             tags: tags,
             created_at: Datetime(aggregate.created_at),

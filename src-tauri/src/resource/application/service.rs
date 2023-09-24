@@ -38,7 +38,7 @@ impl<'a> ResourceService<'a> {
         }
     }
 
-    pub async fn create_resource(&self, name: String, description: String, file_path: String, belong_category: String) -> Result<String, String> {
+    pub async fn create_resource(&self, name: String, description: String, file_path: String, url_path: String, belong_category: String) -> Result<String, String> {
         let category = self.category_repository
             .find_by_id(&belong_category)
             .await
@@ -51,6 +51,7 @@ impl<'a> ResourceService<'a> {
             belong_category: category.id,
             root_path: category.root_path,
             file_path,
+            url_path,
         };
 
         let handler = CreateResourceHandler::register(self.resource_repository);

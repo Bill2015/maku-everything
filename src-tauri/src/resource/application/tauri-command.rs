@@ -1,9 +1,15 @@
 use super::{service::RESOURCE_SERVICE, dto::{ResourceResDto, ResourceDetailDto}};
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_resource(name: &str, description: &str, file_path: &str, belong_category: &str) -> Result<String, String> {
+pub async fn create_resource(name: &str, description: &str, file_path: &str, url_path: &str, belong_category: &str) -> Result<String, String> {
     let result = RESOURCE_SERVICE
-        .create_resource(name.to_string(), description.to_string(), file_path.to_string(), belong_category.to_string())
+        .create_resource(
+            name.to_string(),
+            description.to_string(),
+            file_path.to_string(),
+            url_path.to_string(),
+            belong_category.to_string()
+        )
         .await?;
 
     Ok(result)

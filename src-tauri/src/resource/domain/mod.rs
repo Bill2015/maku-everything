@@ -1,6 +1,7 @@
 use std::ffi::OsStr;
 use std::{path::Path};
 use chrono::{DateTime, Utc};
+use url::Url;
 use serde::Serialize;
 use crate::category::domain::CategoryID;
 use crate::tag::domain::TagID;
@@ -68,6 +69,42 @@ impl ResourceFileAggregate {
     } 
 }
 
+#[derive(Debug, Serialize)]
+pub struct ResourceUrlAggregate {
+    pub host: String,
+    pub full: String,
+}
+impl ResourceUrlAggregate {
+    pub fn new(url: String) -> Result<Option<Self>, String> {
+        if url.is_empty() {
+            return Ok(None);
+        }
+
+        let url_obj = Url::parse(url.as_str())
+            .or(Err(String::from("url::ParseError")))?;
+
+        if url_obj.host().is_none() {
+            return Err(String::from("url::ParseError::EmptyHost"));
+        }
+
+        Ok(
+            Some(
+                ResourceUrlAggregate {
+                    host: url_obj.host().unwrap().to_string(),
+                    full: url,
+                }
+            )
+        )
+    }
+
+    pub fn from_do(host: String, full: String) -> Self {
+        ResourceUrlAggregate {
+            host: host,
+            full: full,
+        }
+    }
+}
+
 // =====================================================
 #[derive(Debug, Serialize)]
 pub struct ResourceAggregate {
@@ -76,6 +113,7 @@ pub struct ResourceAggregate {
     pub description: String,
     pub belong_category: CategoryID,
     pub file: Option<ResourceFileAggregate>,
+    pub url: Option<ResourceUrlAggregate>,
     pub auth: bool,
     pub tags: Vec<TagID>,
     pub new_tags: Vec<TagID>,
@@ -86,8 +124,10 @@ pub struct ResourceAggregate {
 
 impl ResourceAggregate {
 
-    pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String) -> Result<Self, String> {
+    pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String, url: String) -> Result<Self, String> {
         let file = ResourceFileAggregate::new(root_path, file_path)?;
+
+        let url = ResourceUrlAggregate::new(url)?;
         
         if name.is_empty() && file.is_none() {
             return Err(String::from("Create Resource Error"));
@@ -106,6 +146,7 @@ impl ResourceAggregate {
             description: description,
             belong_category: belong_category,
             file: file,
+            url: url,
             auth: false,
             tags: Vec::new(),
             new_tags: Vec::new(),
