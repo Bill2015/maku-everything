@@ -2,8 +2,11 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
+use crate::common::application::thing_serialize;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CategoryResDto {
+    #[serde(serialize_with = "thing_serialize")]
     pub id: Thing,
 
     pub name: String,
