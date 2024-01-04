@@ -47,8 +47,6 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
         let result = self.categroy_repo
             .save(new_category)
             .await;
-
-        dbg!(&result);
         
         match result {
             Ok(value) => Ok(value.id.to_string()),

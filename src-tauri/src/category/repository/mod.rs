@@ -74,14 +74,11 @@ impl<'a> CategoryRepository<'a> {
         let result: Option<CategoryDO> = match is_new {
             true => {
                 // let db auto generate the id
-                let data =  self.db
+                self.db
                     .create(tablens::CATEGORY)
                     .content(category_do)
                     .await?
-                    .pop();
-                dbg!(&data);
-                data
-
+                    .pop()
             }
             false => {
                 self.db
@@ -91,8 +88,6 @@ impl<'a> CategoryRepository<'a> {
             }
         };
         
-        dbg!(&result);
-
         let aggregate: CategoryAggregate = CategoryRepoMapper::do_to_aggregate(result.unwrap());
 
         Ok(aggregate)
