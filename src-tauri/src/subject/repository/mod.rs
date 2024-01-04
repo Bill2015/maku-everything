@@ -2,6 +2,7 @@
 mod query;
 pub use query::{SUBJECT_QUERY_REPOSITORY, SubjectQueryRepository};
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
@@ -34,12 +35,12 @@ pub struct SubjectDO {
 /**
  * Repository */
 pub struct SubjectRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
     common_repo: &'a CommonRepository<'a>,
 }
 
 impl<'a> SubjectRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>, common_repo: &'a CommonRepository) -> Self {
+    pub const fn init(db: &'a Lazy<Surreal<Client>>, common_repo: &'a CommonRepository) -> Self {
         SubjectRepository {
             db: db,
             common_repo: common_repo,
@@ -106,6 +107,7 @@ impl<'a> SubjectRepository<'a> {
                     .create(tablens::SUBJECT)
                     .content(subject_do)
                     .await?
+                    .pop()
 
             }
             false => {

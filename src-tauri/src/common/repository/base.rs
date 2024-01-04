@@ -33,12 +33,14 @@ pub mod relatens {
 
 
 pub mod env {
-    pub static DB: Surreal<Client> = Surreal::init();
 
+    use once_cell::sync::Lazy;
     use surrealdb::Surreal;
     use surrealdb::engine::remote::ws::Client;
     use surrealdb::engine::remote::ws::Ws;
     use surrealdb::opt::auth::Root;
+
+    pub static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
     pub async fn connent_db() -> Result<String, surrealdb::Error> {
         // Connect to the server

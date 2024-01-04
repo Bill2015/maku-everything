@@ -1,4 +1,5 @@
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
@@ -21,11 +22,11 @@ pub static COMMON_REPOSITORY: CommonRepository<'_> = CommonRepository::init(&env
 /**
  * Repository */
  pub struct CommonRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
 }
 
 impl<'a> CommonRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
+    pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         CommonRepository { db: db }
     }
 

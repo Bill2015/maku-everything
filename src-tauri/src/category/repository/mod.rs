@@ -2,6 +2,7 @@
 mod query;
 pub use query::{CATEGORY_QUERY_REPOSITORY, CategoryQueryRepository};
 
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
@@ -30,11 +31,11 @@ pub struct CategoryDO {
 /**
  * Repository */
 pub struct CategoryRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
 }
 
 impl<'a> CategoryRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
+    pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         CategoryRepository { db: db }
     }
 
@@ -78,7 +79,7 @@ impl<'a> CategoryRepository<'a> {
                     .create(tablens::CATEGORY)
                     .content(category_do)
                     .await?
-
+                    .pop()
             }
             false => {
                 self.db
@@ -87,7 +88,7 @@ impl<'a> CategoryRepository<'a> {
                     .await?
             }
         };
-
+        
         let aggregate: CategoryAggregate = CategoryRepoMapper::do_to_aggregate(result.unwrap());
 
         Ok(aggregate)

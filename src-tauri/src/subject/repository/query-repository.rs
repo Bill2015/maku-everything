@@ -1,3 +1,4 @@
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
@@ -10,10 +11,10 @@ use crate::subject::infrastructure::SubjectQueryBuilder;
 pub static SUBJECT_QUERY_REPOSITORY: SubjectQueryRepository<'_> = SubjectQueryRepository::init(&env::DB);
 
 pub struct SubjectQueryRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
 }
 impl<'a> SubjectQueryRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
+    pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         SubjectQueryRepository { db: db }
     }
 

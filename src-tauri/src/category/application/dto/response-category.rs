@@ -1,8 +1,12 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
+use crate::common::application::thing_serialize;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CategoryResDto {
+    #[serde(serialize_with = "thing_serialize")]
     pub id: Thing,
 
     pub name: String,
@@ -15,7 +19,7 @@ pub struct CategoryResDto {
 
     pub root_path: String,
 
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
 
-    pub updated_at: String,
+    pub updated_at: DateTime<Utc>,
 }

@@ -1,3 +1,4 @@
+use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
@@ -13,11 +14,11 @@ pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQuer
 /**
  * Repository */
  pub struct ResourceQueryRepository<'a> {
-    db: &'a Surreal<Client>,
+    db: &'a Lazy<Surreal<Client>>,
 }
 
 impl<'a> ResourceQueryRepository<'a> {
-    pub const fn init(db: &'a Surreal<Client>) -> Self {
+    pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         ResourceQueryRepository { db: db }
     }
 
