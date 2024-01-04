@@ -1,13 +1,13 @@
-import { InvokeArgs } from '@tauri-apps/api/tauri';
-
 export interface CategoryResDto {
     id: string,
 
-    title: string,
+    name: string,
 
     resource_num: number,
 
     description: string,
+
+    root_path: string;
 
     auth: boolean,
 
@@ -17,9 +17,11 @@ export interface CategoryResDto {
 }
 
 export interface CategoryCreateDto {
-    title: string,
+    name: string,
 
     description: string;
+
+    root_path: string;
 }
 
 export interface CategoryUpdateDto extends Partial<CategoryCreateDto> {

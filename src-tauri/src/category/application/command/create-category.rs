@@ -8,8 +8,9 @@ use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
 
 pub struct CreateCategoryCommand {
-    pub title: String,
+    pub name: String,
     pub description: String,
+    pub root_path: String,
     pub auth: bool,
 }
 
@@ -35,13 +36,14 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
 
     async fn execute(&self, command: CreateCategoryCommand) -> Self::Output {
         let CreateCategoryCommand { 
-            title,
-            description, 
+            name,
+            description,
+            root_path,
             auth,
         } = command;
 
         // create new category
-        let new_category = CategoryAggregate::new(title, description);
+        let new_category = CategoryAggregate::new(name, description, root_path)?;
 
         // save
         let result = self.categroy_repo

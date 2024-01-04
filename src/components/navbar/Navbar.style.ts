@@ -2,9 +2,9 @@ import { createStyles, rem } from '@mantine/core';
 
 export const useNavbarStyles = createStyles((theme) => ({
     link: {
-        width:          rem(50),
-        height:         rem(50),
-        borderRadius:   theme.radius.md,
+        width:          '100%',
+        height:         rem(30),
+        borderRadius:   0,
         display:        'flex',
         alignItems:     'center',
         justifyContent: 'center',

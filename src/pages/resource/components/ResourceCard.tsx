@@ -4,6 +4,7 @@ import { ResourceResDto } from '@api/resource';
 
 export interface ResourceCardProps {
     data: ResourceResDto;
+
     onDetailClick: (data: ResourceResDto) => void;
 }
 
@@ -14,11 +15,11 @@ export function ResourceCard(props: ResourceCardProps) {
         <Grid.Col lg={2} md={4} sm={6}>
             <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Card.Section>
-                    <Image src={convertFileSrc(data.file.path)} alt={data.title} height={180} />
+                    <Image src={convertFileSrc(data.file.root + data.file.path)} alt={data.name} height={180} />
                 </Card.Section>
 
                 <Group position="apart" mt="md" mb="xs">
-                    <Text>{data.title}</Text>
+                    <Text>{data.name}</Text>
                 </Group>
 
                 <Group position="apart" mt="md" mb="xs">

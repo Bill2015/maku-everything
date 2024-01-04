@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ResourceAPI } from './ResourceAPI';
 import { ResourceTagDto } from './Dto';
@@ -30,11 +30,25 @@ export namespace ResourceQuery {
         const queryfn = () => ResourceAPI.getById(id);
 
         return useQuery(
-            ['resurce', id],
+            ['resource', id],
             queryfn,
             {
                 placeholderData: null,
                 initialData:     null,
+            },
+        );
+    }
+
+    export function useGetByCategory(categoryId: string | null) {
+        const queryfn = () => ResourceAPI.query({ belong_category: categoryId! });
+
+        return useQuery(
+            ['resource', 'belong-category', categoryId],
+            queryfn,
+            {
+                enabled:         !!categoryId,
+                placeholderData: [],
+                initialData:     [],
             },
         );
     }
@@ -50,10 +64,6 @@ export namespace ResourceQuery {
                 initialData:     null,
             },
         );
-
-        useEffect(() => {
-            console.log("change");
-        }, [resourceData]);
 
         // Mapping the tag by subjectName
         const resourceTagData: IResourceTagGroup[] = useMemo(() => {
@@ -76,9 +86,17 @@ export namespace ResourceQuery {
             return Array.from(map.values());
         }, [resourceData]);
 
+        const subjects: Set<string> = useMemo(() => {
+            if (resourceData) {
+                return new Set<string>(resourceData.tags.map((val) => val.belong_subject));
+            }
+            return new Set();
+        }, [resourceData]);
+
         return {
             data:       resourceData,
             tagMapData: resourceTagData,
+            subjects:   subjects,
             ...query,
         };
     }

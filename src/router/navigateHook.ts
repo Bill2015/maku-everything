@@ -22,3 +22,13 @@ export function useResourceDetailNavigate() {
 
     return jumpFn;
 }
+
+export function useHomeNavigate() {
+    const navigate = useNavigate();
+
+    const jumpFn = useCallback(() => {
+        navigate('/', { replace: true });
+    }, [navigate]);
+
+    return jumpFn;
+}

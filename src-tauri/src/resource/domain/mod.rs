@@ -1,6 +1,7 @@
 use std::ffi::OsStr;
 use std::{path::Path};
 use chrono::{DateTime, Utc};
+use url::Url;
 use serde::Serialize;
 use crate::category::domain::CategoryID;
 use crate::tag::domain::TagID;
@@ -19,13 +20,19 @@ pub struct ResourceFileAggregate {
 }
 
 impl ResourceFileAggregate {
-    pub fn new(file_path: String) -> Result<Option<Self>, String> {
+    pub fn new(root_path: String, file_path: String) -> Result<Option<Self>, String> {
         
         if file_path.is_empty() {
             return Ok(None);
         }
 
-        let path = Path::new(file_path.as_str());
+        // If path already contain root path
+        // trim it and re-concat it
+        let main_path = file_path.trim_start_matches(&root_path);
+        let full_path = root_path + main_path;
+
+        // concat with root path
+        let path = Path::new(full_path.as_str());
 
         if path.exists() == false {
             return Err(String::from("Path not exist"));
@@ -46,7 +53,7 @@ impl ResourceFileAggregate {
                     uuid: String::from("id"),
                     name: String::from(path.file_name().unwrap().to_str().unwrap()),
                     ext: String::from(ext.to_str().unwrap()),
-                    path: file_path,
+                    path: String::from(main_path),
                 }
             )
         )
@@ -62,14 +69,51 @@ impl ResourceFileAggregate {
     } 
 }
 
+#[derive(Debug, Serialize)]
+pub struct ResourceUrlAggregate {
+    pub host: String,
+    pub full: String,
+}
+impl ResourceUrlAggregate {
+    pub fn new(url: String) -> Result<Option<Self>, String> {
+        if url.is_empty() {
+            return Ok(None);
+        }
+
+        let url_obj = Url::parse(url.as_str())
+            .or(Err(String::from("url::ParseError")))?;
+
+        if url_obj.host().is_none() {
+            return Err(String::from("url::ParseError::EmptyHost"));
+        }
+
+        Ok(
+            Some(
+                ResourceUrlAggregate {
+                    host: url_obj.host().unwrap().to_string(),
+                    full: url,
+                }
+            )
+        )
+    }
+
+    pub fn from_do(host: String, full: String) -> Self {
+        ResourceUrlAggregate {
+            host: host,
+            full: full,
+        }
+    }
+}
+
 // =====================================================
 #[derive(Debug, Serialize)]
 pub struct ResourceAggregate {
     pub id: ResourceID,
-    pub title: String,
+    pub name: String,
     pub description: String,
     pub belong_category: CategoryID,
     pub file: Option<ResourceFileAggregate>,
+    pub url: Option<ResourceUrlAggregate>,
     pub auth: bool,
     pub tags: Vec<TagID>,
     pub new_tags: Vec<TagID>,
@@ -80,13 +124,29 @@ pub struct ResourceAggregate {
 
 impl ResourceAggregate {
 
-    pub fn new(title: String, description: String, belong_category: CategoryID, file_path: String) -> Result<Self, String> {
+    pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String, url: String) -> Result<Self, String> {
+        let file = ResourceFileAggregate::new(root_path, file_path)?;
+
+        let url = ResourceUrlAggregate::new(url)?;
+        
+        if name.is_empty() && file.is_none() {
+            return Err(String::from("Create Resource Error"));
+        }
+        
+        // if no provide resource name, use file name as default
+        let new_name = match name.is_empty() {
+            true => file.as_ref().unwrap().name.clone(),
+            false => name,
+        };
+
+        
         Ok(ResourceAggregate {
             id: ResourceID::new(),
-            title: title,
+            name: new_name,
             description: description,
             belong_category: belong_category,
-            file: ResourceFileAggregate::new(file_path)?,
+            file: file,
+            url: url,
             auth: false,
             tags: Vec::new(),
             new_tags: Vec::new(),
@@ -96,12 +156,12 @@ impl ResourceAggregate {
         })
     }
 
-    pub fn change_title(&mut self, new_title: String) {
-        if new_title.len() <= 0 {
-            println!("Title can't be empty");
+    pub fn change_name(&mut self, new_name: String) {
+        if new_name.len() <= 0 {
+            println!("Name can't be empty");
         }
 
-        self.title = new_title;
+        self.name = new_name;
     }
 
     pub fn change_description(&mut self, new_description: String) {
@@ -112,8 +172,8 @@ impl ResourceAggregate {
         self.description = new_description;
     }
 
-    pub fn change_file(&mut self, file_path: String) -> Result<(), String> {
-        self.file = ResourceFileAggregate::new(file_path)?;
+    pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), String> {
+        self.file = ResourceFileAggregate::new(root_path, file_path)?;
         Ok(())
     }
 

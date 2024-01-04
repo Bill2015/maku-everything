@@ -31,18 +31,11 @@ pub struct TagDO {
    pub created_at: Datetime,
    pub updated_at: Datetime,
 
-   #[serde(skip_serializing)]
-   #[serde(default = "default_ref")]
-   pub belong_category: String, 
+   pub belong_category: Thing, 
 
-   #[serde(skip_serializing)]
-   #[serde(default = "default_ref")]
-   pub belong_subject: String,
+   pub belong_subject: Thing,
 }
 
-fn default_ref() -> String {
-    "/".to_string()
-}
 /**
  * Repository */
  pub struct TagRepository<'a> {
@@ -59,7 +52,7 @@ impl<'a> TagRepository<'a> {
     }
 
     async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<TagAggregate>> {
-        let sql = "SELECT *, type::string((->tag_belong.out)[0]) AS belong_category FROM type::table($table) WHERE id == $id";
+        let sql = "SELECT * FROM type::table($table) WHERE id == $id";
 
         let mut response = self.db
             .query(sql)

@@ -5,13 +5,15 @@ export interface ResourceFileDto {
 
     path: string,
 
+    root: string,
+
     ext: string,
 }
 
 export interface ResourceResDto {
     id: string,
 
-    title: string,
+    name: string,
 
     description: string,
 
@@ -23,13 +25,15 @@ export interface ResourceResDto {
 }
 
 export interface ResourceCreateDto {
-    title: string,
+    name: string,
 
     description: string,
 
     belong_category: string,
 
     file_path: string,
+
+    url_path: string,
 }
 
 export interface ResourceTagOperateDto {
@@ -57,7 +61,7 @@ export interface ResourceTagDto {
 export interface ResourceDetailDto {
     id: string,
 
-    title: string,
+    name: string,
 
     description: string,
 
@@ -68,4 +72,14 @@ export interface ResourceDetailDto {
     updated_at: string,
 
     tags: ResourceTagDto[],
+}
+
+export interface QueryResoruceDto {
+    id?: string;
+
+    name?: string;
+
+    belong_category?: string;
+
+    order_by?: string;
 }

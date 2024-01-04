@@ -35,30 +35,31 @@ pub struct ResourceFileDo {
     pub ext: String,
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ResourceUrlDo {
+    pub host: String,
+    pub full: String,
+}
+
 /**
  * Resource Data Object */
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResourceDO {
     #[serde(skip_serializing)]
     pub id: Thing,
-    pub title: String,
+    pub name: String,
     pub description: String,
     pub file: Option<ResourceFileDo>,
+    pub url: Option<ResourceUrlDo>,
     pub auth: bool,
     pub created_at: Datetime,
     pub updated_at: Datetime,
 
-    #[serde(skip_serializing)]
-    #[serde(default = "default_resource")]
-    pub belong_category: String,
+    pub belong_category: Thing,
 
     #[serde(skip_serializing)]
     #[serde(default = "default_vec")]
     pub tags: Vec<Thing>,
-}
-
-fn default_resource() -> String {
-    "/".to_string()
 }
 
 fn default_vec() -> Vec<Thing> {
@@ -89,7 +90,6 @@ impl<'a> ResourceRepository<'a> {
         let sql = r#"
             SELECT 
                 *, 
-                type::string((->resource_belong.out)[0]) AS belong_category,
                 <-tagging.in as tags
             FROM type::table($table) 
             WHERE id == $id"#;

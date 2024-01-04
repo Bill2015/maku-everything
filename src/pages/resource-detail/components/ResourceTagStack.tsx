@@ -1,12 +1,11 @@
-import { PropsWithChildren, useState, useMemo } from 'react';
+import { PropsWithChildren, useState, useMemo, useRef, useEffect } from 'react';
 import {
-    ActionIcon, Badge, Flex, Group, Select, Stack, Text, createStyles, rem,
+    ActionIcon, Badge, Flex, Group, Stack, Text, createStyles, rem,
 } from '@mantine/core';
 import { RxCross1 } from 'react-icons/rx';
-import { IoIosAddCircleOutline } from 'react-icons/io';
 import { ResourceTagDto } from '@api/resource';
-import { TagQuery } from '@api/tag';
-import { useActiveCategoryRedux } from '@store/global';
+import { TagQuery, TagResDto } from '@api/tag';
+import { ResourceTagSelect } from './ResourceTagSelect';
 
 const useSelectStyle = createStyles((_theme) => ({
     root: {
@@ -35,24 +34,33 @@ export interface ResourceTagGroupProps {
 
     tags: ResourceTagDto[];
 
+    autoFocus: boolean;
+
     onSelectNewTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
 
     onRemoveExistTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
 }
 
 export function ResourceTagGroup(props: ResourceTagGroupProps) {
-    const { subjectName, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
-    const { activeCategory } = useActiveCategoryRedux();
+    const { subjectName, autoFocus, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
+    const selectRef = useRef<HTMLInputElement>(null);
     const { classes: selectClasses } = useSelectStyle();
-    const [isSelectFocus, setSelectFocus] = useState<boolean>(false);
-    const [selectInput, setSelectInput] = useState<string>('');
-    const { data: subjectTags } = TagQuery.useGetSubjectTags(activeCategory!.id, subjectId);
+    const [searchValue, setSearchValue] = useState<string>('');
+    const [selectValue, setSelectValue] = useState<string>('');
+    const { data: subjectTags } = TagQuery.useGetSubjectTags(subjectId);
 
-    const handleSelectChange = (tagName: string) => {
-        const tag = subjectTags.find((val) => val.name === tagName);
-        if (tag) {
-            onSelectNewTag({ id: tag.id, name: tag.name });
-            setSelectInput('');
+    // When created, auto focus the add tag input
+    useEffect(() => {
+        if (autoFocus && selectRef.current) {
+            selectRef.current?.focus();
+        }
+    }, [autoFocus]);
+
+    const handleTagSelect = (value: TagResDto | undefined) => {
+        if (value) {
+            onSelectNewTag({ id: value.id, name: value.name });
+            setSelectValue('');
+            setSearchValue('');
         }
     };
 
@@ -65,6 +73,7 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
             pr={3}
             variant="outline"
             tt="initial"
+            key={val.id}
             rightSection={(
                 <ActionIcon
                     size="xs"
@@ -82,28 +91,22 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
     ));
 
     const selectableTags = useMemo(() => subjectTags
-        .filter((tag) => !tags.find((obj) => obj.id === tag.id))
-        .map((tag) => ({
-            key:   tag.id,
-            value: tag.name,
-            label: tag.name,
-        })), [tags, subjectTags]);
+        .filter((tag) => !tags.find((obj) => obj.id === tag.id)), [tags, subjectTags]);
 
     return (
         <Flex direction="column">
             <Text fz="md" c="indigo">{subjectName}</Text>
             <Group spacing="sm">
                 {itemChip}
-                <Select
-                    searchable
+                <ResourceTagSelect
+                    ref={selectRef}
                     rightSectionWidth={0}
-                    onFocus={() => setSelectFocus(true)}
-                    onBlur={() => setSelectFocus(false)}
-                    icon={!isSelectFocus && <IoIosAddCircleOutline />}
                     classNames={selectClasses}
                     data={selectableTags}
-                    value={selectInput}
-                    onChange={handleSelectChange}
+                    value={selectValue}
+                    searchValue={searchValue}
+                    onSearchChange={(e) => setSearchValue(e)}
+                    onItemSelect={handleTagSelect}
                 />
             </Group>
         </Flex>

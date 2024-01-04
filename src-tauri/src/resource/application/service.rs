@@ -6,25 +6,9 @@ use crate::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, Resou
 use crate::category::repository::CATEGORY_REPOSITORY;
 use crate::tag::repository::{TagRepository, TAG_REPOSITORY};
 
-use super::command::{
-    CreateResourceCommand,
-    CreateResourceHandler,
-    UpdateResourceHandler,
-    UpdateResourceCommand,
-    ResourceAddTagCommand,
-    ResourceAddTagHandler,
-    ResourceRemoveTagCommand,
-    ResourceRemoveTagHandler
-};
-use super::dto::{ResourceResDto, ResourceDetailDto};
-use super::query::{
-    GetByIdResourceQuery, 
-    GetByIdResourceHandler, 
-    GetAllResourceQuery, 
-    GetAllResourceHandler, 
-    ResourceDetailQuery, 
-    ResourceDetailHandler
-};
+use super::command::*;
+use super::dto::*;
+use super::query::*;
 
 pub static RESOURCE_SERVICE: ResourceService = ResourceService::init(
     &RESOURCE_REPOSITORY, 
@@ -54,22 +38,20 @@ impl<'a> ResourceService<'a> {
         }
     }
 
-    pub async fn create_resource(&self, title: String, description: String, file_path: String, belong_category: String) -> Result<String, String> {
+    pub async fn create_resource(&self, name: String, description: String, file_path: String, url_path: String, belong_category: String) -> Result<String, String> {
         let category = self.category_repository
             .find_by_id(&belong_category)
             .await
-            .unwrap_or(None);
-
-        if category.is_none() {
-            println!("Category Not Exist");
-            return Err(String::from("Category Not Exist"));
-        }
+            .unwrap_or(None)
+            .ok_or(String::from("Category Not Exist"))?;
         
         let command = CreateResourceCommand {
-            title,
+            name,
             description,
-            belong_category: category.unwrap().id,
+            belong_category: category.id,
+            root_path: category.root_path,
             file_path,
+            url_path,
         };
 
         let handler = CreateResourceHandler::register(self.resource_repository);
@@ -79,10 +61,10 @@ impl<'a> ResourceService<'a> {
         Ok(String::from("Ok"))
     }
 
-    pub async fn update_resource(&self, id: String, title: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
+    pub async fn update_resource(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
         let command = UpdateResourceCommand {
             id,
-            title,
+            name,
             description,
             auth,
         };
@@ -187,5 +169,26 @@ impl<'a> ResourceService<'a> {
             .unwrap();
 
         Ok(())
+    }
+
+    pub async fn list_resource(
+        &self, 
+        id: Option<String>,
+        name: Option<String>,
+        belong_category: Option<String>, 
+        order_by: Option<String>,
+    ) -> Result<Vec<ResourceResDto>, String> {
+        let query = ListResourceQuery { 
+            id,
+            name,
+            belong_category,
+            order_by
+        };
+        
+        let handler = ListResourceHandler::register(self.resource_query_repo);
+
+        let res = handler.query(query).await?;
+
+        Ok(res)
     }
 }

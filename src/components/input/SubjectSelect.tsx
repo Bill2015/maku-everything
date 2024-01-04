@@ -1,6 +1,6 @@
 import { forwardRef, useMemo, useCallback } from 'react';
 import { Group, Select, SelectItem, SelectItemProps, SelectProps, Text } from '@mantine/core';
-import { SubjectQuery } from '@api/subject';
+import { SubjectResDto } from '@api/subject';
 
 export interface SubjectSelectItem extends SelectItem {
     id: string;
@@ -27,16 +27,17 @@ const Item = forwardRef<HTMLDivElement, ItemProps>(
 );
 
 export interface SubjectSelectProps extends Omit<SelectProps, 'itemComponent'|'data'> {
+    subjects: SubjectResDto[];
+
     onItemSelect: (data: SubjectSelectItem) => void;
 }
 
-export function SubjectSelect(props: SubjectSelectProps) {
-    const { onItemSelect, ...selectProps } = props;
-    const { data: subjectData } = SubjectQuery.useGetAll();
+export const SubjectSelect = forwardRef<HTMLInputElement, SubjectSelectProps>((props, ref) => {
+    const { subjects, onItemSelect, ...selectProps } = props;
 
     const handleChanged = useCallback((value: string) => {
         // TODO: should use hash to speedup?
-        const target = subjectData.find((val) => val.name === value);
+        const target = subjects.find((val) => val.name === value);
         if (target) {
             onItemSelect({
                 value:       target.name,
@@ -44,29 +45,30 @@ export function SubjectSelect(props: SubjectSelectProps) {
                 description: target.description,
             });
         }
-    }, [subjectData, onItemSelect]);
+    }, [subjects, onItemSelect]);
 
     // Memo the autocomplete item
     const subjectSelectItem = useMemo(
-        () => subjectData.map<SubjectSelectItem>((obj) => ({
+        () => subjects.map<SubjectSelectItem>((obj) => ({
             label:       obj.name,
             value:       obj.name,
             id:          obj.id,
             description: obj.description,
         })),
-        [subjectData],
+        [subjects],
     );
 
     return (
         <Select
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...selectProps}
+            ref={ref}
             searchable
             placeholder="Select one subject"
             nothingFound="No Subject"
             onChange={handleChanged}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...selectProps}
             data={subjectSelectItem}
             itemComponent={Item}
         />
     );
-}
+});

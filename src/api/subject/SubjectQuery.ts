@@ -15,4 +15,18 @@ export namespace SubjectQuery {
             },
         );
     }
+
+    export function useGetByCategory(categoryId: string | null) {
+        const queryfn = () => SubjectAPI.query({ belong_category: categoryId! });
+
+        return useQuery(
+            ['subjects', categoryId],
+            queryfn,
+            {
+                enabled:         !!categoryId,
+                placeholderData: [],
+                initialData:     [],
+            },
+        );
+    }
 }

@@ -6,6 +6,7 @@ use surrealdb::sql::{Thing, thing};
 
 use crate::common::repository::{env, tablens};
 use crate::subject::application::dto::SubjectResDto;
+use crate::subject::infrastructure::SubjectQueryBuilder;
 
 pub static SUBJECT_QUERY_REPOSITORY: SubjectQueryRepository<'_> = SubjectQueryRepository::init(&env::DB);
 
@@ -39,6 +40,30 @@ impl<'a> SubjectQueryRepository<'a> {
         let result: Option<SubjectResDto> = response
             .take(0)
             .unwrap_or(None);
+
+        Ok(result) 
+    }
+
+    pub async fn query(&self, builder: SubjectQueryBuilder) -> surrealdb::Result<Vec<SubjectResDto>> {
+        let query_string = builder.build();
+
+        let sql = format!(
+            r#"SELECT 
+                *
+            FROM subject WHERE {}"#
+        , query_string);
+
+        dbg!(&sql);
+
+        let mut response = self.db
+            .query(sql)
+            .await?;
+
+        dbg!(&response);
+
+        let result: Vec<SubjectResDto> = response
+            .take(0)
+            .unwrap();
 
         Ok(result) 
     }

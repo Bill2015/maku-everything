@@ -11,20 +11,22 @@ export interface CreateResourceModalProps extends ModalProps {
 
 export function CreateResourceModal(props: CreateResourceModalProps) {
     const { activeCategory, onConfirm, ...modelProps } = props;
-    const [title, setTitle] = useState<string>('');
+    const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [filePath, setFilePath] = useState<string>('');
+    const [urlPath, setUrlPath] = useState<string>('');
 
     const handleCreateConfirm = useCallback(() => {
-        setTitle('');
+        setName('');
         setDescription('');
         onConfirm({
-            title:           title,
+            name:            name,
             description:     description,
             belong_category: activeCategory.id,
             file_path:       filePath,
+            url_path:        urlPath,
         });
-    }, [description, title, filePath, activeCategory, onConfirm]);
+    }, [description, name, filePath, urlPath, activeCategory, onConfirm]);
 
     return (
         // eslint-disable-next-line react/jsx-props-no-spreading
@@ -34,13 +36,13 @@ export function CreateResourceModal(props: CreateResourceModalProps) {
                     In:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input disabled value={activeCategory.title} />
+                    <Input disabled value={activeCategory.name} />
                 </Grid.Col>
                 <Grid.Col span={4}>
-                    Title:
+                    Name:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input placeholder="resource title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Input placeholder="resource name" value={name} onChange={(e) => setName(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Description:
@@ -53,6 +55,12 @@ export function CreateResourceModal(props: CreateResourceModalProps) {
                 </Grid.Col>
                 <Grid.Col span={12}>
                     <Input placeholder="resource file path" value={filePath} onChange={(e) => setFilePath(e.target.value)} />
+                </Grid.Col>
+                <Grid.Col span={12}>
+                    URL Path
+                </Grid.Col>
+                <Grid.Col span={12}>
+                    <Input placeholder="URL path" value={urlPath} onChange={(e) => setUrlPath(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={6}>
                     <Button color="pink">Cancel</Button>

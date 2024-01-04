@@ -12,7 +12,11 @@ import { CreateResourceModal } from './components/ResourceModal';
 export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const navigateResourceTo = useResourceDetailNavigate();
-    const { data: resourceData, isFetching: isResourceFetching, refetch: resourceRefetch } = ResourceQuery.useGetAll();
+    const {
+        data: resourceData,
+        isFetching: isResourceFetching,
+        refetch: resourceRefetch,
+    } = ResourceQuery.useGetByCategory(activeCategory.id);
     const [opened, { open, close }] = useDisclosure(false);
 
     const createResource = ResourceMutation.useCreate();
@@ -20,11 +24,17 @@ export default function ResourcesPage() {
     // When Resource Detail Click
     const handleResoruceDetail = useCallback(async (data: ResourceResDto) => {
         if (activeCategory) {
-            navigateResourceTo(activeCategory.title, data.id);
+            navigateResourceTo(activeCategory.name, data.id);
         }
     }, [activeCategory, navigateResourceTo]);
 
-    const resourceItems = resourceData.map((val) => <ResourceCard key={val.id} data={val} onDetailClick={handleResoruceDetail} />);
+    const resourceItems = resourceData.map((val) => (
+        <ResourceCard
+            key={val.id}
+            data={val}
+            onDetailClick={handleResoruceDetail}
+        />
+    ));
 
     const handleCreateConfirm = useCallback(async (data: ResourceCreateDto) => {
         const _ = await createResource.mutateAsync(data);
@@ -42,7 +52,7 @@ export default function ResourcesPage() {
                     <Grid.Col span={12}>
                         <Title order={3}>
                             Current Category:
-                            {activeCategory.title}
+                            {activeCategory.name}
                         </Title>
                     </Grid.Col>
                     <Grid.Col span={6}>

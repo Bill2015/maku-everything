@@ -7,7 +7,7 @@ import { useCreateSubjectModel } from '@store/modal';
 export function CreateSubjectModal() {
     const { activeCategory } = useActiveCategoryRedux();
     const { opened, close } = useCreateSubjectModel();
-    const [title, setTitle] = useState<string>('');
+    const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const createSubject = SubjectMutation.useCreate();
 
@@ -16,14 +16,14 @@ export function CreateSubjectModal() {
             return;
         }
         createSubject.mutateAsync({
-            name:            title,
+            name:            name,
             description:     description,
             belong_category: activeCategory.id,
         });
-        setTitle('');
+        setName('');
         setDescription('');
         close();
-    }, [createSubject, description, title, activeCategory, close]);
+    }, [createSubject, description, name, activeCategory, close]);
 
     if (activeCategory === null) {
         return null;
@@ -35,13 +35,13 @@ export function CreateSubjectModal() {
                     Belong:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input disabled value={activeCategory.title} />
+                    <Input disabled value={activeCategory.name} />
                 </Grid.Col>
                 <Grid.Col span={4}>
-                    Title:
+                    Name:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input placeholder="resource title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <Input placeholder="resource name" value={name} onChange={(e) => setName(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Description:

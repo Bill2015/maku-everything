@@ -6,13 +6,15 @@ use surrealdb::sql::Thing;
 pub struct CategoryResDto {
     pub id: Thing,
 
-    pub title: String,
+    pub name: String,
 
     pub resource_num: i64,
 
     pub description: String,
 
     pub auth: bool,
+
+    pub root_path: String,
 
     pub created_at: DateTime<Utc>,
 

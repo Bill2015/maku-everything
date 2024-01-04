@@ -7,6 +7,7 @@ use surrealdb::sql::{Thing, thing};
 use crate::common::repository::{env, tablens};
 use crate::resource::application::dto::ResourceResDto;
 use crate::resource::application::dto::ResourceDetailDto;
+use crate::resource::infrastructure::ResourceQueryBuilder;
 
 pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQueryRepository::init(&env::DB);
 
@@ -22,8 +23,14 @@ impl<'a> ResourceQueryRepository<'a> {
     }
 
     pub async fn get_all(&self) -> surrealdb::Result<Vec<ResourceResDto>> {
+       let sql = r#"
+            SELECT 
+                *,
+                (->belong->category.root_path)[0] as file.root
+            FROM type::table($table)"#;
+
         let mut response = self.db
-            .query("SELECT * FROM type::table($table)")
+            .query(sql)
             .bind(("table", &tablens::RESOURCE))
             .await?;
 
@@ -35,6 +42,13 @@ impl<'a> ResourceQueryRepository<'a> {
     }
 
     pub async fn get_by_id(&self, id: &String) -> surrealdb::Result<Option<ResourceResDto>> {
+        let sql = r#"
+            SELECT 
+                *,
+                (->belong->category.root_path)[0] as file.root
+            FROM type::table($table)
+            WHERE id == $id"#;
+
         let mut response = self.db
             .query("SELECT * FROM type::table($table) WHERE id == $id")
             .bind(("table", &tablens::RESOURCE))
@@ -53,9 +67,9 @@ impl<'a> ResourceQueryRepository<'a> {
         let sql = r#"
             SELECT 
             *,
+            (->belong->category.root_path)[0] as file.root,
             (SELECT 
                 *,
-                (->belong->subject.id)[0] AS belong_subject,
                 (->belong->subject.name)[0] AS subject_name
                 FROM tag 
                 WHERE ->tagging->resource.id CONTAINS $parent.id
@@ -70,6 +84,27 @@ impl<'a> ResourceQueryRepository<'a> {
             .await?;
 
         let result: Option<ResourceDetailDto> = response
+            .take(0)
+            .unwrap();
+
+        Ok(result) 
+    }
+
+    pub async fn query(&self, builder: ResourceQueryBuilder) -> surrealdb::Result<Vec<ResourceResDto>> {
+        let query_string = builder.build();
+
+        let sql = format!(
+            r#"SELECT 
+                *,
+                (->belong->category.root_path)[0] as file.root
+            FROM resource WHERE {}"#
+        , query_string);
+
+        let mut response = self.db
+            .query(sql)
+            .await?;
+
+        let result: Vec<ResourceResDto> = response
             .take(0)
             .unwrap();
 

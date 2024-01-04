@@ -22,10 +22,8 @@ impl<'a> TagQueryRepository<'a> {
         let sql = r#"
             SELECT 
                 *,
-                (->belong->subject.id)[0] as belong_subject,
                 (->belong->subject.name)[0] as subject_name,
-                (->belong->category.id)[0] as belong_category,
-                (->belong->category.title)[0] as category_name,
+                (->belong->category.name)[0] as category_name,
                 array::len(->tagging.out) as tag_nums
             FROM tag
         "#;
@@ -45,9 +43,7 @@ impl<'a> TagQueryRepository<'a> {
         let sql = r#"
             "SELECT 
                 *,
-                (->belong->subject.id)[0] as belong_subject,
                 (->belong->subject.name)[0] as subject_name,
-                (->belong->category.id)[0] as belong_category,
                 (->belong->category.name)[0] as category_name,
                 array::len(->tagging.out) as tag_nums
             FROM tag WHERE id == $id
@@ -71,10 +67,8 @@ impl<'a> TagQueryRepository<'a> {
         let sql = format!(
             r#"SELECT 
                 *,
-                (->belong->subject.id)[0] as belong_subject,
                 (->belong->subject.name)[0] as subject_name,
-                (->belong->category.id)[0] as belong_category,
-                (->belong->category.title)[0] as category_name,
+                (->belong->category.name)[0] as category_name,
                 array::len(->tagging.out) as tag_nums
             FROM tag WHERE {}"#
         , query_string);

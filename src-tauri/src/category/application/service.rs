@@ -25,9 +25,10 @@ impl<'a> CategoryService<'a> {
         }
     }
 
-    pub async fn create_category(&self, title: String, description: String) -> Result<String, CategoryError> {
+    pub async fn create_category(&self, name: String, description: String, root_path: String) -> Result<String, CategoryError> {
         let command = CreateCategoryCommand {
-            title: title,
+            name: name,
+            root_path: root_path,
             description: description,
             auth: false,
         };
@@ -38,10 +39,10 @@ impl<'a> CategoryService<'a> {
         Ok(res)
     }
 
-    pub async fn update_category(&self, id: String, title: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, CategoryError> {
+    pub async fn update_category(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, CategoryError> {
         let command = UpdateCategoryCommand {
             id: id,
-            title: title,
+            name: name,
             description: description,
             auth: auth,
         };

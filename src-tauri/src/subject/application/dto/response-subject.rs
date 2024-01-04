@@ -9,6 +9,8 @@ pub struct SubjectResDto {
 
     pub description: String,
 
+    pub belong_category: Thing,
+
     pub auth: bool,
 
     pub created_at: String,

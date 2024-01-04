@@ -9,3 +9,7 @@ pub use get_by_id::*;
 #[path ="./resource-detail.rs"]
 mod detail;
 pub use detail::*;
+
+#[path ="./query-resource.rs"]
+mod query;
+pub use query::*;
