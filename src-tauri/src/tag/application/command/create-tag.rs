@@ -1,9 +1,8 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::category::domain::CategoryID;
 use crate::subject::domain::SubjectID;
-use crate::tag::domain::TagAggregate;
+use crate::tag::domain::{TagAggregate, TagError, TagGenericError};
 use crate::tag::repository::TagRepository;
 use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
@@ -36,7 +35,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         String::from("Create Tag Command")
     }
 
-    type Output = Result<String, String>;
+    type Output = Result<String, TagError>;
 
     async fn execute(&self, command: CreateTagCommand) -> Self::Output {
         let CreateTagCommand { 
@@ -47,7 +46,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         } = command;
 
         // create new tag
-        let new_tag = TagAggregate::new(name, description, belong_category, belong_subject);
+        let new_tag = TagAggregate::new(name, description, belong_category, belong_subject)?;
 
         // save
         let result = self.tag_repo
@@ -56,7 +55,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(String::from("TagError::Create()")),
+            _ => Err(TagError::Create(TagGenericError::Unknown { message: String::from("Database Error") })),
         }
     }
 }

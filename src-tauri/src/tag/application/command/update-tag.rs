@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 
-use crate::tag;
-use crate::tag::domain::TagAggregate;
+use crate::tag::domain::{TagError, TagGenericError};
 use crate::tag::repository::TagRepository;
 use crate::common::application::ICommandHandler;
 
@@ -30,7 +29,7 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
         String::from("Change Tag Command")
     }
 
-    type Output = Result<String, String>;
+    type Output = Result<String, TagError>;
 
     async fn execute(&self, command: UpdateTagCommand) -> Self::Output {
         let UpdateTagCommand { 
@@ -48,11 +47,11 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
         let mut tag = tag_result
             .ok()
             .flatten()
-            .ok_or_else(|| String::from("TagError::Update(id)"))?;
+            .ok_or_else(|| TagError::Update(TagGenericError::IdNotFounded()))?;
  
         // change name
         if name.is_some() {
-            tag.change_name(name.unwrap());
+            tag.change_name(name.unwrap())?;
         }
 
         // change description

@@ -8,6 +8,9 @@ use crate::subject::domain::SubjectID;
 
 mod id;
 pub use id::TagID;
+mod error;
+pub use error::TagError;
+pub use error::TagGenericError;
 
 pub struct TagAggregate {
     pub id: TagID,
@@ -21,25 +24,32 @@ pub struct TagAggregate {
 }
 
 impl TagAggregate {
-    pub fn new(name: String, description: String, belong_category: CategoryID, belong_subject: SubjectID) -> Self {
-        TagAggregate {
-            id: TagID::new(),
-            name: name,
-            belong_category: belong_category,
-            belong_subject: belong_subject,
-            description: description,
-            auth: false,
-            created_at: Utc::now(),
-            updated_at: Utc::now(),
+    pub fn new(name: String, description: String, belong_category: CategoryID, belong_subject: SubjectID) -> Result<Self, TagError> {
+        if name.len() <= 0 {
+            return Err(TagError::Create(TagGenericError::NameIsEmpty()));
         }
+
+        Ok(
+            TagAggregate {
+                id: TagID::new(),
+                name: name,
+                belong_category: belong_category,
+                belong_subject: belong_subject,
+                description: description,
+                auth: false,
+                created_at: Utc::now(),
+                updated_at: Utc::now(),
+            }
+        )
     }
 
-    pub fn change_name(&mut self, new_name: String) {
+    pub fn change_name(&mut self, new_name: String) -> Result<(), TagError>{
         if new_name.len() <= 0 {
-            print!("Name can't be empty");
+            return Err(TagError::Update(TagGenericError::NameIsEmpty()));
         }
 
         self.name = new_name;
+        Ok(())
     }
 
     pub fn change_description(&mut self, new_description: String) {

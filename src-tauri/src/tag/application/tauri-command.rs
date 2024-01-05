@@ -1,8 +1,10 @@
+use crate::tag::domain::TagError;
+
 use super::service::TAG_SERVICE;
 use super::dto::TagResDto;
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_tag(name: &str, description: &str, belong_category: &str, belong_subject: &str) -> Result<String, String> {
+pub async fn create_tag(name: &str, description: &str, belong_category: &str, belong_subject: &str) -> Result<String, TagError> {
     let result = TAG_SERVICE
         .create_tag(
             name.to_string(), 
@@ -16,7 +18,7 @@ pub async fn create_tag(name: &str, description: &str, belong_category: &str, be
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn update_tag(id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
+pub async fn update_tag(id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, TagError> {
     let result = TAG_SERVICE
         .update_tag(id, name, description, auth)
         .await?;
@@ -25,7 +27,7 @@ pub async fn update_tag(id: String, name: Option<String>, description: Option<St
 }
 
 #[tauri::command]
-pub async fn get_all_tag() -> Result<Vec<TagResDto>, String> {
+pub async fn get_all_tag() -> Result<Vec<TagResDto>, TagError> {
     let result = TAG_SERVICE
         .get_all_tag()
         .await?;
@@ -34,7 +36,7 @@ pub async fn get_all_tag() -> Result<Vec<TagResDto>, String> {
 }
 
 #[tauri::command]
-pub async fn get_tag_by_id(id: String) -> Result<Option<TagResDto>, String> {
+pub async fn get_tag_by_id(id: String) -> Result<Option<TagResDto>, TagError> {
     let result = TAG_SERVICE
         .get_tag_by_id(id)
         .await?;
@@ -50,7 +52,7 @@ pub async fn list_tags(
     belong_subject: Option<String>,
     tagging_resource: Option<String>,
     order_by: Option<String>,
-) -> Result<Vec<TagResDto>, String> {
+) -> Result<Vec<TagResDto>, TagError> {
     let result = TAG_SERVICE
         .list_tags(
             id, 

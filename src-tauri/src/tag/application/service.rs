@@ -1,6 +1,7 @@
 
 use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
 use crate::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
+use crate::tag::domain::{TagError, TagGenericError};
 use crate::tag::repository::{TAG_REPOSITORY, TAG_QUERY_REPOSITORY, TagRepository, TagQueryRepository};
 use crate::tag::application::command::{CreateTagCommand, CreateTagHandler};
 use crate::common::application::{ICommandHandler, IQueryHandler};
@@ -37,7 +38,7 @@ impl<'a> TagService<'a> {
         }
     }
 
-    pub async fn create_tag(&self, name: String, description: String, belong_category: String, belong_subject: String) -> Result<String, String> {
+    pub async fn create_tag(&self, name: String, description: String, belong_category: String, belong_subject: String) -> Result<String, TagError> {
         // Category
         let category = self.category_repository
             .find_by_id(&belong_category)
@@ -46,7 +47,7 @@ impl<'a> TagService<'a> {
 
         if category.is_none() {
             println!("Category Not Exist");
-            return Err(String::from("Category Not Exist"));
+            return Err(TagError::Create(TagGenericError::BelongCategoryNotExists()));
         }
         
         // Subject 
@@ -57,7 +58,7 @@ impl<'a> TagService<'a> {
 
         if subject.is_none() {
             println!("Subject Not Exist");
-            return Err(String::from("Category Not Exist"));
+            return Err(TagError::Create(TagGenericError::BelongSubjectNotExists()));
         }
 
         let command = CreateTagCommand {
@@ -73,7 +74,7 @@ impl<'a> TagService<'a> {
         Ok(res)
     }
 
-    pub async fn update_tag(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
+    pub async fn update_tag(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, TagError> {
         let command = UpdateTagCommand {
             id: id,
             name: name,
@@ -88,7 +89,7 @@ impl<'a> TagService<'a> {
         Ok(res)
     }
 
-    pub async fn get_all_tag(&self) -> Result<Vec<TagResDto>, String> {
+    pub async fn get_all_tag(&self) -> Result<Vec<TagResDto>, TagError> {
         let query = GetAllTagQuery { };
 
         let handler = GetAllTagHandler::register(self.tag_queryrepo);
@@ -98,7 +99,7 @@ impl<'a> TagService<'a> {
         Ok(res)
     }
 
-    pub async fn get_tag_by_id(&self, id: String) -> Result<Option<TagResDto>, String> {
+    pub async fn get_tag_by_id(&self, id: String) -> Result<Option<TagResDto>, TagError> {
         let query = GetByIdTagQuery { id: id };
         
         let handler = GetByIdTagHandler::register(self.tag_queryrepo);
@@ -116,7 +117,7 @@ impl<'a> TagService<'a> {
         belong_subject: Option<String>,
         tagging_resource: Option<String>,
         order_by: Option<String>,
-    ) -> Result<Vec<TagResDto>, String> {
+    ) -> Result<Vec<TagResDto>, TagError> {
         let query = ListTagQuery { 
             id,
             name,
