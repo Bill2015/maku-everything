@@ -33,7 +33,7 @@ impl IQueryHandler<GetAllResourceQuery> for GetAllResourceHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(ResourceError::GetAll(ResourceGenericError::Unknown { message: String::from("Get all resource failed") })),
+            _ => Err(ResourceError::GetAll(ResourceGenericError::DBInternalError())),
         }
     }
 }

@@ -19,30 +19,6 @@ pub enum CategoryError {
     GetById(#[source] CategoryGenericError),
 }
 
-#[derive(thiserror::Error, Debug)]
-pub enum CategoryGenericError {
-    #[error("Name is empty")]
-    NameIsEmpty(),
-
-    #[error("Name is duplicated: {current_name}")]
-    NameIsDuplicated{ current_name: String },
-
-    #[error("Description is empty")]
-    DescriptionIsEmpty(),
-
-    #[error("Root path is empty")]
-    RootPathIsEmpty(),
-
-    #[error("Root path is not exists")]
-    RootPathNotExists(),
-
-    #[error("Id is not exists")]
-    IdNotFounded(),
-
-    #[error("unknown Category error")]
-    Unknown{ message: String },
-}
-
 impl Serialize for CategoryError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -68,4 +44,31 @@ impl Serialize for CategoryError {
         };
         error_message.serialize(serializer)
     }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum CategoryGenericError {
+    #[error("Name is empty")]
+    NameIsEmpty(),
+
+    #[error("Name is duplicated: {current_name}")]
+    NameIsDuplicated{ current_name: String },
+
+    #[error("Description is empty")]
+    DescriptionIsEmpty(),
+
+    #[error("Root path is empty")]
+    RootPathIsEmpty(),
+
+    #[error("Root path is not exists")]
+    RootPathNotExists(),
+
+    #[error("Id is not exists")]
+    IdNotFounded(),
+
+    #[error("unknown Category error")]
+    Unknown{ message: String },
+
+    #[error("Database internal error")]
+    DBInternalError(),
 }

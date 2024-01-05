@@ -37,7 +37,7 @@ impl IQueryHandler<GetByIdTagQuery> for GetByIdTagHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(TagError::GetById(TagGenericError::Unknown { message: String::from("Database Error") })),
+            _ => Err(TagError::GetById(TagGenericError::DBInternalError())),
         }
     }
 }

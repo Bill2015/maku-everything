@@ -1,4 +1,3 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
@@ -34,7 +33,7 @@ impl IQueryHandler<GetAllTagQuery> for GetAllTagHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(TagError::GetAll(TagGenericError::Unknown { message: String::from("Database Error") })),
+            _ => Err(TagError::GetAll(TagGenericError::DBInternalError())),
         }
     }
 }

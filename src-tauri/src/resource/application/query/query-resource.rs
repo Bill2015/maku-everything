@@ -1,4 +1,3 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
@@ -45,7 +44,7 @@ impl IQueryHandler<ListResourceQuery> for ListResourceHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(ResourceError::Query(ResourceGenericError::Unknown { message: String::from("Query parameter invalid") })),
+            _ => Err(ResourceError::Query(ResourceGenericError::DBInternalError())),
         }
     }
 }

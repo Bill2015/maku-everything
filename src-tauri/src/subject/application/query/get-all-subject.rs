@@ -1,4 +1,3 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
@@ -34,7 +33,7 @@ impl IQueryHandler<GetAllSubjectQuery> for GetAllSubjectHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(SubjectError::GetAll(SubjectGenericError::Unknown { message: String::from("DataBase Error") })),
+            _ => Err(SubjectError::GetAll(SubjectGenericError::DBInternalError())),
         }
     }
 }

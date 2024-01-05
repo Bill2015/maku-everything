@@ -55,7 +55,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(TagError::Create(TagGenericError::Unknown { message: String::from("Database Error") })),
+            _ => Err(TagError::Create(TagGenericError::DBInternalError())),
         }
     }
 }

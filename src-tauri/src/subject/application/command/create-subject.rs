@@ -1,4 +1,3 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::category::domain::CategoryID;
@@ -52,7 +51,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(SubjectError::Create(SubjectGenericError::Unknown { message: String::from("Save Subject Failed") })),
+            _ => Err(SubjectError::Create(SubjectGenericError::DBInternalError())),
         }
     }
 }

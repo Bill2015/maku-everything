@@ -37,7 +37,7 @@ impl IQueryHandler<GetByIdCategoryQuery> for GetByIdCategoryHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(CategoryError::GetById(CategoryGenericError::IdNotFounded())),
+            _ => Err(CategoryError::GetById(CategoryGenericError::DBInternalError())),
         }
     }
 }

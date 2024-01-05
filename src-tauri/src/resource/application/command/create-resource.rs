@@ -65,7 +65,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(ResourceError::Create(ResourceGenericError::Unknown { message: String::from("Created Resource Failed") })),
+            _ => Err(ResourceError::Create(ResourceGenericError::DBInternalError())),
         }
     }
 }

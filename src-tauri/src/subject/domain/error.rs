@@ -22,26 +22,6 @@ pub enum SubjectError {
     Query(#[source] SubjectGenericError),
 }
 
-#[derive(thiserror::Error, Debug)]
-pub enum SubjectGenericError {
-    #[error("Name is empty")]
-    NameIsEmpty(),
-
-    #[error("Name is duplicated: {current_name}")]
-    NameIsDuplicated{ current_name: String },
-
-    #[error("Description is empty")]
-    DescriptionIsEmpty(),
-
-    #[error("Belong category dose not exists")]
-    BelongCategoryNotExists(),
-
-    #[error("Id is not exists")]
-    IdNotFounded(),
-
-    #[error("unknown Subject error")]
-    Unknown{ message: String },
-}
 
 impl Serialize for SubjectError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -72,4 +52,28 @@ impl Serialize for SubjectError {
         };
         error_message.serialize(serializer)
     }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum SubjectGenericError {
+    #[error("Name is empty")]
+    NameIsEmpty(),
+
+    #[error("Name is duplicated: {current_name}")]
+    NameIsDuplicated{ current_name: String },
+
+    #[error("Description is empty")]
+    DescriptionIsEmpty(),
+
+    #[error("Belong category dose not exists")]
+    BelongCategoryNotExists(),
+
+    #[error("Id is not exists")]
+    IdNotFounded(),
+
+    #[error("unknown Subject error")]
+    Unknown{ message: String },
+
+    #[error("Database internal error")]
+    DBInternalError(),
 }

@@ -37,7 +37,7 @@ impl IQueryHandler<GetByIdSubjectQuery> for GetByIdSubjectHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(SubjectError::GetById(SubjectGenericError::Unknown { message: String::from("Database Error") })),
+            _ => Err(SubjectError::GetById(SubjectGenericError::DBInternalError())),
         }
     }
 }

@@ -45,7 +45,7 @@ impl IQueryHandler<ListSubjectQuery> for ListSubjectHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(SubjectError::Query(SubjectGenericError::Unknown { message: String::from("Database Error") })),
+            _ => Err(SubjectError::Query(SubjectGenericError::DBInternalError())),
         }
     }
 }

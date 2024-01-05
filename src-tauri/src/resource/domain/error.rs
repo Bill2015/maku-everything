@@ -115,4 +115,7 @@ pub enum ResourceGenericError {
 
     #[error("unknown Category error")]
     Unknown{ message: String },
+
+    #[error("Database internal error")]
+    DBInternalError(),
 }

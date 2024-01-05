@@ -60,7 +60,7 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(ResourceError::AddTag(ResourceGenericError::Unknown { message: String::from("Save tag failed") })),
+            _ => Err(ResourceError::AddTag(ResourceGenericError::DBInternalError())),
         }
     }
 }

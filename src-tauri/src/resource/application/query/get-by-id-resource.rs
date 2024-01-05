@@ -37,7 +37,7 @@ impl IQueryHandler<GetByIdResourceQuery> for GetByIdResourceHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(ResourceError::GetById(ResourceGenericError::IdNotFound())),
+            _ => Err(ResourceError::GetById(ResourceGenericError::DBInternalError())),
         }
     }
 }

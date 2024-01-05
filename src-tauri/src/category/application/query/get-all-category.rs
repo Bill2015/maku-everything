@@ -1,4 +1,3 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
@@ -34,7 +33,7 @@ impl IQueryHandler<GetAllCategoryQuery> for GetAllCategoryHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(CategoryError::GetAll(CategoryGenericError::Unknown{ message: String::from("uncertain error") })),
+            _ => Err(CategoryError::GetAll(CategoryGenericError::DBInternalError())),
         }
     }
 }
