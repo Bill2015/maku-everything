@@ -2,6 +2,7 @@ use std::fmt;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
+use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::infrastructure::ResourceQueryBuilder;
 use crate::resource::repository::ResourceQueryRepository;
 use crate::resource::application::dto::ResourceResDto;
@@ -33,7 +34,7 @@ impl IQueryHandler<ListResourceQuery> for ListResourceHandler<'_>{
         String::from("Get All Resource")
     }
 
-    type Output = Result<Vec<ResourceResDto>, String>;
+    type Output = Result<Vec<ResourceResDto>, ResourceError>;
 
     async fn query(&self, query: ListResourceQuery) -> Self::Output {
         let query_builder = ResourceQueryBuilder::from(query);
@@ -44,7 +45,7 @@ impl IQueryHandler<ListResourceQuery> for ListResourceHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(String::from("ResourceError::FindAll()")),
+            _ => Err(ResourceError::Query(ResourceGenericError::Unknown { message: String::from("Query parameter invalid") })),
         }
     }
 }

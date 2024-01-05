@@ -10,6 +10,9 @@ use crate::common::domain::ID;
 
 mod id;
 pub use id::ResourceID;
+mod error;
+pub use error::ResourceError;
+pub use error::ResourceGenericError;
 
 #[derive(Debug, Serialize)]
 pub struct ResourceFileAggregate {
@@ -20,7 +23,7 @@ pub struct ResourceFileAggregate {
 }
 
 impl ResourceFileAggregate {
-    pub fn new(root_path: String, file_path: String) -> Result<Option<Self>, String> {
+    pub fn new(root_path: String, file_path: String) -> Result<Option<Self>, ResourceError> {
         
         if file_path.is_empty() {
             return Ok(None);
@@ -35,11 +38,11 @@ impl ResourceFileAggregate {
         let path = Path::new(full_path.as_str());
 
         if path.exists() == false {
-            return Err(String::from("Path not exist"));
+            return Err(ResourceError::Create(ResourceGenericError::FilePathNotExist()));
         }
         
         if path.file_name().is_none() {
-            return Err(String::from("No file name"));
+            return Err(ResourceError::Create(ResourceGenericError::FileNameIsEmpty()));
         }
 
         let ext = match path.is_file() {
@@ -75,16 +78,16 @@ pub struct ResourceUrlAggregate {
     pub full: String,
 }
 impl ResourceUrlAggregate {
-    pub fn new(url: String) -> Result<Option<Self>, String> {
+    pub fn new(url: String) -> Result<Option<Self>, ResourceError> {
         if url.is_empty() {
             return Ok(None);
         }
 
         let url_obj = Url::parse(url.as_str())
-            .or(Err(String::from("url::ParseError")))?;
+            .or(Err(ResourceError::Create(ResourceGenericError::UrlParseFailed())))?;
 
         if url_obj.host().is_none() {
-            return Err(String::from("url::ParseError::EmptyHost"));
+            return Err(ResourceError::Create(ResourceGenericError::UrlEmptyHost()));
         }
 
         Ok(
@@ -124,13 +127,13 @@ pub struct ResourceAggregate {
 
 impl ResourceAggregate {
 
-    pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String, url: String) -> Result<Self, String> {
+    pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String, url: String) -> Result<Self, ResourceError> {
         let file = ResourceFileAggregate::new(root_path, file_path)?;
 
         let url = ResourceUrlAggregate::new(url)?;
         
         if name.is_empty() && file.is_none() {
-            return Err(String::from("Create Resource Error"));
+            return Err(ResourceError::Create(ResourceGenericError::NameAndFilePathIsEmpty()));
         }
         
         // if no provide resource name, use file name as default
@@ -172,7 +175,7 @@ impl ResourceAggregate {
         self.description = new_description;
     }
 
-    pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), String> {
+    pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), ResourceError> {
         self.file = ResourceFileAggregate::new(root_path, file_path)?;
         Ok(())
     }
@@ -181,9 +184,9 @@ impl ResourceAggregate {
         self.auth = flag;
     }
 
-    pub fn add_tag(&mut self, tag_id: TagID) -> Result<(), String> {
+    pub fn add_tag(&mut self, tag_id: TagID) -> Result<(), ResourceError> {
         if self.tags.contains(&tag_id) {
-            return Err(String::from("Cannot Add same tags"));
+            return Err(ResourceError::AddTag(ResourceGenericError::AddSameTag()));
         }
 
         self.new_tags.push(tag_id);
@@ -191,11 +194,9 @@ impl ResourceAggregate {
         Ok(())
     }
 
-    pub fn del_tag(&mut self, tag_id: TagID) -> Result<(), String> {
-        dbg!(&tag_id);
-        dbg!(&self.tags);
+    pub fn del_tag(&mut self, tag_id: TagID) -> Result<(), ResourceError> {
         if self.tags.contains(&tag_id) == false {
-            return Err(String::from("Cannot remove not existed tags"));
+            return Err(ResourceError::RemoveTag(ResourceGenericError::TagNotExists()));
         }
     
         self.del_tags.push(tag_id);

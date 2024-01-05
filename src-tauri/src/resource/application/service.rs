@@ -2,6 +2,7 @@ use std::path::Path;
 use std::process::Command;
 use crate::common::application::{ICommandHandler, IQueryHandler};
 use crate::category::repository::CategoryRepository;
+use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, ResourceQueryRepository, RESOURCE_QUERY_REPOSITORY};
 use crate::category::repository::CATEGORY_REPOSITORY;
 use crate::tag::repository::{TagRepository, TAG_REPOSITORY};
@@ -38,12 +39,19 @@ impl<'a> ResourceService<'a> {
         }
     }
 
-    pub async fn create_resource(&self, name: String, description: String, file_path: String, url_path: String, belong_category: String) -> Result<String, String> {
+    pub async fn create_resource(
+        &self,
+        name: String,
+        description: String,
+        file_path: String,
+        url_path: String,
+        belong_category: String,
+    ) -> Result<String, ResourceError> {
         let category = self.category_repository
             .find_by_id(&belong_category)
             .await
             .unwrap_or(None)
-            .ok_or(String::from("Category Not Exist"))?;
+            .ok_or(ResourceError::Create(ResourceGenericError::BelongCategoryNotExists()))?;
         
         let command = CreateResourceCommand {
             name,
@@ -61,7 +69,12 @@ impl<'a> ResourceService<'a> {
         Ok(String::from("Ok"))
     }
 
-    pub async fn update_resource(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, String> {
+    pub async fn update_resource(&self,
+        id: String,
+        name: Option<String>,
+        description: Option<String>,
+        auth: Option<bool>
+    ) -> Result<String, ResourceError> {
         let command = UpdateResourceCommand {
             id,
             name,
@@ -70,13 +83,13 @@ impl<'a> ResourceService<'a> {
         };
 
         let handler = UpdateResourceHandler::register(self.resource_repository);
-        
+
         let _  = handler.execute(command).await?;
 
         Ok(String::from("Ok"))
     }
 
-    pub async fn add_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, String> {
+    pub async fn add_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, ResourceError> {
         // Category
         let tag = self.tag_respository
             .find_by_id(&tag_id)
@@ -84,8 +97,7 @@ impl<'a> ResourceService<'a> {
             .unwrap_or(None);
 
         if tag.is_none() {
-            println!("Tag Not Exist");
-            return Err(String::from("Tag Not Exist"));
+            return Err(ResourceError::AddTag(ResourceGenericError::TagNotExists()));
         }
         
         let command = ResourceAddTagCommand {
@@ -100,7 +112,7 @@ impl<'a> ResourceService<'a> {
         Ok(String::from("Ok"))
     }
 
-    pub async fn remove_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, String> {
+    pub async fn remove_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, ResourceError> {
         // Category
         let tag = self.tag_respository
             .find_by_id(&tag_id)
@@ -108,8 +120,7 @@ impl<'a> ResourceService<'a> {
             .unwrap_or(None);
 
         if tag.is_none() {
-            println!("Tag Not Exist");
-            return Err(String::from("Tag Not Exist"));
+            return Err(ResourceError::AddTag(ResourceGenericError::TagNotExists()));
         }
         
         let command = ResourceRemoveTagCommand {
@@ -126,7 +137,7 @@ impl<'a> ResourceService<'a> {
 
 
 
-    pub async fn get_resource_by_id(&self, resource_id: String) -> Result<Option<ResourceResDto>, String> {
+    pub async fn get_resource_by_id(&self, resource_id: String) -> Result<Option<ResourceResDto>, ResourceError> {
         let query = GetByIdResourceQuery { id: resource_id };
 
         let handler = GetByIdResourceHandler::register(self.resource_query_repo);
@@ -136,7 +147,7 @@ impl<'a> ResourceService<'a> {
         Ok(res)
     }
 
-    pub async fn get_all_resource(&self) -> Result<Vec<ResourceResDto>, String> {
+    pub async fn get_all_resource(&self) -> Result<Vec<ResourceResDto>, ResourceError> {
         let query = GetAllResourceQuery {};
 
         let handler = GetAllResourceHandler::register(self.resource_query_repo);
@@ -146,7 +157,7 @@ impl<'a> ResourceService<'a> {
         Ok(res)
     }
 
-    pub async fn resource_detail(&self, resource_id: String) -> Result<Option<ResourceDetailDto>, String> {
+    pub async fn resource_detail(&self, resource_id: String) -> Result<Option<ResourceDetailDto>, ResourceError> {
         let query = ResourceDetailQuery { id: resource_id };
 
         let handler = ResourceDetailHandler::register(self.resource_query_repo);
@@ -156,11 +167,11 @@ impl<'a> ResourceService<'a> {
         Ok(res)
     }
 
-    pub async fn expore_the_file(&self, file_path: String) -> Result<(), String> {
+    pub async fn expore_the_file(&self, file_path: String) -> Result<(), ResourceError> {
         let path = Path::new(file_path.as_str());
 
         if path.exists() == false {
-            return Err(String::from("File Not Existed"));
+            return Err(ResourceError::ExploreFile(ResourceGenericError::FilePathNotExist()));
         }
         // TODO: For now, Windows Only 
         Command::new("explorer")
@@ -177,7 +188,7 @@ impl<'a> ResourceService<'a> {
         name: Option<String>,
         belong_category: Option<String>, 
         order_by: Option<String>,
-    ) -> Result<Vec<ResourceResDto>, String> {
+    ) -> Result<Vec<ResourceResDto>, ResourceError> {
         let query = ListResourceQuery { 
             id,
             name,

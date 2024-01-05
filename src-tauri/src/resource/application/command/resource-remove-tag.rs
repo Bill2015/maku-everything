@@ -1,7 +1,6 @@
-use std::fmt;
 use async_trait::async_trait;
 
-use crate::resource::domain::{ResourceAggregate, ResourceID};
+use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
@@ -32,7 +31,7 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
         String::from("Create Resource Command")
     }
 
-    type Output = Result<String, String>;
+    type Output = Result<String, ResourceError>;
 
     async fn execute(&self, command: ResourceRemoveTagCommand) -> Self::Output {
         let ResourceRemoveTagCommand { 
@@ -49,7 +48,7 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
         let mut resource = resource_result
             .ok()
             .flatten()
-            .ok_or_else(|| String::from("ResourceError::Update(id)"))?;
+            .ok_or_else(|| ResourceError::RemoveTag(ResourceGenericError::IdNotFound()))?;
                 
         // remove tag
         resource.del_tag(tag_id)?;
@@ -61,7 +60,7 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(String::from("ResourceError::Create()")),
+            _ => Err(ResourceError::RemoveTag(ResourceGenericError::Unknown { message: String::from("Save tag failed") })),
         }
     }
 }

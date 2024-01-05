@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 
-use crate::resource;
-use crate::resource::domain::ResourceAggregate;
+use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 
@@ -30,7 +29,7 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
         String::from("Change Resource Command")
     }
 
-    type Output = Result<String, String>;
+    type Output = Result<String, ResourceError>;
 
     async fn execute(&self, command: UpdateResourceCommand) -> Self::Output {
         let UpdateResourceCommand { 
@@ -48,7 +47,7 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
         let mut resource = resource_result
             .ok()
             .flatten()
-            .ok_or_else(|| String::from("ResourceError::Update(id)"))?;
+            .ok_or_else(|| ResourceError::Update(ResourceGenericError::IdNotFound()))?;
  
         // change name
         if name.is_some() {

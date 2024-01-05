@@ -1,9 +1,7 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::category::domain::CategoryID;
-use crate::category::repository::CategoryRepository;
-use crate::resource::domain::ResourceAggregate;
+use crate::resource::domain::{ResourceAggregate, ResourceError, ResourceGenericError};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
@@ -37,7 +35,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         String::from("Create Resource Command")
     }
 
-    type Output = Result<String, String>;
+    type Output = Result<String, ResourceError>;
 
     async fn execute(&self, command: CreateResourceCommand) -> Self::Output {
         let CreateResourceCommand { 
@@ -51,10 +49,14 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
 
 
         // create new resource
-        let new_resource = match ResourceAggregate::new(name, description, belong_category, root_path, file_path, url_path) {
-            Ok(value) => value,
-            _ => return Err(String::from("ResourceError::Create()")),
-        };
+        let new_resource = ResourceAggregate::new(
+            name,
+            description,
+            belong_category,
+            root_path,
+            file_path,
+            url_path
+        )?;
         
         // save
         let result = self.resource_repo
@@ -63,7 +65,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(String::from("ResourceError::Create()")),
+            _ => Err(ResourceError::Create(ResourceGenericError::Unknown { message: String::from("Created Resource Failed") })),
         }
     }
 }
