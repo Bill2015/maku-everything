@@ -1,5 +1,7 @@
+use crate::category::domain::CategoryError;
+
 use super::service::CATEGORY_SERVICE;
-use super::dto::{CategoryError, CategoryResDto};
+use super::dto::CategoryResDto;
 
 #[tauri::command(rename_all = "snake_case")]
 pub async fn create_category(name: &str, description: &str, root_path: &str) -> Result<String, CategoryError> {

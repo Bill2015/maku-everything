@@ -1,8 +1,9 @@
 use std::fmt;
 use async_trait::async_trait;
 
-use crate::category::application::dto::CategoryError;
+use crate::category::domain::CategoryError;
 use crate::category::domain::CategoryAggregate;
+use crate::category::domain::CategoryGenericError;
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
@@ -52,7 +53,7 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(CategoryError::Create()),
+            _ => Err(CategoryError::Create(CategoryGenericError::Unknown { message: String::from("Save to DB failed") })),
         }
     }
 }

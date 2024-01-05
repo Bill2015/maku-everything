@@ -1,9 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use category::application::dto::CategoryResDto;
-use category::application::dto::CategoryError;
-use category::application;
 use common::repository;
 use category::application::service::{CATEGORY_SERVICE};
 

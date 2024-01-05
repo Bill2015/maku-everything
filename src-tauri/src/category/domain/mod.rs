@@ -5,10 +5,13 @@ use chrono::{DateTime, Utc};
 
 use crate::common::domain::ID;
 
+mod error;
+pub use error::CategoryGenericError;
+pub use error::CategoryError;
+
 mod id;
 pub use id::CategoryID;
 
-use super::application::dto::CategoryError;
 
 #[derive(Debug, Serialize)]
 pub struct CategoryAggregate {
@@ -25,7 +28,7 @@ impl CategoryAggregate {
     pub fn new(name: String, description: String, root_path: String) -> Result<Self, CategoryError> {
         // path can't be empty
         if root_path.is_empty() {
-            return Err(CategoryError::Create());
+            return Err(CategoryError::Create(CategoryGenericError::RootPathIsEmpty()));
         }
 
         // the path must be end with '\'
@@ -38,7 +41,17 @@ impl CategoryAggregate {
         // create path object
         let path = Path::new(new_path.as_str());
         if path.exists() == false {
-            return Err(CategoryError::Create());
+            return Err(CategoryError::Create(CategoryGenericError::RootPathNotExists()));
+        }
+
+        // name can't be empty
+        if name.len() <= 0 {
+            return Err(CategoryError::Create(CategoryGenericError::NameIsEmpty()));
+        }
+
+        // description can't be empty
+        if description.len() <= 0 {
+            return  Err(CategoryError::Create(CategoryGenericError::DescriptionIsEmpty()));
         }
         
         Ok(

@@ -2,7 +2,8 @@ use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
 use crate::category::repository::CategoryQueryRepository;
-use crate::category::application::dto::{CategoryResDto, CategoryError};
+use crate::category::application::dto::CategoryResDto;
+use crate::category::domain::{CategoryGenericError, CategoryError};
 
 pub struct GetByIdCategoryQuery { 
     pub id: String,
@@ -36,7 +37,7 @@ impl IQueryHandler<GetByIdCategoryQuery> for GetByIdCategoryHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(CategoryError::FindById(id)),
+            _ => Err(CategoryError::GetById(CategoryGenericError::IdNotFounded())),
         }
     }
 }

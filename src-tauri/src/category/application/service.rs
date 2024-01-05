@@ -2,9 +2,9 @@
 use crate::category::repository::{CATEGORY_REPOSITORY, CATEGORY_QUERY_REPOSITORY, CategoryRepository, CategoryQueryRepository};
 use crate::category::application::command::{CreateCategoryCommand, CreateCategoryHandler};
 use crate::common::application::{ICommandHandler, IQueryHandler};
+use crate::category::domain::CategoryError;
 
 use super::command::{UpdateCategoryCommand, UpdateCategoryHandler};
-use super::dto::CategoryError;
 use super::dto::CategoryResDto;
 use super::query::*;
 

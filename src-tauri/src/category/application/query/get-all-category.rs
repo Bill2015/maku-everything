@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use crate::common::application::IQueryHandler;
 use crate::category::repository::CategoryQueryRepository;
 use crate::category::application::dto::CategoryResDto;
-use crate::category::application::dto::CategoryError;
+use crate::category::domain::{CategoryError, CategoryGenericError};
 
 pub struct GetAllCategoryQuery { }
 
@@ -34,7 +34,7 @@ impl IQueryHandler<GetAllCategoryQuery> for GetAllCategoryHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(CategoryError::FindAll()),
+            _ => Err(CategoryError::GetAll(CategoryGenericError::Unknown{ message: String::from("uncertain error") })),
         }
     }
 }

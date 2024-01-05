@@ -1,7 +1,6 @@
 use async_trait::async_trait;
 
-use crate::category;
-use crate::category::application::dto::CategoryError;
+use crate::category::domain::{CategoryError, CategoryGenericError};
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 
@@ -48,7 +47,7 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
         let mut category = category_result
             .ok()
             .flatten()
-            .ok_or_else(|| CategoryError::Update(id))?;
+            .ok_or_else(|| CategoryError::Update(CategoryGenericError::IdNotFounded()))?;
  
         // change name
         if name.is_some() {
