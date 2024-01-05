@@ -2,6 +2,7 @@ use std::fmt;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
+use crate::subject::domain::{SubjectError, SubjectGenericError};
 use crate::subject::repository::SubjectQueryRepository;
 use crate::subject::application::dto::SubjectResDto;
 
@@ -24,7 +25,7 @@ impl IQueryHandler<GetAllSubjectQuery> for GetAllSubjectHandler<'_>{
         String::from("Get All Subject")
     }
 
-    type Output = Result<Vec<SubjectResDto>, String>;
+    type Output = Result<Vec<SubjectResDto>, SubjectError>;
 
     async fn query(&self, query: GetAllSubjectQuery) -> Self::Output {
         let result = self.subject_repo
@@ -33,7 +34,7 @@ impl IQueryHandler<GetAllSubjectQuery> for GetAllSubjectHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(String::from("SubjectError::FindAll()")),
+            _ => Err(SubjectError::GetAll(SubjectGenericError::Unknown { message: String::from("DataBase Error") })),
         }
     }
 }

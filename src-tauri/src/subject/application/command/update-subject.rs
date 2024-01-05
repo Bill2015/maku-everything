@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use crate::subject;
-use crate::subject::domain::SubjectAggregate;
+use crate::subject::domain::{SubjectAggregate, SubjectError, SubjectGenericError};
 use crate::subject::repository::SubjectRepository;
 use crate::common::application::ICommandHandler;
 
@@ -30,7 +30,7 @@ impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
         String::from("Change Subject Command")
     }
 
-    type Output = Result<String, String>;
+    type Output = Result<String, SubjectError>;
 
     async fn execute(&self, command: UpdateSubjectCommand) -> Self::Output {
         let UpdateSubjectCommand { 
@@ -48,11 +48,11 @@ impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
         let mut subject = subject_result
             .ok()
             .flatten()
-            .ok_or_else(|| String::from("SubjectError::Update(id)"))?;
+            .ok_or_else(|| SubjectError::Update(SubjectGenericError::IdNotFounded()))?;
  
         // change name
         if name.is_some() {
-            subject.change_name(name.unwrap());
+            subject.change_name(name.unwrap())?;
         }
 
         // change description

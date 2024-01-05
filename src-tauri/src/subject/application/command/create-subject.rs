@@ -2,7 +2,7 @@ use std::fmt;
 use async_trait::async_trait;
 
 use crate::category::domain::CategoryID;
-use crate::subject::domain::SubjectAggregate;
+use crate::subject::domain::{SubjectAggregate, SubjectError, SubjectGenericError};
 use crate::subject::repository::SubjectRepository;
 use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
@@ -33,7 +33,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
         String::from("Create Subject Command")
     }
 
-    type Output = Result<String, String>;
+    type Output = Result<String, SubjectError>;
 
     async fn execute(&self, command: CreateSubjectCommand) -> Self::Output {
         let CreateSubjectCommand { 
@@ -43,7 +43,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
         } = command;
 
         // create new subject
-        let new_subject = SubjectAggregate::new(name, description, belong_category);
+        let new_subject = SubjectAggregate::new(name, description, belong_category)?;
 
         // save
         let result = self.subject_repo
@@ -52,7 +52,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id.to_string()),
-            _ => Err(String::from("SubjectError::Create()")),
+            _ => Err(SubjectError::Create(SubjectGenericError::Unknown { message: String::from("Save Subject Failed") })),
         }
     }
 }

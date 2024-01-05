@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
+use crate::subject::domain::{SubjectError, SubjectGenericError};
 use crate::subject::repository::SubjectQueryRepository;
 use crate::subject::application::dto::SubjectResDto;
 
@@ -25,7 +26,7 @@ impl IQueryHandler<GetByIdSubjectQuery> for GetByIdSubjectHandler<'_>{
         String::from("Get All Subject")
     }
 
-    type Output = Result<Option<SubjectResDto>, String>;
+    type Output = Result<Option<SubjectResDto>, SubjectError>;
 
     async fn query(&self, query: GetByIdSubjectQuery) -> Self::Output {
         let GetByIdSubjectQuery { id } = query;
@@ -36,7 +37,7 @@ impl IQueryHandler<GetByIdSubjectQuery> for GetByIdSubjectHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(String::from("SubjectError::FindById(id)")),
+            _ => Err(SubjectError::GetById(SubjectGenericError::Unknown { message: String::from("Database Error") })),
         }
     }
 }

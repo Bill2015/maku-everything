@@ -5,6 +5,9 @@ use crate::category::domain::CategoryID;
 
 mod id;
 pub use id::SubjectID;
+mod error;
+pub use error::SubjectError;
+pub use error::SubjectGenericError;
 
 #[derive(Debug, Serialize)]
 pub struct SubjectAggregate {
@@ -18,24 +21,31 @@ pub struct SubjectAggregate {
 }
 
 impl SubjectAggregate {
-    pub fn new(name: String, description: String, belong_category: CategoryID) -> Self {
-        SubjectAggregate {
-            id: SubjectID::new(),
-            name: name,
-            description: description,
-            belong_category: belong_category,
-            auth: false,
-            created_at: Utc::now(),
-            updated_at: Utc::now(),
+    pub fn new(name: String, description: String, belong_category: CategoryID) -> Result<Self, SubjectError> {
+        if name.len() <= 0 {
+            return  Err(SubjectError::Create(SubjectGenericError::NameIsEmpty()));
         }
+
+        Ok(
+            SubjectAggregate {
+                id: SubjectID::new(),
+                name: name,
+                description: description,
+                belong_category: belong_category,
+                auth: false,
+                created_at: Utc::now(),
+                updated_at: Utc::now(),
+            }
+        )
     }
 
-    pub fn change_name(&mut self, new_name: String) {
+    pub fn change_name(&mut self, new_name: String) -> Result<(), SubjectError> {
         if new_name.len() <= 0 {
-            println!("Name can't be empty");
+            return  Err(SubjectError::Create(SubjectGenericError::NameIsEmpty()));
         }
 
         self.name = new_name;
+        Ok(())
     }
 
     pub fn change_description(&mut self, new_description: String) {
