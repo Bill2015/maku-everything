@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Navbar, Stack, UnstyledButton, Tooltip, Image } from '@mantine/core';
+import { AppShell, Stack, UnstyledButton, Tooltip, Image } from '@mantine/core';
 import { IconBaseProps } from 'react-icons/lib';
 import { BsGear, BsMailbox } from 'react-icons/bs';
 import Logo from '@assets/logo.png';
 import { useHomeNavigate } from '@router/navigateHook';
 
-import { useNavbarStyles } from './Navbar.style';
+import navbarClasses from './Navbar.module.scss';
 
 interface NavbarLinkProps {
     icon: React.FC<IconBaseProps>;
@@ -15,13 +15,12 @@ interface NavbarLinkProps {
 }
 
 function NavbarLink(props: NavbarLinkProps) {
-    const { classes, cx } = useNavbarStyles();
     const { icon: Icon, label, active, onClick } = props;
 
     return (
         <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-            <UnstyledButton onClick={onClick} className={cx(classes.link, { [classes.active]: active })}>
-                <Icon size="1.2rem" stroke="1.5" />
+            <UnstyledButton onClick={onClick} className={navbarClasses.link}>
+                <Icon size="1.5rem" stroke="1.5" />
             </UnstyledButton>
         </Tooltip>
     );
@@ -49,19 +48,19 @@ export function MainNavbar() {
     ));
 
     return (
-        <Navbar height={750} width={{ base: 50 }} p="xs" pl={0} pr={0}>
-            <Navbar.Section>
+        <>
+            <AppShell.Section>
                 <Tooltip label="Maku" position="right" transitionProps={{ duration: 0 }}>
                     <UnstyledButton onClick={navigateToHome}>
-                        <Image p={5} src={Logo} />
+                        <Image p={1} width={1} src={Logo} />
                     </UnstyledButton>
                 </Tooltip>
-            </Navbar.Section>
-            <Navbar.Section grow>
-                <Stack justify="center" spacing={2}>
+            </AppShell.Section>
+            <AppShell.Section grow>
+                <Stack style={{ alignItems: 'center' }} gap={5}>
                     {navbarItem}
                 </Stack>
-            </Navbar.Section>
-        </Navbar>
+            </AppShell.Section>
+        </>
     );
 }

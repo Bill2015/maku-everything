@@ -6,6 +6,13 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
     plugins: [react()],
+    css: {
+        preprocessorOptions: {
+          scss: {
+            additionalData: `@import "./src/_mantine";`,
+          },
+        },
+    },
     // Path alias
     resolve: {
         alias: {

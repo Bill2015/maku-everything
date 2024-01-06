@@ -1,0 +1,14 @@
+.link {
+    width: '100%';
+    height: rem(30);
+    border-radius: 0;
+    display: 'flex';
+    align-items: 'center';
+    justify-content: 'center';
+    color: var(--mantine-color-white);
+    opacity: 0.85;
+
+    &:hover {
+        opacity: 1;
+    }
+}

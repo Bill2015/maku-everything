@@ -6,27 +6,23 @@ export namespace TagQuery {
     export function useGetAll() {
         const queryfn = () => TagAPI.getAll();
 
-        return useQuery(
-            ['tag'],
-            queryfn,
-            {
-                placeholderData: [],
-                initialData:     [],
-            },
-        );
+        return useQuery({
+            queryKey:        ['tag'],
+            queryFn:         queryfn,
+            placeholderData: [],
+            initialData:     [],
+        });
     }
 
     export function useGetSubjectTags(subjectId: string | null) {
         const queryfn = () => TagAPI.query({ belong_subject: subjectId! });
 
-        return useQuery(
-            ['tag', 'query', subjectId],
-            queryfn,
-            {
-                enabled:         !!subjectId,
-                placeholderData: [],
-                initialData:     [],
-            },
-        );
+        return useQuery({
+            queryKey:        ['tag', 'query', subjectId],
+            queryFn:         queryfn,
+            enabled:         !!subjectId,
+            placeholderData: [],
+            initialData:     [],
+        });
     }
 }

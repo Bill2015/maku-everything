@@ -6,13 +6,11 @@ export namespace CategoryQuery {
     export function useGetAll() {
         const queryfn = () => CategoryAPI.getAll();
 
-        return useQuery(
-            ['categories'],
-            queryfn,
-            {
-                placeholderData: [],
-                initialData:     [],
-            },
-        );
+        return useQuery({
+            queryKey:        ['categories'],
+            queryFn:         queryfn,
+            placeholderData: [],
+            initialData:     [],
+        });
     }
 }

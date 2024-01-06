@@ -6,27 +6,23 @@ export namespace SubjectQuery {
     export function useGetAll() {
         const queryfn = () => SubjectAPI.getAll();
 
-        return useQuery(
-            ['subjects'],
-            queryfn,
-            {
-                placeholderData: [],
-                initialData:     [],
-            },
-        );
+        return useQuery({
+            queryKey:        ['subjects'],
+            queryFn:         queryfn,
+            placeholderData: [],
+            initialData:     [],
+        });
     }
 
     export function useGetByCategory(categoryId: string | null) {
         const queryfn = () => SubjectAPI.query({ belong_category: categoryId! });
 
-        return useQuery(
-            ['subjects', categoryId],
-            queryfn,
-            {
-                enabled:         !!categoryId,
-                placeholderData: [],
-                initialData:     [],
-            },
-        );
+        return useQuery({
+            queryKey:        ['subjects', categoryId],
+            queryFn:         queryfn,
+            enabled:         !!categoryId,
+            placeholderData: [],
+            initialData:     [],
+        });
     }
 }

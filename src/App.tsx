@@ -1,6 +1,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { SnackbarProvider } from 'notistack';
-import { Box, MantineProvider, Header, AppShell } from '@mantine/core';
+import { Box, MantineProvider, AppShell, Group, Burger, Skeleton } from '@mantine/core';
 import { useRoutes } from 'react-router-dom';
 
 import { invoke } from '@tauri-apps/api/tauri';
@@ -10,7 +10,7 @@ import { CreateSubjectModal } from '@modals/subject';
 import { CreateTagModal } from '@modals/tag';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
-import './App.css';
+import '@mantine/core/styles.css';
 
 function App() {
     const routes = useRoutes(ROUTE_OBJECTS);
@@ -36,16 +36,27 @@ function App() {
 
     return (
         <SnackbarProvider anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>
-            <MantineProvider withGlobalStyles withNormalizeCSS theme={{ colorScheme: theme ? 'dark' : 'light' }}>
+            <MantineProvider defaultColorScheme="dark">
                 <AppShell
+                    header={{ height: 60 }}
+                    navbar={{ width: 70, breakpoint: 'sm' }}
                     padding="md"
-                    navbar={<MainNavbar />}
-                    header={<Header height={60} p="xs">{/* Header content */}</Header>}
-                    styles={(theme) => ({ main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] } })}
                 >
-                    <Suspense fallback={<Box>FallBack</Box>}>
-                        {routes}
-                    </Suspense>
+                    <AppShell.Header>
+                        <Group px="md">
+                            Header
+                        </Group>
+                    </AppShell.Header>
+
+                    <AppShell.Navbar p="sm">
+                        <MainNavbar />
+                    </AppShell.Navbar>
+
+                    <AppShell.Main>
+                        <Suspense fallback={<Box>FallBack</Box>}>
+                            {routes}
+                        </Suspense>
+                    </AppShell.Main>
                 </AppShell>
                 <CreateSubjectModal />
                 <CreateTagModal />

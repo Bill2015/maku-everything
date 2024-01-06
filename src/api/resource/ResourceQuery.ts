@@ -16,54 +16,46 @@ export namespace ResourceQuery {
     export function useGetAll() {
         const queryfn = () => ResourceAPI.getAll();
 
-        return useQuery(
-            ['resource'],
-            queryfn,
-            {
-                placeholderData: [],
-                initialData:     [],
-            },
-        );
+        return useQuery({
+            queryKey:        ['resource'],
+            queryFn:         queryfn,
+            placeholderData: [],
+            initialData:     [],
+        });
     }
 
     export function useGetById(id: string) {
         const queryfn = () => ResourceAPI.getById(id);
 
-        return useQuery(
-            ['resource', id],
-            queryfn,
-            {
-                placeholderData: null,
-                initialData:     null,
-            },
-        );
+        return useQuery({
+            queryKey:        ['resource', id],
+            queryFn:         queryfn,
+            placeholderData: null,
+            initialData:     null,
+        });
     }
 
     export function useGetByCategory(categoryId: string | null) {
         const queryfn = () => ResourceAPI.query({ belong_category: categoryId! });
 
-        return useQuery(
-            ['resource', 'belong-category', categoryId],
-            queryfn,
-            {
-                enabled:         !!categoryId,
-                placeholderData: [],
-                initialData:     [],
-            },
-        );
+        return useQuery({
+            queryKey:        ['resource', 'belong-category', categoryId],
+            queryFn:         queryfn,
+            enabled:         !!categoryId,
+            placeholderData: [],
+            initialData:     [],
+        });
     }
 
     export function useGetDetail(id: string) {
         const queryfn = () => ResourceAPI.getDetail(id);
 
-        const { data: resourceData, ...query } = useQuery(
-            ['resurce-detail', id],
-            queryfn,
-            {
-                placeholderData: null,
-                initialData:     null,
-            },
-        );
+        const { data: resourceData, ...query } = useQuery({
+            queryKey:        ['resurce-detail', id],
+            queryFn:         queryfn,
+            placeholderData: null,
+            initialData:     null,
+        });
 
         // Mapping the tag by subjectName
         const resourceTagData: IResourceTagGroup[] = useMemo(() => {
