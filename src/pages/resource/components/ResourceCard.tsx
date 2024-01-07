@@ -1,5 +1,7 @@
 import { convertFileSrc } from '@tauri-apps/api/tauri';
-import { Grid, Card, Group, Text, Button, rem, Image } from '@mantine/core';
+import {
+    Grid, Card, Group, Text, Button, rem, Image, Tooltip,
+} from '@mantine/core';
 import { ResourceResDto } from '@api/resource';
 
 export interface ResourceCardProps {
@@ -12,21 +14,29 @@ export function ResourceCard(props: ResourceCardProps) {
     const { data, onDetailClick } = props;
 
     return (
-        <Grid.Col lg={2} md={4} sm={6}>
+        <Grid.Col
+            span={{
+                lg: 2,
+                md: 4,
+                sm: 6,
+            }}
+        >
             <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Card.Section>
                     <Image src={convertFileSrc(data.file.root + data.file.path)} alt={data.name} height={180} />
                 </Card.Section>
 
-                <Group position="apart" mt="md" mb="xs">
-                    <Text>{data.name}</Text>
+                <Group justify="flex-start" mt="md" mb="xs">
+                    <Tooltip label={data.name} openDelay={500}>
+                        <Text truncate="end">{data.name}</Text>
+                    </Tooltip>
                 </Group>
 
-                <Group position="apart" mt="md" mb="xs">
+                <Group justify="center" mt="md" mb="xs">
                     <Text>{data.description}</Text>
                 </Group>
 
-                <Group position="apart" mt="md" mb="xs" spacing={0}>
+                <Group justify="flex-start" mt="md" mb="xs">
                     <Text style={{ width: '100%' }} size={rem(5)}>
                         Created At:
                         {data.created_at}
@@ -37,7 +47,7 @@ export function ResourceCard(props: ResourceCardProps) {
                     </Text>
                 </Group>
 
-                <Group position="right">
+                <Group justify="flex-end">
                     <Button onClick={() => onDetailClick(data)}>Detail</Button>
                 </Group>
             </Card>
