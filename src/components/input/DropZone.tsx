@@ -31,7 +31,7 @@ export function TauriDropZone(props: TauriDropZoneProps) {
     useEffect(() => {
         async function dropEventRegister() {
             dropListener.current = await appWindow.onFileDropEvent((event) => {
-                if (event.payload.type === 'hover') {
+                if (event.payload.type === 'hover' && event.payload.paths.length > 0) {
                     setDragHover(true);
                 }
                 else if (event.payload.type === 'cancel') {
