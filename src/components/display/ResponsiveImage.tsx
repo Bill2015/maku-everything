@@ -6,15 +6,13 @@ export interface ResponsiveImageProps extends ComponentProps<'img'> { }
 export function ResponsiveImage(props: ResponsiveImageProps) {
     const { alt, src } = props;
     const [size, setSize] = useState<{w: number, h: number}>({ w: 0, h: 0 });
+    const [isLoaded, setLoaded] = useState<boolean>(false);
 
     const measuredRef = useCallback((node: HTMLImageElement) => {
-        // this timeout is waiting img mounted
-        setTimeout(() => {
-            if (node !== null) {
-                setSize({ w: node.naturalWidth, h: node.naturalHeight });
-            }
-        }, 50);
-    }, []);
+        if (node !== null && isLoaded) {
+            setSize({ w: node.naturalWidth, h: node.naturalHeight });
+        }
+    }, [isLoaded]);
 
     // if Image width larger than height which mean it need to change flex direction to vertical align
     const needVerticalAlign: MantineStyleProp = size.w > size.h
@@ -28,6 +26,7 @@ export function ResponsiveImage(props: ResponsiveImageProps) {
         <Container h="100%" style={needVerticalAlign}>
             <img
                 ref={measuredRef}
+                onLoad={() => setLoaded(true)}
                 alt={alt}
                 src={src}
                 hidden={(size.w + size.h) === 0}
