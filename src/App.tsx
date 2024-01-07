@@ -1,6 +1,6 @@
 import { useEffect, useState, Suspense } from 'react';
 import { SnackbarProvider } from 'notistack';
-import { Box, MantineProvider, AppShell, Group, Burger, Skeleton } from '@mantine/core';
+import { Box, MantineProvider, AppShell, Group } from '@mantine/core';
 import { useRoutes } from 'react-router-dom';
 
 import { invoke } from '@tauri-apps/api/tauri';
@@ -10,7 +10,9 @@ import { CreateSubjectModal } from '@modals/subject';
 import { CreateTagModal } from '@modals/tag';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
+
 import '@mantine/core/styles.css';
+import '@mantine/dropzone/styles.css';
 
 function App() {
     const routes = useRoutes(ROUTE_OBJECTS);
@@ -28,11 +30,6 @@ function App() {
                 });
         }
     }, [isConnected]);
-
-    async function dbTest() {
-    // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-        console.log(await invoke('db_test2'));
-    }
 
     return (
         <SnackbarProvider anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}>

@@ -1,0 +1,11 @@
+.dropzone {
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    border: calc(0.125rem*var(--mantine-scale)) dashed var(--mantine-color-gray-4);
+    border-radius: 0.5rem;
+    position: fixed;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    background-color: var(--mantine-color-default);
+    z-index: 9999;
+}

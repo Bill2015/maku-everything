@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@emotion/react": "^11.11.3",
 		"@mantine/core": "^7.4.0",
+		"@mantine/dropzone": "^7.4.0",
 		"@mantine/hooks": "^7.4.0",
 		"@reduxjs/toolkit": "^2.0.1",
 		"@tanstack/react-query": "^5.17.5",
@@ -24,6 +25,7 @@
 		"react-router-dom": "^6.21.1"
 	},
 	"devDependencies": {
+		"@simbathesailor/use-what-changed": "^2.0.0",
 		"@tauri-apps/cli": "^1.5.9",
 		"@types/node": "^20.10.6",
 		"@types/react": "^18.2.46",

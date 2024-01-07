@@ -6,6 +6,7 @@ import { useActiveCategoryRedux } from '@store/global';
 import { useResourceDetailNavigate } from '@router/navigateHook';
 
 import { ResourceCreateDto, ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
+import { TauriDropZone } from '@components/input';
 import { ResourceCard } from './components/ResourceCard';
 import { CreateResourceModal } from './components/ResourceModal';
 
@@ -36,6 +37,19 @@ export default function ResourcesPage() {
         />
     ));
 
+    const onDropFiles = useCallback(async (filePaths: string[]) => {
+        if (filePaths.length === 1) {
+            const _ = await createResource.mutateAsync({
+                name:            '',
+                description:     '',
+                belong_category: activeCategory.id,
+                file_path:       filePaths[0],
+                url_path:        '',
+            });
+            resourceRefetch();
+        }
+    }, [activeCategory, createResource, resourceRefetch]);
+
     const handleCreateConfirm = useCallback(async (data: ResourceCreateDto) => {
         const _ = await createResource.mutateAsync(data);
         close();
@@ -47,7 +61,8 @@ export default function ResourcesPage() {
     }
     return (
         <>
-            <Stack spacing="lg">
+            <TauriDropZone onDropFiles={onDropFiles} />
+            <Stack gap="lg">
                 <Grid>
                     <Grid.Col span={12}>
                         <Title order={3}>
