@@ -1,31 +1,10 @@
 import { PropsWithChildren, useState, useMemo, useRef, useEffect } from 'react';
-import {
-    ActionIcon, Badge, Flex, Group, Stack, Text, createStyles, rem,
-} from '@mantine/core';
-import { RxCross1 } from 'react-icons/rx';
+import { Flex, Group, Pill, Stack, Text } from '@mantine/core';
 import { ResourceTagDto } from '@api/resource';
 import { TagQuery, TagResDto } from '@api/tag';
 import { ResourceTagSelect } from './ResourceTagSelect';
 
-const useSelectStyle = createStyles((_theme) => ({
-    root: {
-        flexGrow: 1,
-        minWidth: '50%',
-    },
-    input: {
-        border:          'none',
-        backgroundColor: 'transparent',
-        boxShadow:       'none',
-        paddingLeft:     '0px!important',
-    },
-    icon: {
-        width:      '20px',
-        lineHeight: '2px',
-        cursor:     'pointer',
-        opacity:    '0.75',
-    },
-    rightSection: { display: 'none' },
-}));
+import classes from './ResourceTagStack.module.scss';
 
 export interface ResourceTagGroupProps {
     subjectName: string;
@@ -44,7 +23,6 @@ export interface ResourceTagGroupProps {
 export function ResourceTagGroup(props: ResourceTagGroupProps) {
     const { subjectName, autoFocus, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
     const selectRef = useRef<HTMLInputElement>(null);
-    const { classes: selectClasses } = useSelectStyle();
     const [searchValue, setSearchValue] = useState<string>('');
     const [selectValue, setSelectValue] = useState<string>('');
     const { data: subjectTags } = TagQuery.useGetSubjectTags(subjectId);
@@ -64,30 +42,15 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
         }
     };
 
-    const handleRemoveClick = (tagId: string, tagName: string) => {
-        onRemoveExistTag({ id: tagId, name: tagName });
-    };
-
     const itemChip = tags.map((val) => (
-        <Badge
-            pr={3}
-            variant="outline"
-            tt="initial"
+        <Pill
+            classNames={{ root: classes.pillRoot, label: classes.pilllabel }}
+            withRemoveButton
             key={val.id}
-            rightSection={(
-                <ActionIcon
-                    size="xs"
-                    color="blue"
-                    radius="xl"
-                    variant="transparent"
-                    onClick={() => handleRemoveClick(val.id, val.name)}
-                >
-                    <RxCross1 size={rem(10)} />
-                </ActionIcon>
-            )}
+            onRemove={() => onRemoveExistTag({ id: val.id, name: val.name })}
         >
             {val.name}
-        </Badge>
+        </Pill>
     ));
 
     const selectableTags = useMemo(() => subjectTags
@@ -96,12 +59,11 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
     return (
         <Flex direction="column">
             <Text fz="md" c="indigo">{subjectName}</Text>
-            <Group spacing="sm">
+            <Group>
                 {itemChip}
                 <ResourceTagSelect
                     ref={selectRef}
                     rightSectionWidth={0}
-                    classNames={selectClasses}
                     data={selectableTags}
                     value={selectValue}
                     searchValue={searchValue}

@@ -12,7 +12,7 @@ import { ResourceDetailParam } from '@router/params';
 import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
 import { SubjectQuery } from '@api/subject';
 import { ResponsiveImage } from '@components/display';
-import { ReturnButton, SubjectSelect } from '@components/input';
+import { ReturnButton } from '@components/input';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
 
 import classes from './ResourceDetailPage.module.scss';
@@ -77,7 +77,7 @@ export default function ResourcesDetailPage() {
                             </Grid.Col>
 
                             <Grid.Col span={{ lg: 12 }}>
-                                {/* <ResourceTagStack>
+                                <ResourceTagStack>
                                     {resourceTagData.map(({ subjectId, subjectName, tags }) => (
                                         <ResourceTagStack.Group
                                             autoFocus={subjectId === newSubjectId}
@@ -95,7 +95,7 @@ export default function ResourcesDetailPage() {
                                             }}
                                         />
                                     ))}
-                                </ResourceTagStack> */}
+                                </ResourceTagStack>
                             </Grid.Col>
 
                             <Grid.Col span={{ lg: 12 }}>
