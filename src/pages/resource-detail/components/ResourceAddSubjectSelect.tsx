@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { Group, Text } from '@mantine/core';
 import { SubjectResDto } from '@api/subject';
-import { SubjectSelect, SubjectSelectItem } from '@components/input';
+import { SubjectSelect, SubjectSelectItemData } from '@components/input';
 import { TagQuery, TagResDto } from '@api/tag';
 import { ResourceTagSelect } from './ResourceTagSelect';
 
@@ -17,11 +17,10 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
     const { subjects, exclude, onSelectNewTag } = props;
     const tagInputRef = useRef<HTMLInputElement>(null);
     const subjectInputRef = useRef<HTMLInputElement>(null);
-    const [subjectValue, setSubjectValue] = useState<string>('');
     const [tagValue, setTagValue] = useState<string>('');
     const [tagSearchValue, setTagSearchValue] = useState<string>('');
 
-    const [selectedSubject, setSelectedSubject] = useState<SubjectSelectItem | null>(null);
+    const [selectedSubject, setSelectedSubject] = useState<SubjectSelectItemData | null>(null);
     const { data: subjectTags } = TagQuery.useGetSubjectTags(selectedSubject && selectedSubject!.id);
 
     const visibleSubject = useMemo(() => subjects.filter((val) => !exclude.has(val.id)), [subjects, exclude]);
@@ -29,12 +28,11 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
     const handleTagSelect = (value: TagResDto | undefined) => {
         if (value) {
             setSelectedSubject(null);
-            setSubjectValue('');
             onSelectNewTag(value);
         }
     };
 
-    const handleSubjectItemSelect = useCallback((data: SubjectSelectItem) => {
+    const handleSubjectItemSelect = useCallback((data: SubjectSelectItemData) => {
         setSelectedSubject(data);
         setTagValue('');
         setTagSearchValue('');
@@ -46,15 +44,12 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
     return (
         <>
             <SubjectSelect
-                ref={subjectInputRef}
-                placeholder="tagging resource here..."
-                value={subjectValue}
-                display={selectedSubject ? 'none' : 'unset'}
+                inputRef={subjectInputRef}
                 onItemSelect={handleSubjectItemSelect}
+                hidden={!!selectedSubject}
                 subjects={visibleSubject}
-                rightSection={<div />}
             />
-            <Group display={selectedSubject ? 'flex' : 'none'} spacing="xs">
+            <Group display={selectedSubject ? 'flex' : 'none'} gap="xs">
                 <Text fw="bolder">
                     {selectedSubject ? selectedSubject.value : ''}
                     :
@@ -68,7 +63,6 @@ export function ResourceAddSubjectSelect(props: ResourceAddSubjectSelectProps) {
                     onKeyDown={(e) => {
                         if (e.key === 'Backspace' && !(tagValue)) {
                             setSelectedSubject(null);
-                            setSubjectValue('');
                             setTimeout(() => subjectInputRef.current?.focus(), 10);
                         }
                     }}

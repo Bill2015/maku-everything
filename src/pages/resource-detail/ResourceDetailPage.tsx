@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { FcOpenedFolder } from 'react-icons/fc';
 import {
-    Box, Grid, Title, Text, Button, Flex, ScrollArea, Affix, rem,
+    Box, Grid, Title, Text, Button, Flex, ScrollArea, Affix, rem, Divider,
 } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
@@ -11,12 +11,16 @@ import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
 import { SubjectQuery } from '@api/subject';
-import { ReturnButton } from '@components/input';
+import { ResponsiveImage } from '@components/display';
+import { ReturnButton, SubjectSelect } from '@components/input';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
+
+import classes from './ResourceDetailPage.module.scss';
 
 export default function ResourcesDetailPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const { resourceId } = useParams<ResourceDetailParam>();
+
     // when new subject group was created, use for auto focus
     const [newSubjectId, setNewSubjectId] = useState<string>('');
 
@@ -30,6 +34,7 @@ export default function ResourcesDetailPage() {
         tagMapData: resourceTagData,
         refetch: resourceRefetch,
     } = ResourceQuery.useGetDetail(resourceId as string);
+
     const { data: subjects } = SubjectQuery.useGetByCategory(activeCategory?.id);
     const { open: openSubject } = useCreateSubjectModel();
     const { open: openTag } = useCreateTagModel();
@@ -45,15 +50,15 @@ export default function ResourcesDetailPage() {
     }
     return (
         <>
-            <Grid mah="100%" h="100%">
-                <Grid.Col p={0} lg={6} h="100%" ta="center">
-                    <img
-                        alt="Iamge"
-                        style={{ maxHeight: '100%', maxWidth: '100%' }}
+            <Grid classNames={classes}>
+                <Grid.Col p={0} span={{ lg: 5 }} ta="center" h="100%">
+                    <ResponsiveImage
+                        alt={resourceData.name}
                         src={convertFileSrc(resourceData.file.root + resourceData.file.path)}
                     />
                 </Grid.Col>
-                <Grid.Col p={0} lg={6} h="100%">
+                <Divider orientation="vertical" size="sm" />
+                <Grid.Col span={{ lg: 6 }} h="100%">
                     <Flex gap="xs">
                         <Text fz="sm" c="dimmed" lh={2}>
                             {resourceData.file.root}
@@ -61,18 +66,18 @@ export default function ResourcesDetailPage() {
                         <Text fz="sm" c="dimmed" lh={2}>
                             {resourceData.file.path}
                         </Text>
-                        <Button onClick={handleExporeClick} variant="subtle" compact p={0} fz="1.45em">
+                        <Button onClick={handleExporeClick} variant="subtle" p={0} fz="1.45em">
                             <FcOpenedFolder />
                         </Button>
                     </Flex>
                     <ScrollArea mx="auto" h="100%" type="hover" classNames={{ scrollbar: 'mgra' }}>
                         <Grid w="100%">
-                            <Grid.Col lg={12}>
+                            <Grid.Col span={{ lg: 12 }}>
                                 <Title order={2}>{resourceData.name}</Title>
                             </Grid.Col>
 
-                            <Grid.Col lg={12}>
-                                <ResourceTagStack>
+                            <Grid.Col span={{ lg: 12 }}>
+                                {/* <ResourceTagStack>
                                     {resourceTagData.map(({ subjectId, subjectName, tags }) => (
                                         <ResourceTagStack.Group
                                             autoFocus={subjectId === newSubjectId}
@@ -90,22 +95,22 @@ export default function ResourcesDetailPage() {
                                             }}
                                         />
                                     ))}
-                                </ResourceTagStack>
+                                </ResourceTagStack> */}
                             </Grid.Col>
 
-                            <Grid.Col lg={12}>
-                                <Button onClick={() => openSubject()} variant="subtle" compact p={0} fz="1.45em">
+                            <Grid.Col span={{ lg: 12 }}>
+                                <Button onClick={() => openSubject()} variant="subtle" p={0} fz="1.45em">
                                     Open Subject
                                 </Button>
                             </Grid.Col>
 
-                            <Grid.Col lg={12}>
-                                <Button onClick={() => openTag()} variant="subtle" compact p={0} fz="1.45em">
+                            <Grid.Col span={{ lg: 12 }}>
+                                <Button onClick={() => openTag()} variant="subtle" p={0} fz="1.45em">
                                     Open Tag
                                 </Button>
                             </Grid.Col>
 
-                            <Grid.Col lg={12} style={{ paddingBottom: '60px' }}>
+                            <Grid.Col span={{ lg: 12 }} style={{ paddingBottom: '60px' }}>
                                 <ResourceAddSubjectSelect
                                     subjects={subjects}
                                     exclude={existedSubject}

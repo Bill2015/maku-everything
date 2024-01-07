@@ -11,6 +11,7 @@ import { CreateTagModal } from '@modals/tag';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
 
+import './App.css';
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
 
@@ -49,11 +50,15 @@ function App() {
                         <MainNavbar />
                     </AppShell.Navbar>
 
-                    <AppShell.Main>
+                    <AppShell.Main mah="100vh" display="flex">
                         <Suspense fallback={<Box>FallBack</Box>}>
                             {routes}
                         </Suspense>
                     </AppShell.Main>
+
+                    <AppShell.Footer h={20}>
+                        <div>Hi</div>
+                    </AppShell.Footer>
                 </AppShell>
                 <CreateSubjectModal />
                 <CreateTagModal />

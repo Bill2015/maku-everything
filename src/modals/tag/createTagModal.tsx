@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Modal, Button, Grid, Input, Title } from '@mantine/core';
+import { Modal, Button, Grid, Input, Title, Text } from '@mantine/core';
 import { TagMutation } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateTagModel } from '@store/modal';
@@ -11,12 +11,12 @@ export function CreateTagModal() {
     const { opened, close } = useCreateTagModel();
     const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
     const [name, setName] = useState<string>('');
-    const [belongSubject, setBelongSubject] = useState({ value: '', id: '' });
+    const [belongSubject, setBelongSubject] = useState<{ value: string, id: string } | null>(null);
     const [description, setDescription] = useState<string>('');
     const createTag = TagMutation.useCreate();
 
     const handleCreateConfirm = useCallback(() => {
-        if (activeCategory === null) {
+        if (activeCategory === null || belongSubject === null) {
             return;
         }
         createTag.mutateAsync({
@@ -40,13 +40,18 @@ export function CreateTagModal() {
                     Belong Category:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <Input disabled value={activeCategory.name} />
+                    <Text>{activeCategory.name}</Text>
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Belong Subject:
                 </Grid.Col>
                 <Grid.Col span={8}>
-                    <SubjectSelect withinPortal subjects={subjectData} onItemSelect={setBelongSubject} />
+                    <SubjectSelect
+                        value={belongSubject?.value}
+                        onClickResult={() => setBelongSubject(null)}
+                        subjects={subjectData}
+                        onItemSelect={setBelongSubject}
+                    />
                 </Grid.Col>
                 <Grid.Col span={4}>
                     Name:

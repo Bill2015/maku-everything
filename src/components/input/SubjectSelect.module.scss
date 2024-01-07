@@ -1,0 +1,6 @@
+.resultBox {
+    border: calc(.0625rem * var(--mantine-scale)) solid var(--mantine-color-dark-4);
+    background-color: var(--mantine-color-dark-6) !important;
+    padding: 5px !important;
+    border-radius: 0.25em;
+}
