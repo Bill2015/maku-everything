@@ -10,6 +10,7 @@ import { CreateSubjectModal } from '@modals/subject';
 import { CreateTagModal } from '@modals/tag';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
+import { Initializer } from './__test__/components/Initializer';
 
 import './App.css';
 import '@mantine/core/styles.css';
@@ -62,6 +63,7 @@ function App() {
                 </AppShell>
                 <CreateSubjectModal />
                 <CreateTagModal />
+                <Initializer />
             </MantineProvider>
         </SnackbarProvider>
     );
