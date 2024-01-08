@@ -62,9 +62,7 @@ export default function ResourcesDetailPage() {
                     <Flex gap="xs">
                         <Text fz="sm" c="dimmed" lh={2}>
                             {resourceData.file.root}
-                        </Text>
-                        <Text fz="sm" c="dimmed" lh={2}>
-                            {resourceData.file.path}
+                            <Text component="span" fw={500} fz="sm">{resourceData.file.path}</Text>
                         </Text>
                         <Button onClick={handleExporeClick} variant="subtle" p={0} fz="1.45em">
                             <FcOpenedFolder />

@@ -1,5 +1,9 @@
-import { Grid, Card, Group, Text, Badge, Button, rem } from '@mantine/core';
+import {
+    Card, Group, Text, Badge, Button, rem, Spoiler, Box, Title, Divider,
+} from '@mantine/core';
 import { CategoryResDto } from '@api/category';
+
+import classes from './CategoryCard.module.scss';
 
 export interface CategoryCardProps {
     data: CategoryResDto;
@@ -10,32 +14,33 @@ export function CategoryCard(props: CategoryCardProps) {
     const { data, onLoadClick } = props;
 
     return (
-        <Grid.Col span={4}>
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
-                <Group position="apart" mt="md" mb="xs">
-                    <Text>{data.name}</Text>
-                    <Badge color="cyan" variant="light">{data.resource_num}</Badge>
-                </Group>
+        <Card shadow="sm" padding="md" pt="xs" radius="md" withBorder classNames={{ root: classes.card }}>
+            <Title order={3} display="flex">
+                <Box component="span" pr="sm">{data.name}</Box>
+                <Badge color="cyan" variant="light" mt={rem(8)}>{data.resource_num}</Badge>
+            </Title>
+            <Divider orientation="horizontal" size={1} />
 
-                <Group position="apart" mt="md" mb="xs">
+            <Spoiler maxHeight={120} showLabel="Show more" hideLabel="Hide">
+                <Box maw={300}>
                     <Text>{data.description}</Text>
-                </Group>
+                </Box>
+            </Spoiler>
 
-                <Group position="apart" mt="md" mb="xs" spacing={0}>
-                    <Text style={{ width: '100%' }} size={rem(5)}>
-                        Created At:
-                        {data.created_at}
-                    </Text>
-                    <Text style={{ width: '100%' }} size={rem(5)}>
-                        Updated At:
-                        {data.updated_at}
-                    </Text>
-                </Group>
+            <Group mt="md" mb="xs">
+                <Text style={{ width: '100%' }} size={rem(5)}>
+                    Created At:
+                    {data.created_at}
+                </Text>
+                <Text style={{ width: '100%' }} size={rem(5)}>
+                    Updated At:
+                    {data.updated_at}
+                </Text>
+            </Group>
 
-                <Group position="right">
-                    <Button onClick={() => onLoadClick(data)}>Load</Button>
-                </Group>
-            </Card>
-        </Grid.Col>
+            <Group>
+                <Button onClick={() => onLoadClick(data)}>Load</Button>
+            </Group>
+        </Card>
     );
 }

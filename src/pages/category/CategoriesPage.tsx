@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Grid, Stack, Skeleton, Container, Title, Button } from '@mantine/core';
+import { Grid, Stack, Skeleton, Title, Button, ScrollArea, Flex } from '@mantine/core';
 import { useSnackbar } from 'notistack';
 
 import { CategoryCreateDto, CategoryMutation, CategoryQuery, CategoryResDto } from '@api/category';
@@ -36,7 +36,7 @@ export default function CategoriesPage() {
 
     return (
         <>
-            <Stack spacing="lg">
+            <Stack>
                 <Grid>
                     <Grid.Col span={6}>
                         <Title order={3}>Category</Title>
@@ -45,13 +45,13 @@ export default function CategoriesPage() {
                         <Button onClick={open}>Create Category</Button>
                     </Grid.Col>
                 </Grid>
-                <Container fluid style={{ textAlign: 'start', margin: 0 }}>
+                <ScrollArea style={{ textAlign: 'start', margin: 0 }}>
                     <Skeleton visible={isCategoriesLoading}>
-                        <Grid align="flex-start">
+                        <Flex align="flex-start" gap="sm" wrap="wrap">
                             {categoryItems}
-                        </Grid>
+                        </Flex>
                     </Skeleton>
-                </Container>
+                </ScrollArea>
             </Stack>
             <CreateCategoryModal
                 opened={opened}
