@@ -4,6 +4,13 @@ use serde::{Deserialize, Serialize};
 use crate::common::application::thing_serialize;
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct ResourceUrlDto {
+    pub full: String,
+
+    pub host: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct ResourceFileDto {
     pub uuid: String,
 
@@ -26,6 +33,8 @@ pub struct ResourceResDto {
     pub root_path: String,
 
     pub file: Option<ResourceFileDto>,
+
+    pub url: Option<ResourceUrlDto>,
 
     pub created_at: String,
 
@@ -63,6 +72,8 @@ pub struct ResourceDetailDto {
     pub root_path: String,
 
     pub file: Option<ResourceFileDto>,
+
+    pub url: Option<ResourceUrlDto>,
 
     #[serde(serialize_with = "thing_serialize")]
     pub belong_category: Thing,

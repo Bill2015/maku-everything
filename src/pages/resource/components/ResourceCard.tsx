@@ -1,8 +1,7 @@
 import { convertFileSrc } from '@tauri-apps/api/tauri';
-import {
-    Grid, Card, Group, Text, Button, rem, Image, Tooltip,
-} from '@mantine/core';
+import { Grid, Card, Group, Text, Button, rem, Tooltip } from '@mantine/core';
 import { ResourceResDto } from '@api/resource';
+import { ResponsiveImage, YoutubeThumbnail } from '@components/display';
 
 export interface ResourceCardProps {
     data: ResourceResDto;
@@ -16,7 +15,7 @@ export function ResourceCard(props: ResourceCardProps) {
     return (
         <Grid.Col
             span={{
-                lg: 2,
+                lg: 3,
                 md: 4,
                 sm: 6,
             }}
@@ -24,7 +23,9 @@ export function ResourceCard(props: ResourceCardProps) {
             <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Card.Section>
                     {
-                        data.file && <Image src={convertFileSrc(data.root_path + data.file.path)} alt={data.name} height={180} />
+                        data.file === null
+                            ? <YoutubeThumbnail url={data.url!.full} />
+                            : <ResponsiveImage src={convertFileSrc(data.root_path + data.file!.path)} alt={data.name} width="100%" height="100%" />
                     }
                 </Card.Section>
 

@@ -1,3 +1,9 @@
+export interface ResourceUrlDto {
+    full: string;
+
+    host: string;
+}
+
 export interface ResourceFileDto {
     uuid: string,
 
@@ -18,6 +24,8 @@ export interface ResourceResDto {
     root_path: string,
 
     file?: ResourceFileDto,
+
+    url?: ResourceUrlDto,
 
     created_at: string,
 
@@ -68,6 +76,8 @@ export interface ResourceDetailDto {
     root_path: string,
 
     file?: ResourceFileDto,
+
+    url?: ResourceUrlDto,
 
     created_at: string,
 
