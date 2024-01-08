@@ -15,7 +15,7 @@ export function ResponsiveImage(props: ResponsiveImageProps) {
     }, [isLoaded]);
 
     // if Image width larger than height which mean it need to change flex direction to vertical align
-    const needVerticalAlign: MantineStyleProp = size.w > size.h
+    const needVerticalAlign: MantineStyleProp = size.w >= size.h
         ? {
             display:        'flex',
             flexDirection:  'column',
@@ -31,7 +31,7 @@ export function ResponsiveImage(props: ResponsiveImageProps) {
                 src={src}
                 hidden={(size.w + size.h) === 0}
                 width={(size.w < size.h) ? 'inherit' : '100%'}
-                height={(size.w > size.h) ? 'inherit' : '100%'}
+                height={(size.w >= size.h) ? 'inherit' : '100%'}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...props}
             />
