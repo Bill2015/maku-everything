@@ -11,8 +11,6 @@ pub struct ResourceFileDto {
 
     pub path: String,
 
-    pub root: String,
-
     pub ext: String,
 }
 
@@ -25,7 +23,9 @@ pub struct ResourceResDto {
 
     pub description: String,
 
-    pub file: ResourceFileDto,
+    pub root_path: String,
+
+    pub file: Option<ResourceFileDto>,
 
     pub created_at: String,
 
@@ -60,7 +60,9 @@ pub struct ResourceDetailDto {
 
     pub description: String,
 
-    pub file: ResourceFileDto,
+    pub root_path: String,
+
+    pub file: Option<ResourceFileDto>,
 
     #[serde(serialize_with = "thing_serialize")]
     pub belong_category: Thing,

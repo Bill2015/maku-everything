@@ -23,7 +23,9 @@ export function ResourceCard(props: ResourceCardProps) {
         >
             <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Card.Section>
-                    <Image src={convertFileSrc(data.file.root + data.file.path)} alt={data.name} height={180} />
+                    {
+                        data.file && <Image src={convertFileSrc(data.root_path + data.file.path)} alt={data.name} height={180} />
+                    }
                 </Card.Section>
 
                 <Group justify="flex-start" mt="md" mb="xs">

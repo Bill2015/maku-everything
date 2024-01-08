@@ -40,8 +40,8 @@ export default function ResourcesDetailPage() {
     const { open: openTag } = useCreateTagModel();
 
     const handleExporeClick = useCallback(() => {
-        if (resourceData) {
-            exporeFile.mutateAsync(resourceData.file.root + resourceData.file.path);
+        if (resourceData && resourceData.file) {
+            exporeFile.mutateAsync(resourceData.root_path + resourceData.file.path);
         }
     }, [exporeFile, resourceData]);
 
@@ -52,17 +52,21 @@ export default function ResourcesDetailPage() {
         <>
             <Grid classNames={classes}>
                 <Grid.Col p={0} span={{ lg: 5 }} ta="center" h="100%">
-                    <ResponsiveImage
-                        alt={resourceData.name}
-                        src={convertFileSrc(resourceData.file.root + resourceData.file.path)}
-                    />
+                    { resourceData.file && (
+                        <ResponsiveImage
+                            alt={resourceData.name}
+                            src={convertFileSrc(resourceData.root_path + resourceData.file.path)}
+                        />
+                    ) }
                 </Grid.Col>
                 <Divider orientation="vertical" size="sm" />
                 <Grid.Col span={{ lg: 6 }} h="100%">
                     <Flex gap="xs">
                         <Text fz="sm" c="dimmed" lh={2}>
-                            {resourceData.file.root}
-                            <Text component="span" fw={500} fz="sm">{resourceData.file.path}</Text>
+                            {resourceData.root_path}
+                            {
+                                resourceData.file && <Text component="span" fw={500} fz="sm">{resourceData.file.path}</Text>
+                            }
                         </Text>
                         <Button onClick={handleExporeClick} variant="subtle" p={0} fz="1.45em">
                             <FcOpenedFolder />

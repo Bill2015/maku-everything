@@ -26,7 +26,7 @@ impl<'a> ResourceQueryRepository<'a> {
        let sql = r#"
             SELECT 
                 *,
-                (->belong->category.root_path)[0] as file.root
+                (->belong->category.root_path)[0] as root_path
             FROM type::table($table)"#;
 
         let mut response = self.db
@@ -45,7 +45,7 @@ impl<'a> ResourceQueryRepository<'a> {
         let sql = r#"
             SELECT 
                 *,
-                (->belong->category.root_path)[0] as file.root
+                (->belong->category.root_path)[0] as root_path
             FROM type::table($table)
             WHERE id == $id"#;
 
@@ -67,7 +67,7 @@ impl<'a> ResourceQueryRepository<'a> {
         let sql = r#"
             SELECT 
             *,
-            (->belong->category.root_path)[0] as file.root,
+            (->belong->category.root_path)[0] as root_path,
             (SELECT 
                 *,
                 (->belong->subject.name)[0] AS subject_name
@@ -96,7 +96,7 @@ impl<'a> ResourceQueryRepository<'a> {
         let sql = format!(
             r#"SELECT 
                 *,
-                (->belong->category.root_path)[0] as file.root
+                (->belong->category.root_path)[0] as root_path
             FROM resource WHERE {}"#
         , query_string);
 

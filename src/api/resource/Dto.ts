@@ -5,8 +5,6 @@ export interface ResourceFileDto {
 
     path: string,
 
-    root: string,
-
     ext: string,
 }
 
@@ -17,7 +15,9 @@ export interface ResourceResDto {
 
     description: string,
 
-    file: ResourceFileDto,
+    root_path: string,
+
+    file?: ResourceFileDto,
 
     created_at: string,
 
@@ -65,7 +65,9 @@ export interface ResourceDetailDto {
 
     description: string,
 
-    file: ResourceFileDto,
+    root_path: string,
+
+    file?: ResourceFileDto,
 
     created_at: string,
 
