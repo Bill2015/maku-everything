@@ -9,3 +9,7 @@
 .mantine-AppShell-main {
     max-height: 1px;
 } */
+
+main > * {
+    width: 100%;
+}

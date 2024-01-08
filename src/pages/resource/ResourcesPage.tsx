@@ -4,9 +4,10 @@ import { useDisclosure } from '@mantine/hooks';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { useResourceDetailNavigate } from '@router/navigateHook';
-
 import { ResourceCreateDto, ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
 import { TauriDropZone } from '@components/input';
+import { StackGrid } from '@components/layout';
+
 import { ResourceCard } from './components/ResourceCard';
 import { CreateResourceModal } from './components/ResourceModal';
 
@@ -79,9 +80,9 @@ export default function ResourcesPage() {
                 </Grid>
                 <Container fluid style={{ textAlign: 'start', margin: 0 }}>
                     <Skeleton visible={isResourceFetching}>
-                        <Grid align="flex-start">
+                        <StackGrid w={270}>
                             {resourceItems}
-                        </Grid>
+                        </StackGrid>
                     </Skeleton>
                 </Container>
             </Stack>
