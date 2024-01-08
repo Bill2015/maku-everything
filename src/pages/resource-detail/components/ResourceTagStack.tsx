@@ -37,8 +37,11 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
     const handleTagSelect = (value: TagResDto | undefined) => {
         if (value) {
             onSelectNewTag({ id: value.id, name: value.name });
-            setSelectValue('');
-            setSearchValue('');
+            // A small timeout for clear input value
+            setTimeout(() => {
+                setSelectValue('');
+                setSearchValue('');
+            }, 1);
         }
     };
 
@@ -58,10 +61,11 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
 
     return (
         <Flex direction="column">
-            <Text fz="md" c="indigo">{subjectName}</Text>
-            <Group>
+            <Text fz="md" c="indigo" pb={3}>{subjectName}</Text>
+            <Group gap="xs">
                 {itemChip}
                 <ResourceTagSelect
+                    placeholder="+"
                     ref={selectRef}
                     rightSectionWidth={0}
                     data={selectableTags}
