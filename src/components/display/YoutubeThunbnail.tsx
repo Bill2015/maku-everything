@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { CiImageOff } from 'react-icons/ci';
 
+import { Center } from '@mantine/core';
 import { ResponsiveImage, ResponsiveImageProps } from './ResponsiveImage';
 
 const YOUTUBE_PREFIX = 'https://www.youtube.com/watch?v=';
@@ -24,7 +25,11 @@ export function YoutubeThumbnail(props: YoutubeThumbnailProps) {
     }, [url]);
 
     if (!videoHash) {
-        return <CiImageOff />;
+        return (
+            <Center>
+                <CiImageOff style={{ width: '50%', height: '50%' }} />
+            </Center>
+        );
     }
     return (
         <ResponsiveImage
