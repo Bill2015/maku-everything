@@ -1,0 +1,16 @@
+.ActionIconRoot {
+    border: var(--mantine-color-blue-4) 3px solid;
+    width: 2em;
+    height: 2em;
+    background: #3c3c3cb9;
+
+    svg {
+        width: 1.35em;
+        height: 1.15em;
+    }
+}
+
+.tooltip {
+    background-color: var(--mantine-color-default-border);
+    color: var(--mantine-color-text)
+}

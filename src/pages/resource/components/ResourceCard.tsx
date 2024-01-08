@@ -1,7 +1,7 @@
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { Card, Group, Text, Button, rem, Tooltip, Divider } from '@mantine/core';
 import { ResourceResDto } from '@api/resource';
-import { ResponsiveImage, YoutubeThumbnail } from '@components/display';
+import { LinkIcon, ResponsiveImage, YoutubeThumbnail } from '@components/display';
 
 export interface ResourceCardProps {
     data: ResourceResDto;
@@ -14,7 +14,19 @@ export function ResourceCard(props: ResourceCardProps) {
 
     return (
         <Card shadow="sm" padding="lg" radius="md" withBorder>
+
             <Card.Section>
+                {
+                    data.url && (
+                        <LinkIcon
+                            pos="absolute"
+                            top="2%"
+                            right="5%"
+                            host={data.url!.host}
+                            url={data.url!.full}
+                        />
+                    )
+                }
                 {
                     data.file === null
                         ? <YoutubeThumbnail url={data.url!.full} />
