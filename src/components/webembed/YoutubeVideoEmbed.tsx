@@ -1,7 +1,8 @@
-import { UrlHost, YoutubePrefix } from '@declares/variables';
+import { UrlHost } from '@declares/variables';
 import { Center } from '@mantine/core';
 import { CiVideoOff } from 'react-icons/ci';
 
+import { getYoutubeVideoId } from '@utils/urlParser';
 import { RegisteWebEmbedComponent, WebEmbedProps } from './WebEmbedDisplayer';
 
 export interface YoutubeVideoEmbedProps extends WebEmbedProps {
@@ -15,17 +16,9 @@ export interface YoutubeVideoEmbedProps extends WebEmbedProps {
 export function YoutubeVideoEmbed(props: YoutubeVideoEmbedProps) {
     const { url, name } = props;
 
-    const youtubeId = (() => {
-        if (url.startsWith(YoutubePrefix.NormalVideo)) {
-            return url.substring(YoutubePrefix.NormalVideo.length);
-        }
-        if (url.startsWith(YoutubePrefix.ShortVideo)) {
-            return url.substring(YoutubePrefix.ShortVideo.length);
-        }
-        return '';
-    })();
+    const videoId = getYoutubeVideoId(url);
 
-    if (!youtubeId) {
+    if (!videoId) {
         return (
             <Center w="100%" h="100%">
                 <CiVideoOff style={{ width: '100%', height: '100%' }} />
@@ -37,7 +30,7 @@ export function YoutubeVideoEmbed(props: YoutubeVideoEmbedProps) {
         <iframe
             width="100%"
             height="315"
-            src={`https://www.youtube.com/embed/${youtubeId}`}
+            src={`https://www.youtube.com/embed/${videoId}`}
             title={name}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

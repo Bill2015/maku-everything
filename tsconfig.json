@@ -25,6 +25,7 @@
 			"@api/*": ["src/api/*"],
 			"@store/*": ["src/store/*"],
 			"@declares/*": ["src/declares/*"],
+			"@utils/*": ["src/utils/*"],
 			"@modals/*": ["src/modals/*"],
 			"@pages/*": ["src/pages/*"],
 			"@router/*": ["src/router/*"],

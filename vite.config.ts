@@ -20,6 +20,7 @@ export default defineConfig(async () => ({
             '@assets':     path.resolve(__dirname, './src/assets'),
             '@store':      path.resolve(__dirname, './src/store'),
             '@declares':   path.resolve(__dirname, './src/declares'),
+            '@utils':      path.resolve(__dirname, './src/utils'),
             '@router':     path.resolve(__dirname, './src/router'),
             '@modals':     path.resolve(__dirname, './src/modals'),
             '@api':        path.resolve(__dirname, './src/api'),
