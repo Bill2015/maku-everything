@@ -51,7 +51,7 @@ export function ResourceDisplay(props: ResourceDisplayProps) {
 
     if (haveUrl) {
         return (
-            <Center p="md">
+            <Center p="md" w="100%">
                 <WebEmbedDisplayer name={name} url={url!} host={host!} />
             </Center>
         );
