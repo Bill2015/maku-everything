@@ -11,9 +11,10 @@ import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
 import { SubjectQuery } from '@api/subject';
-import { ResponsiveImage } from '@components/display';
+import { ResponsiveImage, YoutubeThumbnail } from '@components/display';
 import { ReturnButton } from '@components/input';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
+import { ResourceDisplay } from './components/ResourceDisplay';
 
 import classes from './ResourceDetailPage.module.scss';
 
@@ -51,16 +52,18 @@ export default function ResourcesDetailPage() {
     return (
         <>
             <Grid classNames={classes}>
-                <Grid.Col p={0} span={{ lg: 5 }} ta="center" h="100%">
-                    { resourceData.file && (
-                        <ResponsiveImage
-                            alt={resourceData.name}
-                            src={convertFileSrc(resourceData.root_path + resourceData.file.path)}
-                        />
-                    ) }
+                <Grid.Col p={0} span={{ lg: 5, sm: 11 }} ta="center" display="flex" style={{ justifyContent: 'center' }}>
+                    <ResourceDisplay
+                        name={resourceData.name}
+                        havePath={!!resourceData.file}
+                        haveUrl={!!resourceData.url}
+                        host={resourceData.url?.host}
+                        url={resourceData.url?.full}
+                        filePath={convertFileSrc(resourceData.root_path + resourceData.file?.path)}
+                    />
                 </Grid.Col>
                 <Divider orientation="vertical" size="sm" />
-                <Grid.Col span={{ lg: 6 }} h="100%">
+                <Grid.Col span={{ lg: 6, sm: 12 }} h="100%">
                     <Flex gap="xs">
                         <Text fz="sm" c="dimmed" lh={2}>
                             {resourceData.root_path}
