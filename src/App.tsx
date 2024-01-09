@@ -38,7 +38,11 @@ function App() {
             <MantineProvider defaultColorScheme="dark">
                 <AppShell
                     header={{ height: 60 }}
-                    navbar={{ width: 70, breakpoint: 'sm' }}
+                    navbar={{
+                        width:      70,
+                        breakpoint: 'sm',
+                        collapsed:  { mobile: true },
+                    }}
                     padding="md"
                 >
                     <AppShell.Header>

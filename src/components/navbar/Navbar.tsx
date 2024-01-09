@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppShell, Stack, UnstyledButton, Tooltip, Image } from '@mantine/core';
+import { Stack, UnstyledButton, Tooltip, Image } from '@mantine/core';
 import { IconBaseProps } from 'react-icons/lib';
 import { BsGear, BsMailbox } from 'react-icons/bs';
 import Logo from '@assets/logo.png';
@@ -49,18 +49,15 @@ export function MainNavbar() {
 
     return (
         <>
-            <AppShell.Section>
-                <Tooltip label="Maku" position="right" transitionProps={{ duration: 0 }}>
-                    <UnstyledButton onClick={navigateToHome}>
-                        <Image p={1} width={1} src={Logo} />
-                    </UnstyledButton>
-                </Tooltip>
-            </AppShell.Section>
-            <AppShell.Section grow>
-                <Stack style={{ alignItems: 'center' }} gap={5}>
-                    {navbarItem}
-                </Stack>
-            </AppShell.Section>
+            <Tooltip label="Maku" position="right" transitionProps={{ duration: 0 }}>
+                <UnstyledButton onClick={navigateToHome} pb={5}>
+                    <Image p={1} width="45px" h="45px" src={Logo} />
+                </UnstyledButton>
+            </Tooltip>
+
+            <Stack style={{ alignItems: 'center' }} gap={5}>
+                {navbarItem}
+            </Stack>
         </>
     );
 }
