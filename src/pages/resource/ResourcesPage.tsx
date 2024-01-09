@@ -1,15 +1,13 @@
 import { useCallback } from 'react';
-import { Box, Stack, Grid, Title, Button, Container, Skeleton } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Box, Stack, Title, Skeleton, ScrollArea, Group } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { useResourceDetailNavigate } from '@router/navigateHook';
-import { ResourceCreateDto, ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
+import { ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
 import { TauriDropZone } from '@components/input';
 import { StackGrid } from '@components/layout';
 
 import { ResourceCard } from './components/ResourceCard';
-import { CreateResourceModal } from './components/ResourceModal';
 
 export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -19,7 +17,6 @@ export default function ResourcesPage() {
         isFetching: isResourceFetching,
         refetch: resourceRefetch,
     } = ResourceQuery.useGetByCategory(activeCategory.id);
-    const [opened, { open, close }] = useDisclosure(false);
 
     const createResource = ResourceMutation.useCreate();
 
@@ -51,12 +48,6 @@ export default function ResourcesPage() {
         }
     }, [activeCategory, createResource, resourceRefetch]);
 
-    const handleCreateConfirm = useCallback(async (data: ResourceCreateDto) => {
-        const _ = await createResource.mutateAsync(data);
-        close();
-        resourceRefetch();
-    }, [resourceRefetch, close, createResource]);
-
     if (activeCategory === null) {
         return <Box>A</Box>;
     }
@@ -64,34 +55,20 @@ export default function ResourcesPage() {
         <>
             <TauriDropZone onDropFiles={onDropFiles} />
             <Stack gap="lg">
-                <Grid>
-                    <Grid.Col span={12}>
-                        <Title order={3}>
-                            Current Category:
-                            {activeCategory.name}
-                        </Title>
-                    </Grid.Col>
-                    <Grid.Col span={6}>
-                        <Title order={3}>Resources</Title>
-                    </Grid.Col>
-                    <Grid.Col span={6} style={{ textAlign: 'end' }}>
-                        <Button onClick={open}>Create Resources</Button>
-                    </Grid.Col>
-                </Grid>
-                <Container fluid style={{ textAlign: 'start', margin: 0 }}>
+                <Group justify="space-between">
+                    <Title order={3}>
+                        Current Category:
+                        {activeCategory.name}
+                    </Title>
+                </Group>
+                <ScrollArea h="100%" style={{ textAlign: 'start', margin: 0 }}>
                     <Skeleton visible={isResourceFetching}>
                         <StackGrid w={270}>
                             {resourceItems}
                         </StackGrid>
                     </Skeleton>
-                </Container>
+                </ScrollArea>
             </Stack>
-            <CreateResourceModal
-                opened={opened}
-                activeCategory={activeCategory}
-                onConfirm={handleCreateConfirm}
-                onClose={close}
-            />
         </>
     );
 }

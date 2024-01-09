@@ -1,36 +1,34 @@
 import { useCallback, useState } from 'react';
-import { Modal, ModalProps, Button, Grid, Input, Title } from '@mantine/core';
-import { ResourceCreateDto } from '@api/resource';
-import { ActiveCategory } from '@store/global';
+import { Modal, Button, Grid, Input, Title } from '@mantine/core';
+import { ResourceMutation } from '@api/resource';
+import { useActiveCategoryRedux } from '@store/global';
+import { useCreateResourceModel } from '@store/modal';
 
-export interface CreateResourceModalProps extends ModalProps {
-    activeCategory: ActiveCategory;
+export function CreateResourceModal() {
+    const { activeCategory } = useActiveCategoryRedux();
+    const { opened, close } = useCreateResourceModel();
 
-    onConfirm: (data: ResourceCreateDto) => void;
-}
-
-export function CreateResourceModal(props: CreateResourceModalProps) {
-    const { activeCategory, onConfirm, ...modelProps } = props;
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [filePath, setFilePath] = useState<string>('');
     const [urlPath, setUrlPath] = useState<string>('');
+    const createResource = ResourceMutation.useCreate();
 
     const handleCreateConfirm = useCallback(() => {
         setName('');
         setDescription('');
-        onConfirm({
+        createResource.mutateAsync({
             name:            name,
             description:     description,
             belong_category: activeCategory.id,
             file_path:       filePath,
             url_path:        urlPath,
         });
-    }, [description, name, filePath, urlPath, activeCategory, onConfirm]);
+        close();
+    }, [description, name, filePath, urlPath, activeCategory, createResource, close]);
 
     return (
-        // eslint-disable-next-line react/jsx-props-no-spreading
-        <Modal {...modelProps} title={<Title order={2}>Create New Resource</Title>} centered>
+        <Modal opened={opened} onClose={close} title={<Title order={2}>Create New Resource</Title>} centered>
             <Grid>
                 <Grid.Col span={4}>
                     In:

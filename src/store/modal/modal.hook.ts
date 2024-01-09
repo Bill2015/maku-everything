@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useModelSelector, useModelDispatch } from '../hook';
-import { setCreateSubjectModelOpen, setCreateTagModelOpen } from './modal.slice';
+import { setCreateResourceModelOpen, setCreateSubjectModelOpen, setCreateTagModelOpen } from './modal.slice';
 
 export function useCreateSubjectModel() {
     const { opened } = useModelSelector().createSubject;
@@ -29,6 +29,23 @@ export function useCreateTagModel() {
 
     const close = useCallback(() => {
         dispatch(setCreateTagModelOpen(false));
+    }, [dispatch]);
+
+    return {
+        opened, open, close,
+    };
+}
+
+export function useCreateResourceModel() {
+    const { opened } = useModelSelector().createResource;
+    const dispatch = useModelDispatch();
+
+    const open = useCallback(() => {
+        dispatch(setCreateResourceModelOpen(true));
+    }, [dispatch]);
+
+    const close = useCallback(() => {
+        dispatch(setCreateResourceModelOpen(false));
     }, [dispatch]);
 
     return {

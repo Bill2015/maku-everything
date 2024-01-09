@@ -9,7 +9,6 @@ import {
 import { useActiveCategoryRedux } from '@store/global';
 import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
-import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
 import { SubjectQuery } from '@api/subject';
 import { ReturnButton } from '@components/input';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
@@ -36,8 +35,6 @@ export default function ResourcesDetailPage() {
     } = ResourceQuery.useGetDetail(resourceId as string);
 
     const { data: subjects } = SubjectQuery.useGetByCategory(activeCategory?.id);
-    const { open: openSubject } = useCreateSubjectModel();
-    const { open: openTag } = useCreateTagModel();
 
     const handleExporeClick = useCallback(() => {
         if (resourceData && resourceData.file) {
@@ -100,18 +97,6 @@ export default function ResourcesDetailPage() {
                                         />
                                     ))}
                                 </ResourceTagStack>
-                            </Grid.Col>
-
-                            <Grid.Col span={{ lg: 12 }}>
-                                <Button onClick={() => openSubject()} variant="subtle" p={0} fz="1.45em">
-                                    Open Subject
-                                </Button>
-                            </Grid.Col>
-
-                            <Grid.Col span={{ lg: 12 }}>
-                                <Button onClick={() => openTag()} variant="subtle" p={0} fz="1.45em">
-                                    Open Tag
-                                </Button>
                             </Grid.Col>
 
                             <Grid.Col span={{ lg: 12 }} style={{ paddingBottom: '60px' }}>
