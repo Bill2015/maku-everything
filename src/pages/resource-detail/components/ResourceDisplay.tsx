@@ -1,60 +1,10 @@
 import { Carousel } from '@mantine/carousel';
 import { Center, Image } from '@mantine/core';
-import { CiVideoOff } from 'react-icons/ci';
+import { useViewportSize } from '@mantine/hooks';
+import { WebEmbedDisplayer } from '@components/webembed';
 
 import '@mantine/carousel/styles.css';
 import classes from './ResourceDisplay.module.scss';
-
-const YOUTUBE_PREFIX = 'https://www.youtube.com/watch?v=';
-const YOUTUBE_SHORT_PREFIX = 'https://www.youtube.com/shorts/';
-
-interface UrlDisplayerProps {
-    name: string;
-
-    url: string;
-
-    host: string;
-}
-
-function UrlDisplayer(props: UrlDisplayerProps) {
-    const { name, host, url } = props;
-
-    return (
-        <>
-            {
-                (() => {
-                    let youtubeId = '';
-                    if (host === 'www.youtube.com') {
-                        if (url.startsWith(YOUTUBE_PREFIX)) {
-                            youtubeId = url.substring(YOUTUBE_PREFIX.length);
-                        }
-                        if (url.startsWith(YOUTUBE_SHORT_PREFIX)) {
-                            youtubeId = url.substring(YOUTUBE_SHORT_PREFIX.length);
-                        }
-                        return (
-                            <iframe
-                                width="560"
-                                height="315"
-                                src={`https://www.youtube.com/embed/${youtubeId}`}
-                                title={name}
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                            />
-                        );
-                    }
-                    if (!youtubeId) {
-                        return (
-                            <Center w="100%" h="100%">
-                                <CiVideoOff style={{ width: '100%', height: '100%' }} />
-                            </Center>
-                        );
-                    }
-                })()
-            }
-        </>
-    );
-}
 
 export interface ResourceDisplayProps {
     name: string;
@@ -72,18 +22,28 @@ export interface ResourceDisplayProps {
 
 export function ResourceDisplay(props: ResourceDisplayProps) {
     const { name, filePath, havePath, url, haveUrl, host } = props;
+    // because I can't let image size within the parent element
+    // Therefore, I use viewport to change it.
+    const { height } = useViewportSize();
 
     if (havePath && haveUrl) {
         return (
-            <Carousel withIndicators classNames={{ root: classes.carouselRoot, viewport: classes.carouselViewport }}>
+            <Carousel
+                slideGap="lg"
+                loop
+                withIndicators
+                classNames={{ root: classes.carouselRoot, slide: classes.carouselSlide }}
+            >
                 <Carousel.Slide>
                     <Image
+                        height={height - 100}
+                        className={classes.image}
                         alt={name}
                         src={filePath}
                     />
                 </Carousel.Slide>
                 <Carousel.Slide>
-                    <UrlDisplayer name={name} url={url!} host={host!} />
+                    <WebEmbedDisplayer name={name} url={url!} host={host!} />
                 </Carousel.Slide>
             </Carousel>
         );
@@ -92,16 +52,16 @@ export function ResourceDisplay(props: ResourceDisplayProps) {
     if (haveUrl) {
         return (
             <Center p="md">
-                <UrlDisplayer name={name} url={url!} host={host!} />
+                <WebEmbedDisplayer name={name} url={url!} host={host!} />
             </Center>
         );
     }
 
     if (havePath) {
         return (
-            <Center p="md">
+            <Center p="md" h="100%">
                 <Image
-                    height="auto"
+                    className={classes.image}
                     alt={name}
                     src={filePath}
                 />

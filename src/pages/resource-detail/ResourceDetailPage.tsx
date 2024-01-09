@@ -11,7 +11,6 @@ import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { useCreateSubjectModel, useCreateTagModel } from '@store/modal';
 import { SubjectQuery } from '@api/subject';
-import { ResponsiveImage, YoutubeThumbnail } from '@components/display';
 import { ReturnButton } from '@components/input';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
 import { ResourceDisplay } from './components/ResourceDisplay';
@@ -52,7 +51,7 @@ export default function ResourcesDetailPage() {
     return (
         <>
             <Grid classNames={classes}>
-                <Grid.Col p={0} span={{ lg: 5, sm: 11 }} ta="center" display="flex" style={{ justifyContent: 'center' }}>
+                <Grid.Col p={0} span={{ lg: 5, sm: 11 }} mah="100%" ta="center" display="flex" style={{ justifyContent: 'center' }}>
                     <ResourceDisplay
                         name={resourceData.name}
                         havePath={!!resourceData.file}

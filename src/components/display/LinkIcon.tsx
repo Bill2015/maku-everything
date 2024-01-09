@@ -6,10 +6,12 @@ import { FaYoutube } from 'react-icons/fa';
 import { FaLink } from 'react-icons/fa6';
 import { useSnackbar } from 'notistack';
 
+import { UrlHost } from '@declares/variables';
+
 import classes from './LinkIcon.module.scss';
 
 const URL_ICON_MAPPER = new Map<string, IconType>();
-URL_ICON_MAPPER.set('www.youtube.com', FaYoutube);
+URL_ICON_MAPPER.set(UrlHost.Youtube, FaYoutube);
 
 export interface LinkIconProps extends ActionIconProps {
     /** Host of URL, for example: **www.youtube.com**  */

@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
 import { CiImageOff } from 'react-icons/ci';
-
 import { Center } from '@mantine/core';
-import { ResponsiveImage, ResponsiveImageProps } from './ResponsiveImage';
+import { YoutubePrefix } from '@declares/variables';
 
-const YOUTUBE_PREFIX = 'https://www.youtube.com/watch?v=';
-const YOUTUBE_SHORT_PREFIX = 'https://www.youtube.com/shorts/';
+import { ResponsiveImage, ResponsiveImageProps } from './ResponsiveImage';
 
 export interface YoutubeThumbnailProps extends Omit<ResponsiveImageProps, 'src'> {
     url: string;
@@ -15,11 +13,11 @@ export function YoutubeThumbnail(props: YoutubeThumbnailProps) {
     const { url } = props;
 
     const videoHash = useMemo(() => {
-        if (url.startsWith(YOUTUBE_PREFIX)) {
-            return url.substring(YOUTUBE_PREFIX.length);
+        if (url.startsWith(YoutubePrefix.NormalVideo)) {
+            return url.substring(YoutubePrefix.NormalVideo.length);
         }
-        if (url.startsWith(YOUTUBE_SHORT_PREFIX)) {
-            return url.substring(YOUTUBE_SHORT_PREFIX.length);
+        if (url.startsWith(YoutubePrefix.ShortVideo)) {
+            return url.substring(YoutubePrefix.ShortVideo.length);
         }
         return '';
     }, [url]);
