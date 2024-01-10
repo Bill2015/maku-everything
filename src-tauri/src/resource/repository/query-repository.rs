@@ -1,8 +1,7 @@
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
-use surrealdb::sql::{Thing, thing};
+use surrealdb::sql::thing;
 
 use crate::common::repository::{env, tablens};
 use crate::resource::application::dto::ResourceResDto;
@@ -18,16 +17,19 @@ pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQuer
 }
 
 impl<'a> ResourceQueryRepository<'a> {
+    const ROOT_PATH_FIELD: &str = "(->belong->category.root_path)[0] as root_path";
+
     pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         ResourceQueryRepository { db: db }
     }
 
     pub async fn get_all(&self) -> surrealdb::Result<Vec<ResourceResDto>> {
-       let sql = r#"
-            SELECT 
+        let sql = format!(r#"
+            SELECT
                 *,
-                (->belong->category.root_path)[0] as root_path
-            FROM type::table($table)"#;
+                {}
+            FROM type::table($table)"#, 
+            Self::ROOT_PATH_FIELD);
 
         let mut response = self.db
             .query(sql)
@@ -42,15 +44,16 @@ impl<'a> ResourceQueryRepository<'a> {
     }
 
     pub async fn get_by_id(&self, id: &String) -> surrealdb::Result<Option<ResourceResDto>> {
-        let sql = r#"
-            SELECT 
+        let sql = format!(r#"
+            SELECT
                 *,
-                (->belong->category.root_path)[0] as root_path
+                {}
             FROM type::table($table)
-            WHERE id == $id"#;
+            WHERE id == $id"#, 
+            Self::ROOT_PATH_FIELD);
 
         let mut response = self.db
-            .query("SELECT * FROM type::table($table) WHERE id == $id")
+            .query(sql)
             .bind(("table", &tablens::RESOURCE))
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
@@ -64,22 +67,23 @@ impl<'a> ResourceQueryRepository<'a> {
 
     // TODO: need more data to measure response time
     pub async fn detail(&self, id: &String)  -> surrealdb::Result<Option<ResourceDetailDto>> {
-        let sql = r#"
+        let sql = format!(r#"
             SELECT 
             *,
-            (->belong->category.root_path)[0] as root_path,
+            {},
             (SELECT 
                 *,
                 (->belong->subject.name)[0] AS subject_name
                 FROM tag 
                 WHERE ->tagging->resource.id CONTAINS $parent.id
             ) AS tags
-            FROM resource
-            WHERE id == $id"#;
-        
+            FROM type::table($table)
+            WHERE id == $id"#, 
+            Self::ROOT_PATH_FIELD);
+                    
         let mut response = self.db
             .query(sql)
-            // .bind(("table", &tablens::RESOURCE))
+            .bind(("table", &tablens::RESOURCE))
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
@@ -96,12 +100,13 @@ impl<'a> ResourceQueryRepository<'a> {
         let sql = format!(
             r#"SELECT 
                 *,
-                (->belong->category.root_path)[0] as root_path
-            FROM resource WHERE {}"#
-        , query_string);
+                {}
+            FROM type::table($table) WHERE {query_string}"#, 
+            Self::ROOT_PATH_FIELD, query_string = query_string);
 
         let mut response = self.db
             .query(sql)
+            .bind(("table", &tablens::RESOURCE))
             .await?;
 
         let result: Vec<ResourceResDto> = response

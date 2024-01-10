@@ -1,7 +1,6 @@
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
-use surrealdb::sql::{Datetime, Thing, thing};
+use surrealdb::sql::thing;
 use surrealdb::engine::remote::ws::Client;
 
 use crate::common::domain::ID;
