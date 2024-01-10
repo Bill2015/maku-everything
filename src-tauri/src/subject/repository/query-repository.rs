@@ -1,8 +1,7 @@
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
-use surrealdb::sql::{Thing, thing};
+use surrealdb::sql::thing;
 
 use crate::common::repository::{env, tablens};
 use crate::subject::application::dto::SubjectResDto;
@@ -47,19 +46,15 @@ impl<'a> SubjectQueryRepository<'a> {
     pub async fn query(&self, builder: SubjectQueryBuilder) -> surrealdb::Result<Vec<SubjectResDto>> {
         let query_string = builder.build();
 
-        let sql = format!(
-            r#"SELECT 
+        let sql = format!(r#"
+            SELECT 
                 *
-            FROM subject WHERE {}"#
-        , query_string);
-
-        dbg!(&sql);
+            FROM subject WHERE {}"#, 
+            query_string);
 
         let mut response = self.db
             .query(sql)
             .await?;
-
-        dbg!(&response);
 
         let result: Vec<SubjectResDto> = response
             .take(0)
