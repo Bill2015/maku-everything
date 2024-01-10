@@ -1,10 +1,9 @@
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
-use surrealdb::sql::{Thing, thing};
+use surrealdb::sql::thing;
 
-use crate::common::repository::{env, tablens};
+use crate::common::repository::env;
 use crate::tag::application::dto::TagResDto;
 use crate::tag::infrastructure::TagQueryBuilder;
 
@@ -14,19 +13,25 @@ pub struct TagQueryRepository<'a> {
     db: &'a Lazy<Surreal<Client>>,
 }
 impl<'a> TagQueryRepository<'a> {
+    const SUBJECT_NAME_FIELD: &str = "(->belong->subject.name)[0] as subject_name";
+    const CATEGORY_NAME_FIELD: &str = "(->belong->category.name)[0] as category_name";
+    const TAGGED_COUNT_FIELD: &str = "array::len(->tagging.out) as tagged_count";
+
     pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         TagQueryRepository { db: db }
     }
 
     pub async fn get_all(&self) -> surrealdb::Result<Vec<TagResDto>> {
-        let sql = r#"
+        let sql = format!(r#"
             SELECT 
                 *,
-                (->belong->subject.name)[0] as subject_name,
-                (->belong->category.name)[0] as category_name,
-                array::len(->tagging.out) as tag_nums
-            FROM tag
-        "#;
+                {},
+                {},
+                {}
+            FROM tag"#,
+            Self::SUBJECT_NAME_FIELD,
+            Self::CATEGORY_NAME_FIELD,
+            Self::TAGGED_COUNT_FIELD);
 
         let mut response = self.db
             .query(sql)
@@ -40,14 +45,16 @@ impl<'a> TagQueryRepository<'a> {
     }
 
     pub async fn get_by_id(&self, id: &String) -> surrealdb::Result<Option<TagResDto>> {
-        let sql = r#"
+        let sql = format!(r#"
             "SELECT 
                 *,
-                (->belong->subject.name)[0] as subject_name,
-                (->belong->category.name)[0] as category_name,
-                array::len(->tagging.out) as tag_nums
-            FROM tag WHERE id == $id
-        "#;
+                {},
+                {},
+                {}
+            FROM tag WHERE id == $id"#,
+            Self::SUBJECT_NAME_FIELD,
+            Self::CATEGORY_NAME_FIELD,
+            Self::TAGGED_COUNT_FIELD);
 
         let mut response = self.db
             .query(sql)
@@ -64,22 +71,21 @@ impl<'a> TagQueryRepository<'a> {
     pub async fn query(&self, builder: TagQueryBuilder) -> surrealdb::Result<Vec<TagResDto>> {
         let query_string = builder.build();
 
-        let sql = format!(
-            r#"SELECT 
+        let sql = format!(r#"
+            SELECT 
                 *,
-                (->belong->subject.name)[0] as subject_name,
-                (->belong->category.name)[0] as category_name,
-                array::len(->tagging.out) as tag_nums
-            FROM tag WHERE {}"#
-        , query_string);
-
-        dbg!(&sql);
+                {},
+                {},
+                {}
+            FROM tag WHERE {query_string}"#, 
+            Self::SUBJECT_NAME_FIELD,
+            Self::CATEGORY_NAME_FIELD,
+            Self::TAGGED_COUNT_FIELD,
+            query_string = query_string);
 
         let mut response = self.db
             .query(sql)
             .await?;
-
-        dbg!(&response);
 
         let result: Vec<TagResDto> = response
             .take(0)

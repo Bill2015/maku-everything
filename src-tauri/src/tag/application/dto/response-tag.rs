@@ -17,7 +17,7 @@ pub struct TagResDto {
 
     pub category_name: String,
 
-    pub tag_nums: i64,
+    pub tagged_count: i64,
 
     #[serde(serialize_with = "thing_serialize")]
     pub belong_subject: Thing,
