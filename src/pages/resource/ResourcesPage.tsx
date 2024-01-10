@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { Box, Stack, Title, Skeleton, ScrollArea, Group } from '@mantine/core';
+import { Box, Stack, Title, Skeleton, ScrollArea, Input, Divider } from '@mantine/core';
+import { FaSearch } from 'react-icons/fa';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { useResourceDetailNavigate } from '@router/navigateHook';
@@ -52,23 +53,22 @@ export default function ResourcesPage() {
         return <Box>A</Box>;
     }
     return (
-        <>
-            <TauriDropZone onDropFiles={onDropFiles} />
-            <Stack gap="lg">
-                <Group justify="space-between">
-                    <Title order={3}>
-                        Current Category:
-                        {activeCategory.name}
-                    </Title>
-                </Group>
-                <ScrollArea h="100%" style={{ textAlign: 'start', margin: 0 }}>
-                    <Skeleton visible={isResourceFetching}>
-                        <StackGrid w={270}>
-                            {resourceItems}
-                        </StackGrid>
-                    </Skeleton>
-                </ScrollArea>
+        <Stack gap="lg" p={0}>
+            <Stack justify="space-between" pr={40} gap={0}>
+                <Title order={2}>
+                    {activeCategory.name}
+                </Title>
+                <Input style={{ flexGrow: 1 }} placeholder="search resource..." rightSection={<FaSearch />} />
+                <Divider mt={10} />
             </Stack>
-        </>
+            <ScrollArea h="100%" style={{ textAlign: 'start', margin: 0 }}>
+                <Skeleton visible={isResourceFetching}>
+                    <StackGrid w={270}>
+                        {resourceItems}
+                    </StackGrid>
+                </Skeleton>
+                <TauriDropZone onDropFiles={onDropFiles} />
+            </ScrollArea>
+        </Stack>
     );
 }
