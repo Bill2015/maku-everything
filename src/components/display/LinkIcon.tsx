@@ -4,8 +4,8 @@ import { ActionIcon, ActionIconProps, Tooltip } from '@mantine/core';
 import { IconType } from 'react-icons';
 import { FaYoutube } from 'react-icons/fa';
 import { FaLink } from 'react-icons/fa6';
-import { useSnackbar } from 'notistack';
 
+import { showNotification } from '@components/notification';
 import { UrlHost } from '@declares/variables';
 
 import classes from './LinkIcon.module.scss';
@@ -25,7 +25,6 @@ export interface LinkIconProps extends ActionIconProps {
  * According URL host to determin which icon will be showing */
 export function LinkIcon(props: LinkIconProps) {
     const { host, url, ...actionIconProps } = props;
-    const { enqueueSnackbar } = useSnackbar();
 
     const IconElement = (() => {
         if (URL_ICON_MAPPER.has(host)) {
@@ -49,7 +48,7 @@ export function LinkIcon(props: LinkIconProps) {
                 onClick={() => {
                     open(url)
                         .catch(() => {
-                            enqueueSnackbar('Invalid URL', { variant: 'error' });
+                            showNotification('Invalid URL', url, 'error');
                         });
                 }}
             >

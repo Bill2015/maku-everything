@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Grid, Stack, Skeleton, Title, Button, ScrollArea, Flex } from '@mantine/core';
-import { useSnackbar } from 'notistack';
 
+import { showNotification } from '@components/notification';
 import { CategoryCreateDto, CategoryMutation, CategoryQuery, CategoryResDto } from '@api/category';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCategoryNavigate } from '@router/navigateHook';
@@ -11,7 +11,6 @@ import { CategoryCard, CreateCategoryModal } from './components';
 
 export default function CategoriesPage() {
     const { data: categories, isLoading: isCategoriesLoading, refetch: categoriesRefetch } = CategoryQuery.useGetAll();
-    const { enqueueSnackbar } = useSnackbar();
     const { setActiveCategory } = useActiveCategoryRedux();
     const navigateCategoryTo = useCategoryNavigate();
     const createCategory = CategoryMutation.useCreate();
@@ -20,10 +19,10 @@ export default function CategoriesPage() {
 
     // When Load clicked
     const handleCateogryLoadClick = useCallback(async (data: CategoryResDto) => {
-        enqueueSnackbar(`Success Load ${data.name}`, { variant: 'info' });
+        showNotification('Loaded Category', data.name);
         setActiveCategory({ id: data.id, name: data.name });
         navigateCategoryTo(data.name);
-    }, [enqueueSnackbar, setActiveCategory, navigateCategoryTo]);
+    }, [setActiveCategory, navigateCategoryTo]);
 
     const categoryItems = categories.map((val) => <CategoryCard key={val.id} data={val} onLoadClick={handleCateogryLoadClick} />);
 
