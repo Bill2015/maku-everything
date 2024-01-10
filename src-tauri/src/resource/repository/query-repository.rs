@@ -73,7 +73,8 @@ impl<'a> ResourceQueryRepository<'a> {
             {},
             (SELECT 
                 *,
-                (->belong->subject.name)[0] AS subject_name
+                (->belong->subject.name)[0] AS subject_name,
+                array::len(->tagging.out) as tagged_count
                 FROM tag 
                 WHERE ->tagging->resource.id CONTAINS $parent.id
             ) AS tags

@@ -18,7 +18,13 @@ export interface TagResDto {
 
     belong_category: string;
 
+    category_name: string;
+
     belong_subject: string;
+
+    subject: string;
+
+    tagged_count: number;
 
     created_at: string;
 

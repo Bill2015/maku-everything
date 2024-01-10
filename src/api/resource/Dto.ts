@@ -61,6 +61,8 @@ export interface ResourceTagDto {
 
     subject_name: string,
 
+    tagged_count: number,
+
     created_at: string,
 
     updated_at: string,

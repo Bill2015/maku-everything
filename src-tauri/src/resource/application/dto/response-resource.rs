@@ -55,6 +55,8 @@ pub struct ResourceTagDto {
 
     pub subject_name: String,
 
+    pub tagged_count: i64,
+
     pub created_at: String,
 
     pub updated_at: String,
