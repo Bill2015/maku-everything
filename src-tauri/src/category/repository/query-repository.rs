@@ -13,13 +13,18 @@ pub struct CategoryQueryRepository<'a> {
     db: &'a Lazy<Surreal<Client>>,
 }
 impl<'a> CategoryQueryRepository<'a> {
+    const RESOURCE_NUM_FIELD: &str = "array::len(<-belong<-resource) AS resource_num";
+
+
     pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         CategoryQueryRepository { db: db }
     }
 
     pub async fn get_all(&self) -> surrealdb::Result<Vec<CategoryResDto>> {
+        let sql = format!("SELECT *, {} FROM type::table($table)", Self::RESOURCE_NUM_FIELD);
+
         let mut response = self.db
-            .query("SELECT *, array::len(<-belong<-resource) AS resource_num FROM type::table($table)")
+            .query(sql)
             .bind(("table", &tablens::CATEGORY))
             .await?;
 
@@ -31,9 +36,12 @@ impl<'a> CategoryQueryRepository<'a> {
     }
 
     pub async fn get_by_id(&self, id: &String) -> surrealdb::Result<Option<CategoryResDto>> {
+        let sql = format!("SELECT *, {} FROM type::table($table) WHERE id == $id", Self::RESOURCE_NUM_FIELD);
+
         let mut response = self.db
-            .query("SELECT *, array::len(<-belong<-resource) AS resource_num FROM category WHERE id == $id")
+            .query(sql)
             .bind(("id", thing(id.as_str())))
+            .bind(("table", &tablens::CATEGORY))
             .await?;
 
         let result: Option<CategoryResDto> = response
