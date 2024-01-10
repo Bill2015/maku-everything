@@ -8,6 +8,7 @@ import { invoke } from '@tauri-apps/api/tauri';
 import { MainNavbar } from '@components/navbar';
 import { CreateSubjectModal } from '@modals/subject';
 import { CreateTagModal } from '@modals/tag';
+import { CreateResourceModal } from '@modals/resource';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
 import { Initializer } from './__test__/components/Initializer';
@@ -67,6 +68,7 @@ function App() {
                 </AppShell>
                 <CreateSubjectModal />
                 <CreateTagModal />
+                <CreateResourceModal />
                 <Initializer />
             </MantineProvider>
         </SnackbarProvider>

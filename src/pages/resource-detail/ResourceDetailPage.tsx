@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import { FcOpenedFolder } from 'react-icons/fc';
 import {
-    Box, Grid, Title, Text, Button, Flex, ScrollArea, Affix, rem, Divider,
+    Box, Grid, Title, Text, Button, Flex, ScrollArea, Affix, rem, Divider, Stack,
 } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
@@ -72,46 +72,38 @@ export default function ResourcesDetailPage() {
                         </Button>
                     </Flex>
                     <ScrollArea mx="auto" h="100%" type="hover" classNames={{ scrollbar: 'mgra' }}>
-                        <Grid w="100%">
-                            <Grid.Col span={{ lg: 12 }}>
-                                <Title order={2}>{resourceData.name}</Title>
-                            </Grid.Col>
-
-                            <Grid.Col span={{ lg: 12 }}>
-                                <ResourceTagStack>
-                                    {resourceTagData.map(({ subjectId, subjectName, tags }) => (
-                                        <ResourceTagStack.Group
-                                            autoFocus={subjectId === newSubjectId}
-                                            key={subjectId}
-                                            subjectId={subjectId}
-                                            subjectName={subjectName}
-                                            tags={tags}
-                                            onSelectNewTag={async (tag) => {
-                                                await addResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
-                                                resourceRefetch();
-                                            }}
-                                            onRemoveExistTag={async (tag) => {
-                                                await removeResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
-                                                resourceRefetch();
-                                            }}
-                                        />
-                                    ))}
-                                </ResourceTagStack>
-                            </Grid.Col>
-
-                            <Grid.Col span={{ lg: 12 }} style={{ paddingBottom: '60px' }}>
-                                <ResourceAddSubjectSelect
-                                    subjects={subjects}
-                                    exclude={existedSubject}
-                                    onSelectNewTag={async (tag) => {
-                                        await addResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
-                                        await resourceRefetch();
-                                        // make sure auto focus
-                                        setNewSubjectId(tag.belong_subject);
-                                    }}
-                                />
-                            </Grid.Col>
-                        </Grid>
+                        <Stack>
+                            <Title order={2}>{resourceData.name}</Title>
+                            <ResourceTagStack>
+                                {resourceTagData.map(({ subjectId, subjectName, tags }) => (
+                                    <ResourceTagStack.Group
+                                        autoFocus={subjectId === newSubjectId}
+                                        key={subjectId}
+                                        subjectId={subjectId}
+                                        subjectName={subjectName}
+                                        tags={tags}
+                                        onSelectNewTag={async (tag) => {
+                                            await addResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
+                                            resourceRefetch();
+                                        }}
+                                        onRemoveExistTag={async (tag) => {
+                                            await removeResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
+                                            resourceRefetch();
+                                        }}
+                                    />
+                                ))}
+                            </ResourceTagStack>
+                            <ResourceAddSubjectSelect
+                                subjects={subjects}
+                                exclude={existedSubject}
+                                onSelectNewTag={async (tag) => {
+                                    await addResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
+                                    await resourceRefetch();
+                                    // make sure auto focus
+                                    setNewSubjectId(tag.belong_subject);
+                                }}
+                            />
+                        </Stack>
                     </ScrollArea>
                 </Grid.Col>
             </Grid>

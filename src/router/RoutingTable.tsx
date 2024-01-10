@@ -1,5 +1,6 @@
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
+import { CategoryContainer } from '@pages/common';
 
 const CategoriesPage = React.lazy(() => import(/* webpackChunkName: "category-page" */ '@pages/category/CategoriesPage'));
 const ResourcePage = React.lazy(() => import(/* webpackChunkName: "resources-page" */ '@pages/resource/ResourcesPage'));
@@ -11,13 +12,19 @@ export const ROUTE_OBJECTS: RouteObject[] = [
         element: <CategoriesPage />,
     },
     {
-        path:    '/category/:categoryName/*',
-        element: <ResourcePage />,
+        path:     '/category/:categoryName/*',
+        element:  <CategoryContainer />,
+        children: [
+            {
+                path:    '*',
+                element: <ResourcePage />,
+            },
+            {
+                path:    'resource/:resourceId',
+                element: <ResourcesDetailPage />,
+            },
+        ],
     },
-    {
-        path:    '/category/:categoryName/resource/:resourceId',
-        element: <ResourcesDetailPage />,
-    }
 ];
 
 // export const ROUTE_OBJECTS: RouteObject[] = [
