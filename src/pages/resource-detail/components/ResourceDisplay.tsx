@@ -36,7 +36,7 @@ export function ResourceDisplay(props: ResourceDisplayProps) {
             >
                 <Carousel.Slide>
                     <Image
-                        height={height - 100}
+                        height={height - 130}
                         className={classes.image}
                         alt={name}
                         src={filePath}
@@ -61,6 +61,7 @@ export function ResourceDisplay(props: ResourceDisplayProps) {
         return (
             <Center p="md" h="100%">
                 <Image
+                    height={height - 120}
                     className={classes.image}
                     alt={name}
                     src={filePath}
