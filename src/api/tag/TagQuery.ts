@@ -25,4 +25,16 @@ export namespace TagQuery {
             initialData:     [],
         });
     }
+
+    export function useGetByCategory(categoryId: string | null) {
+        const queryFn = () => TagAPI.query({ belong_category: categoryId! });
+
+        return useQuery({
+            queryKey:        ['tag', 'belong-category', categoryId],
+            queryFn:         queryFn,
+            enabled:         !!categoryId,
+            placeholderData: [],
+            initialData:     [],
+        });
+    }
 }

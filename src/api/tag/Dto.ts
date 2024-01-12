@@ -22,7 +22,7 @@ export interface TagResDto {
 
     belong_subject: string;
 
-    subject: string;
+    subject_name: string;
 
     tagged_count: number;
 
