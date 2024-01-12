@@ -5,10 +5,11 @@ import { FaSearch } from 'react-icons/fa';
 import { useActiveCategoryRedux } from '@store/global';
 import { useResourceDetailNavigate } from '@router/navigateHook';
 import { ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
-import { TauriDropZone } from '@components/input';
+import { ComplexSearchInput, TauriDropZone } from '@components/input';
 import { StackGrid } from '@components/layout';
 
 import { ResourceCard } from './components/ResourceCard';
+import { TagQuery } from '@api/tag';
 
 export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -18,6 +19,11 @@ export default function ResourcesPage() {
         isFetching: isResourceFetching,
         refetch: resourceRefetch,
     } = ResourceQuery.useGetByCategory(activeCategory.id);
+
+    const {
+        data: tagData,
+        isFetching: isTagFetching,
+    } = TagQuery.useGetByCategory(activeCategory.id);
 
     const createResource = ResourceMutation.useCreate();
 
@@ -60,7 +66,9 @@ export default function ResourcesPage() {
                 </Title>
                 <Input style={{ flexGrow: 1 }} placeholder="search resource..." rightSection={<FaSearch />} />
                 <Divider mt={10} />
+                <ComplexSearchInput tags={tagData} />
             </Stack>
+
             <ScrollArea h="100%" style={{ textAlign: 'start', margin: 0 }}>
                 <Skeleton visible={isResourceFetching}>
                     <StackGrid w={270}>
