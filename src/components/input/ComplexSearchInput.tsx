@@ -1,6 +1,35 @@
-import { useCallback, useRef, useState } from 'react';
-import { Combobox, ComboboxOptionProps, Group, Input, Text, useCombobox } from '@mantine/core';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { Combobox, ComboboxOptionProps, Group, Input, Stack, Text, useCombobox } from '@mantine/core';
 import { TagResDto } from '@api/tag';
+
+export interface TagOptionProps extends ComboboxOptionProps {
+    data: TagResDto;
+}
+
+export function TagOption(props: TagOptionProps) {
+    const { data, ...optionProps } = props;
+
+    return (
+        <Combobox.Option
+            itemID={data.id}
+            key={data.name}
+            aria-details={data.subject_name}
+            aria-description={data.description}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...optionProps}
+        >
+            <Stack gap={0} p={0}>
+                <Text component="span" h="0.75em" fz="0.75em" opacity="0.5">{data.subject_name}</Text>
+                <Text component="span" h="1.1em">
+                    {data.name}
+                    <Text component="span" pl={5} fz="0.6em" opacity="0.6">
+                        {data.description}
+                    </Text>
+                </Text>
+            </Stack>
+        </Combobox.Option>
+    );
+}
 
 enum InputStatus {
     Initial,
@@ -57,21 +86,11 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
 
     const totalOptions: JSX.Element[] = [];
 
-    const tagOptions = tags
-        .filter((item) => item.name.toLowerCase().includes(searchText.toLowerCase().trim()))
-        .map((item) => (
-            <Combobox.Option
-                itemID={item.id}
-                value={item.name}
-                key={item.name}
-                aria-details={item.subject_name}
-                aria-description={item.description}
-            >
-                <Group>
-                    {`${item.name} #${item.description}`}
-                </Group>
-            </Combobox.Option>
-        ));
+    const filteredTagOptions = useMemo(() => (
+        tags
+            .filter((item) => `${item.subject_name}:${item.name}`.toLowerCase().includes(searchText.toLowerCase().trim()))
+            .map((item) => (<TagOption data={item} value={`${item.subject_name}:${item.name}`} />))
+    ), [tags, searchText]);
 
     if (currentInputStatus === InputStatus.Initial) {
         totalOptions.push(OPERATION_ITEM[0]);
@@ -80,16 +99,16 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
 
     if (currentInputStatus === InputStatus.PrefixOperator) {
         totalOptions.push(OPERATION_ITEM[2]);
-        totalOptions.push(...tagOptions);
+        totalOptions.push(...filteredTagOptions);
     }
 
     if (currentInputStatus === InputStatus.TagName) {
         totalOptions.push(OPERATION_ITEM[3]);
-        totalOptions.push(...tagOptions);
+        totalOptions.push(...filteredTagOptions);
     }
 
     if (currentInputStatus === InputStatus.LeftBracket) {
-        totalOptions.push(...tagOptions);
+        totalOptions.push(...filteredTagOptions);
     }
 
     const handleOptionSubmit = useCallback((val: string, options: ComboboxOptionProps) => {
@@ -108,7 +127,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
             }
             else {
                 // eslint-disable-next-line prefer-template
-                setStaticText((prev) => (prev + `${options['aria-details']}:${options.value}`));
+                setStaticText((prev) => (prev + val));
                 setCurrentInputStatus(InputStatus.Initial);
             }
         }
@@ -120,7 +139,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
             }
             else {
                 // eslint-disable-next-line prefer-template
-                setStaticText((prev) => (prev + " " + `${options['aria-details']}:${options.value}`));
+                setStaticText((prev) => (prev + " " + val));
                 setCurrentInputStatus(InputStatus.TagName);
             }
         }
@@ -142,7 +161,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                         onChange={(e) => {
                             setSearchText(e.currentTarget.value);
                         }}
-                        onKeyUp={(e) => {
+                        onKeyDown={(e) => {
                             if (e.key === 'Backspace' && searchText === '') {
                                 if (statusStackRef.current.length <= 0) {
                                     setCurrentInputStatus(InputStatus.Initial);
