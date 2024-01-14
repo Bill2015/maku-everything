@@ -1,6 +1,10 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { Combobox, ComboboxOptionProps, Group, Input, Stack, Text, useCombobox } from '@mantine/core';
+import { FaSearch } from 'react-icons/fa';
+
 import { TagResDto } from '@api/tag';
+
+import classes from './ComplexSearchInput.module.scss';
 
 export interface InputOptionProps extends ComboboxOptionProps {
     description: string;
@@ -32,7 +36,7 @@ export function InputOption(props: InputOptionProps) {
     );
 }
 
-const OPERATION_ITEM: { [key: string]: JSX.Element } = [
+const OPERATION_ITEM: { [key: string]: ReactNode } = [
     { name: '+', description: 'include tag' },
     { name: '-', description: 'exclude tag' },
     { name: '(', description: 'bracket' },
@@ -77,15 +81,14 @@ export interface ComplexSearchInputProps {
 
 export function ComplexSearchInput(props: ComplexSearchInputProps) {
     const { tags } = props;
+    const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
     const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>(InputStatus.Initial);
-
     const statusStackRef = useRef<InputStatusCache[]>([]);
 
     const [staticText, setStaticText] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
-    const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
 
-    const totalOptions: JSX.Element[] = [];
+    const totalOptions: ReactNode[] = [];
 
     const filteredTagOptions = useMemo(() => (
         tags
@@ -125,10 +128,12 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
             status: currentInputStatus,
             text:   staticText,
         });
+
         if (currentInputStatus === InputStatus.Initial) {
             setStaticText((prev) => (`${prev} ${val}`));
             setCurrentInputStatus(InputStatus.PrefixOperator);
         }
+
         if (currentInputStatus === InputStatus.PrefixOperator) {
             if (val === '(') {
                 setStaticText((prev) => (prev + val));
@@ -162,11 +167,12 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
             onOptionSubmit={handleOptionSubmit}
         >
             <Combobox.Target>
-                <Group>
+                <Group classNames={{ root: classes.searchRoot }}>
                     <Text>{staticText}</Text>
                     <Input
                         value={searchText}
                         placeholder="search here..."
+                        classNames={{ wrapper: classes.inputWrapper, input: classes.input }}
                         onChange={(e) => {
                             setSearchText(e.currentTarget.value);
                         }}
@@ -184,7 +190,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                             }
                         }}
                         onClick={() => combobox.toggleDropdown()}
-                        style={{ flexGrow: 1 }}
+                        rightSection={<FaSearch />}
                     />
                 </Group>
             </Combobox.Target>

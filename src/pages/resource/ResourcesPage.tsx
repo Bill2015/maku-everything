@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
-import { Box, Stack, Title, Skeleton, ScrollArea, Input, Divider } from '@mantine/core';
-import { FaSearch } from 'react-icons/fa';
+import { Box, Stack, Title, Skeleton, ScrollArea, Divider } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { useResourceDetailNavigate } from '@router/navigateHook';
@@ -64,9 +63,8 @@ export default function ResourcesPage() {
                 <Title order={2}>
                     {activeCategory.name}
                 </Title>
-                <Input style={{ flexGrow: 1 }} placeholder="search resource..." rightSection={<FaSearch />} />
-                <Divider mt={10} />
                 <ComplexSearchInput tags={tagData} />
+                <Divider mt={10} />
             </Stack>
 
             <ScrollArea h="100%" style={{ textAlign: 'start', margin: 0 }}>
