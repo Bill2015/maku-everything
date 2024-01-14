@@ -2,28 +2,29 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Combobox, ComboboxOptionProps, Group, Input, Stack, Text, useCombobox } from '@mantine/core';
 import { TagResDto } from '@api/tag';
 
-export interface TagOptionProps extends ComboboxOptionProps {
-    data: TagResDto;
+export interface InputOptionProps extends ComboboxOptionProps {
+    description: string;
+
+    name: string;
+
+    title: string;
 }
 
-export function TagOption(props: TagOptionProps) {
-    const { data, ...optionProps } = props;
+export function InputOption(props: InputOptionProps) {
+    const { description, name, title, ...optionProps } = props;
 
     return (
         <Combobox.Option
-            itemID={data.id}
-            key={data.name}
-            aria-details={data.subject_name}
-            aria-description={data.description}
+            aria-description={description}
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...optionProps}
         >
             <Stack gap={0} p={0}>
-                <Text component="span" h="0.75em" fz="0.75em" opacity="0.5">{data.subject_name}</Text>
+                <Text component="span" h="0.75em" fz="0.75em" opacity="0.5">{title}</Text>
                 <Text component="span" h="1.1em">
-                    {data.name}
+                    {name}
                     <Text component="span" pl={5} fz="0.6em" opacity="0.6">
-                        {data.description}
+                        {description}
                     </Text>
                 </Text>
             </Stack>
@@ -31,12 +32,27 @@ export function TagOption(props: TagOptionProps) {
     );
 }
 
+const OPERATION_ITEM: { [key: string]: JSX.Element } = [
+    { name: '+', description: 'include tag' },
+    { name: '-', description: 'exclude tag' },
+    { name: '(', description: 'bracket' },
+    { name: ')', description: 'bracket' },
+].reduce((prev, current) => ({
+    ...prev,
+    [current.name]: <InputOption
+        title="Operator"
+        itemID={current.name}
+        name={current.name}
+        value={current.name}
+        description={current.description}
+    />,
+}), {});
+
 enum InputStatus {
     Initial,
     PrefixOperator, // -, +
     TagName, // tag, left bracket
     LeftBracket,
-    RightBracket,
 }
 
 type InputStatusCache = {
@@ -54,21 +70,6 @@ type InputStatusCache = {
 //          | Right Bracket
 
 // LeftBracket =| TagName
-
-// RightBracket =| Initial
-
-const OPERATION_ITEM = [
-    { name: '+', description: 'include tag' },
-    { name: '-', description: 'exclude tag' },
-    { name: '(', description: 'left bracket' },
-    { name: ')', description: 'right bracket' },
-].map((val) => (
-    <Combobox.Option value={val.name}>
-        <Group>
-            {`${val.name} #${val.description}`}
-        </Group>
-    </Combobox.Option>
-));
 
 export interface ComplexSearchInputProps {
     tags: TagResDto[]
@@ -89,22 +90,30 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
     const filteredTagOptions = useMemo(() => (
         tags
             .filter((item) => `${item.subject_name}:${item.name}`.toLowerCase().includes(searchText.toLowerCase().trim()))
-            .map((item) => (<TagOption data={item} value={`${item.subject_name}:${item.name}`} />))
+            .map((item) => (
+                <InputOption
+                    itemID={item.id}
+                    title={item.subject_name}
+                    name={item.name}
+                    description={item.description}
+                    value={`${item.subject_name}:${item.name}`}
+                />
+            ))
     ), [tags, searchText]);
 
     if (currentInputStatus === InputStatus.Initial) {
-        totalOptions.push(OPERATION_ITEM[0]);
-        totalOptions.push(OPERATION_ITEM[1]);
+        totalOptions.push(OPERATION_ITEM['+']);
+        totalOptions.push(OPERATION_ITEM['-']);
     }
 
     if (currentInputStatus === InputStatus.PrefixOperator) {
-        totalOptions.push(OPERATION_ITEM[2]);
         totalOptions.push(...filteredTagOptions);
+        totalOptions.push(OPERATION_ITEM['(']);
     }
 
     if (currentInputStatus === InputStatus.TagName) {
-        totalOptions.push(OPERATION_ITEM[3]);
         totalOptions.push(...filteredTagOptions);
+        totalOptions.push(OPERATION_ITEM[')']);
     }
 
     if (currentInputStatus === InputStatus.LeftBracket) {
@@ -117,7 +126,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
             text:   staticText,
         });
         if (currentInputStatus === InputStatus.Initial) {
-            setStaticText((prev) => (prev + " " + val));
+            setStaticText((prev) => (`${prev} ${val}`));
             setCurrentInputStatus(InputStatus.PrefixOperator);
         }
         if (currentInputStatus === InputStatus.PrefixOperator) {
@@ -134,12 +143,12 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
 
         if (currentInputStatus === InputStatus.LeftBracket || currentInputStatus === InputStatus.TagName) {
             if (val === ')') {
-                setStaticText((prev) => (prev + " " + val));
+                setStaticText((prev) => (`${prev} ${val}`));
                 setCurrentInputStatus(InputStatus.Initial);
             }
             else {
                 // eslint-disable-next-line prefer-template
-                setStaticText((prev) => (prev + " " + val));
+                setStaticText((prev) => (prev + ' ' + val));
                 setCurrentInputStatus(InputStatus.TagName);
             }
         }
