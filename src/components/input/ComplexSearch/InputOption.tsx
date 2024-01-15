@@ -1,5 +1,12 @@
 import { Combobox, ComboboxOptionProps, Stack, Text } from '@mantine/core';
+import { InputSymbol } from './enums';
 import classses from './InputOption.module.scss';
+
+export type ComboboxOptionWithDataProps = ComboboxOptionProps & {
+    'data-groupName'?: string;
+
+    'data-name'?: string;
+}
 
 export type InputOptionType = {
     key: string;
@@ -44,13 +51,15 @@ export function InputOption(props: InputOptionProps) {
     );
 }
 
-type Operators = { [key: string]: InputOptionType };
+type Operators = { [key in InputSymbol]?: InputOptionType };
 
+/**
+ * Selectable Operators */
 InputOption.Operators = [
-    { name: '+', description: 'include tag' },
-    { name: '-', description: 'exclude tag' },
-    { name: '[', description: 'bracket' },
-    { name: ']', description: 'bracket' },
+    { name: InputSymbol.Include, description: 'include tag' },
+    { name: InputSymbol.Exclude, description: 'exclude tag' },
+    { name: InputSymbol.LeftBracket, description: 'bracket' },
+    { name: InputSymbol.RightBracket, description: 'bracket' },
 ].reduce<Operators>((prev, current) => ({
     ...prev,
     [current.name]: {
