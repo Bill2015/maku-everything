@@ -1,5 +1,5 @@
-import { ReactNode, Reducer, useCallback, useMemo, useRef, useState } from 'react';
-import { Badge, Combobox, ComboboxOptionProps, Flex, Group, Input, Stack, Text, useCombobox } from '@mantine/core';
+import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { Combobox, ComboboxOptionProps, Flex, Group, Input, Stack, Text, useCombobox } from '@mantine/core';
 import { FaSearch } from 'react-icons/fa';
 
 import { TagResDto } from '@api/tag';
@@ -46,20 +46,22 @@ export function InputOption(props: InputOptionProps) {
     );
 }
 
-interface TagBadageProps {
-    subjectName: string;
+interface QueryingNodeProps {
+    type: 'tag' | 'string';
 
-    name: string;
+    groupName?: string;
+
+    label: string;
 
     prefix?: string;
 }
 
-function TagBadage(props: TagBadageProps) {
-    const { subjectName, name, prefix } = props;
+function QueryingNode(props: QueryingNodeProps) {
+    const { type, groupName, label, prefix = '' } = props;
     return (
         <Stack gap={0} p={0}>
-            <Text component="span" h="0.65em" fz="0.65em" opacity="0.5">{subjectName}</Text>
-            <Text component="span" h="1.1em">{name}</Text>
+            <Text component="span" h="0.65em" fz="0.65em" opacity="0.5">{groupName}</Text>
+            <Text component="span" h="1.1em">{prefix}{label}</Text>
         </Stack>
     );
 }
@@ -92,7 +94,7 @@ enum InputStatus {
 type InputStatusCache = {
     status: InputStatus;
     text: string;
-    display: ReactNode[];
+    display: QueryingNodeProps[];
 }
 
 type InputStatusMechine = {
@@ -108,7 +110,7 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     const statusStackRef = useRef<InputStatusCache[]>([]);
 
     const [staticText, setStaticText] = useState<string>('');
-    const [displayNode, setDisplayNode] = useState<ReactNode[]>([]);
+    const [queryingNode, setQueryingNode] = useState<QueryingNodeProps[]>([]);
 
     const tagOptionProps: InputOptionType[] = useMemo(() => (
         tags.map<InputOptionType>((item) => ({
@@ -120,15 +122,37 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         }))
     ), [tags]);
 
+    const newInput = useCallback((value: string, node: QueryingNodeProps) => {
+        setStaticText((prev) => {
+            const lastChar = prev[prev.length - 1];
+            if (lastChar === '+' || lastChar === '-') {
+                return prev + value;
+            }
+            return `${prev} ${value}`;
+        });
+        setQueryingNode((prev) => {
+            const lastElement = prev[prev.length - 1];
+            if (lastElement && lastElement.type === 'string') {
+                switch (lastElement.label) {
+                case '+':
+                case '-':
+                    return [...prev.slice(0, prev.length - 1), { ...node, prefix: lastElement.label }];
+                default:
+                    break;
+                }
+            }
+            return [...prev, node];
+        });
+    }, []);
+
     const statusMechine: Map<InputStatus, InputStatusMechine> = useMemo(() => {
         const map = new Map<InputStatus, InputStatusMechine>();
         const status: InputStatusMechine[] = [
             {
                 name:    InputStatus.Initial,
                 options: ['+', '-'],
-                action:  (val, option) => {
-                    setStaticText((prev) => (`${prev} ${val}`));
-                    setDisplayNode((prev) => [...prev, val]);
+                action:  (val, _option) => {
+                    newInput(val, { type: 'string', label: val });
                     return InputStatus.PrefixOperator;
                 },
             },
@@ -136,12 +160,11 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
                 name:    InputStatus.PrefixOperator,
                 options: ['tag', '['],
                 action:  (val, option) => {
-                    setStaticText((prev) => (prev  + ' ' + val));
                     if (val === '[') {
-                        setDisplayNode((prev) => [...prev, val]);
+                        newInput(val, { type: 'string', label: val });
                         return InputStatus.LeftBracket;
                     }
-                    setDisplayNode((prev) => [...prev, <TagBadage subjectName={option['data-groupName']} name={option['data-name']} />]);
+                    newInput(val, { type: 'tag', label: option['data-name'], groupName: option['data-groupName'] });
                     return InputStatus.Initial;
                 },
             },
@@ -149,13 +172,11 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
                 name:    InputStatus.TagName,
                 options: ['tag', ']'],
                 action:  (val, option) => {
-                    // eslint-disable-next-line prefer-template
-                    setStaticText((prev) => (prev + ' ' + val));
                     if (val === ']') {
-                        setDisplayNode((prev) => [...prev, ' ' + val]);
+                        newInput(val, { type: 'string', label: val });
                         return InputStatus.Initial;
                     }
-                    setDisplayNode((prev) => [...prev, <TagBadage subjectName={option['data-groupName']} name={option['data-name']} />]);
+                    newInput(val, { type: 'tag', label: option['data-name'], groupName: option['data-groupName'] });
                     return InputStatus.TagName;
                 },
             },
@@ -163,20 +184,18 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
                 name:    InputStatus.LeftBracket,
                 options: ['tag'],
                 action:  (val, option) => {
-                    // eslint-disable-next-line prefer-template
-                    setStaticText((prev) => (prev + ' ' + val));
                     if (val === ']') {
-                        setDisplayNode((prev) => [...prev, ' ' + val]);
+                        newInput(val, { type: 'string', label: val });
                         return InputStatus.Initial;
                     }
-                    setDisplayNode((prev) => [...prev, <TagBadage subjectName={option['data-groupName']} name={option['data-name']} />]);
+                    newInput(val, { type: 'tag', label: option['data-name'], groupName: option['data-groupName'] });
                     return InputStatus.TagName;
                 },
             },
         ];
         status.forEach((val) => map.set(val.name, val));
         return map;
-    }, []);
+    }, [newInput]);
 
     const selectableOptions = useMemo(() => {
         const mechine = statusMechine.get(currentInputStatus)!;
@@ -192,7 +211,7 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             ));
     }, [statusMechine, currentInputStatus, tagOptionProps, searchText]);
 
-    const backspaceSearch: () => InputStatusCache = useCallback(() => {
+    const backspaceInputSearch: () => InputStatusCache = useCallback(() => {
         if (statusStackRef.current.length <= 0) {
             setCurrentInputStatus(InputStatus.Initial);
             setStaticText('');
@@ -204,28 +223,29 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         }
         const preStatus = statusStackRef.current.pop();
         setCurrentInputStatus(preStatus!.status);
-        setDisplayNode(preStatus!.display);
+        setQueryingNode(preStatus!.display);
         setStaticText(preStatus!.text);
         return preStatus!;
     }, []);
 
-    const forwardSearch = useCallback((val: string, comboxOptionProps: ComboboxOptionProps) => {
+    const forwardInputSearch = useCallback((val: string, comboxOptionProps: ComboboxOptionProps) => {
         statusStackRef.current.push({
             status:  currentInputStatus,
             text:    staticText,
-            display: displayNode,
+            display: queryingNode,
         });
         const nextStatus = statusMechine.get(currentInputStatus)!.action(val, comboxOptionProps);
         setCurrentInputStatus(nextStatus);
-    }, [statusMechine, currentInputStatus, displayNode, staticText]);
+    }, [statusMechine, currentInputStatus, queryingNode, staticText]);
 
     return {
         options:       selectableOptions,
-        displayNode,
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        displayNode:   queryingNode.map((val) => <QueryingNode {...val} />),
         displayText:   staticText,
         currentStatus: currentInputStatus,
-        backspaceSearch,
-        forwardSearch,
+        backspaceInputSearch,
+        forwardInputSearch,
     };
 };
 
@@ -237,13 +257,13 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
     const { tags } = props;
     const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
     const [searchText, setSearchText] = useState<string>('');
-    const { options, displayNode, displayText, backspaceSearch, forwardSearch } = useComplexSearch(tags, searchText);
+    const { options, displayNode, displayText, backspaceInputSearch, forwardInputSearch } = useComplexSearch(tags, searchText);
 
     const handleOptionSubmit = useCallback((val: string, comboxOptionProps: ComboboxOptionProps) => {
-        forwardSearch(val, comboxOptionProps);
+        forwardInputSearch(val, comboxOptionProps);
         combobox.selectFirstOption();
         setSearchText('');
-    }, [combobox, forwardSearch]);
+    }, [combobox, forwardInputSearch]);
 
     return (
         <Combobox
@@ -254,7 +274,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
             <Combobox.Target>
                 <Group classNames={{ root: classes.searchRoot }}>
                     <Flex gap="sm">
-                        {displayText}
+                        {displayNode}
                     </Flex>
                     <Input
                         value={searchText}
@@ -265,7 +285,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                         }}
                         onKeyDown={(e) => {
                             if (e.key === 'Backspace' && searchText === '') {
-                                backspaceSearch();
+                                backspaceInputSearch();
                             }
                         }}
                         onClick={() => combobox.toggleDropdown()}
