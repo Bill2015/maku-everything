@@ -3,7 +3,7 @@ import { InputSymbol } from './enums';
 import classses from './InputOption.module.scss';
 
 export type ComboboxOptionWithDataProps = ComboboxOptionProps & {
-    'data-groupName'?: string;
+    'data-groupname'?: string;
 
     'data-name'?: string;
 }
@@ -19,7 +19,7 @@ export type InputOptionType = {
 
     groupName: string;
 
-    isOperator?: boolean;
+    suffix?: string;
 }
 
 export interface InputOptionProps extends InputOptionType, Omit<ComboboxOptionProps, 'key'> { }
@@ -27,12 +27,12 @@ export interface InputOptionProps extends InputOptionType, Omit<ComboboxOptionPr
 /**
  * Display the input options */
 export function InputOption(props: InputOptionProps) {
-    const { description, name, groupName, ...optionProps } = props;
+    const { description, name, groupName, suffix, ...optionProps } = props;
 
     return (
         <Combobox.Option
             aria-description={description}
-            data-groupName={groupName}
+            data-groupname={groupName}
             data-name={name}
             className={classses.root}
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -42,8 +42,9 @@ export function InputOption(props: InputOptionProps) {
                 <Text component="span" h="0.75em" className={classses.group}>
                     {groupName}
                 </Text>
-                <Text component="span" h="1.1em">
+                <Text component="span" h="1.1em" fw="bold">
                     {name}
+                    <Text component="span" className={classses.suffix}>{suffix}</Text>
                     <Text component="span" className={classses.description}>
                         {description}
                     </Text>
@@ -71,6 +72,5 @@ InputOption.Operators = [
         name:        current.name,
         value:       current.name,
         description: current.description,
-        isOperator:  true,
     },
 }), {});

@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useCallback, useState } from 'react';
 import { ActionIcon, Combobox, ComboboxOptionProps, Flex, Group, Input, useCombobox } from '@mantine/core';
+import { randomId } from '@mantine/hooks';
 import { FaSearch } from 'react-icons/fa';
 
 import { TagResDto } from '@api/tag';
@@ -35,7 +36,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
             <Combobox.Target>
                 <Flex classNames={{ root: classes.searchRoot }}>
                     <Group gap="sm" className={classes.displayQuery}>
-                        {displayNode.map((val) => <QueryingNode key={val.label} {...val} />) }
+                        {displayNode.map((val) => <QueryingNode key={randomId()} {...val} />) }
                         <Input
                             value={searchText}
                             placeholder="search here..."

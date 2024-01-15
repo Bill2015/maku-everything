@@ -137,6 +137,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             groupName:   item.subject_name,
             description: item.description,
             value:       `${item.subject_name}:${item.name}`,
+            suffix:      `(${item.tagged_count})`,
         }))
     ), [tags]);
 
@@ -162,7 +163,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
                 newNode = {
                     type:      'tag',
                     label:     comboxProps['data-name']!,
-                    groupName: comboxProps['data-groupName']!,
+                    groupName: comboxProps['data-groupname']!,
                 };
             }
             const lastElement = prev[prev.length - 1];
