@@ -12,11 +12,13 @@ import { QueryingNode } from './QueryingNode';
 import { InputOption } from './InputOption';
 
 export interface ComplexSearchInputProps {
-    tags: TagResDto[]
+    tags: TagResDto[];
+
+    onSubmitSearch: (searchText: string) => void;
 }
 
 export function ComplexSearchInput(props: ComplexSearchInputProps) {
-    const { tags } = props;
+    const { tags, onSubmitSearch } = props;
     const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
     const [searchText, setSearchText] = useState<string>('');
     const { options, displayNode, rawText, backspaceInputSearch, forwardInputSearch } = useComplexSearch(tags, searchText);
@@ -35,7 +37,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
         >
             <Combobox.Target>
                 <Flex classNames={{ root: classes.searchRoot }}>
-                    <Group gap="sm" className={classes.displayQuery}>
+                    <Group gap="0.6rem" className={classes.displayQuery}>
                         {displayNode.map((val) => <QueryingNode key={randomId()} {...val} />) }
                         <Input
                             value={searchText}
@@ -55,7 +57,12 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                             }}
                         />
                     </Group>
-                    <ActionIcon className={classes.searchBtn}>
+                    <ActionIcon
+                        className={classes.searchBtn}
+                        onClick={() => {
+                            onSubmitSearch(rawText);
+                        }}
+                    >
                         <FaSearch />
                     </ActionIcon>
                 </Flex>

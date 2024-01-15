@@ -6,9 +6,9 @@ import { useResourceDetailNavigate } from '@router/navigateHook';
 import { ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
 import { ComplexSearchInput, TauriDropZone } from '@components/input';
 import { StackGrid } from '@components/layout';
+import { TagQuery } from '@api/tag';
 
 import { ResourceCard } from './components/ResourceCard';
-import { TagQuery } from '@api/tag';
 
 export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -63,7 +63,7 @@ export default function ResourcesPage() {
                 <Title order={2}>
                     {activeCategory.name}
                 </Title>
-                <ComplexSearchInput tags={tagData} />
+                <ComplexSearchInput tags={tagData} onSubmitSearch={(text) => console.log(text)} />
                 <Divider mt={10} />
             </Stack>
 
