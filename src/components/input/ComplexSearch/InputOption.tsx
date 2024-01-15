@@ -24,6 +24,8 @@ export type InputOptionType = {
 
 export interface InputOptionProps extends InputOptionType, Omit<ComboboxOptionProps, 'key'> { }
 
+/**
+ * Display the input options */
 export function InputOption(props: InputOptionProps) {
     const { description, name, groupName, ...optionProps } = props;
 

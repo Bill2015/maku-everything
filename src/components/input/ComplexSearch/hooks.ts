@@ -25,13 +25,25 @@ import { ComboboxOptionWithDataProps, InputOption, InputOptionType } from './Inp
 // +(AI & Python) +Javascript === +AI +Python +Javascript;
 
 export type InputStatusMechine = {
+    /** Status name */
     name: InputStatus;
 
+    /**
+     * Available options in this status */
     options: InputSymbol[];
 
+    /**
+     * When user select the option's action \
+     * Can contain side-effect operate but not recommanded
+     * @param val input value
+     * @returns Next Status */
     action: (val: string) => InputStatus;
 }
 
+/**
+ * Define Input Status Mechine \
+ * But I wrapped with `useMemo`, maybe in the future will contain side-effect function in action. \
+ * Therefore wrapped with `useMemo` instead of pure object */
 export const useInputStatusMechine = () => {
     const statusMechine: Map<InputStatus, InputStatusMechine> = useMemo(() => {
         const map = new Map<InputStatus, InputStatusMechine>();
@@ -65,11 +77,19 @@ export const useInputStatusMechine = () => {
 };
 
 export type InputStatusHistory = {
+    /** Current status */
     status: InputStatus;
+
+    /** Current raw text */
     text: string;
+
+    /** Current displayed querying node */
     display: QueryingNodeProps[];
 }
 
+/**
+ * Manage the Status History \
+ * That can be easily backtrace when user discard his input */
 export const useStateHistory = () => {
     const statusStackRef = useRef<InputStatusHistory[]>([]);
 
@@ -94,14 +114,22 @@ export const useStateHistory = () => {
     };
 };
 
+/**
+ * Major function of complex search
+ * @param tags tag data
+ * @param searchText search text */
 export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     const inputStateMechine = useInputStatusMechine();
     const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>(InputStatus.Initial);
     const { popHistory, pushHistory } = useStateHistory();
 
-    const [staticText, setStaticText] = useState<string>('');
+    // for pass to backend search string
+    const [rawText, setRawText] = useState<string>('');
+
+    // for the displaying search querying
     const [queryingNode, setQueryingNode] = useState<QueryingNodeProps[]>([]);
 
+    // Memerized the tags options props
     const tagOptionProps: InputOptionType[] = useMemo(() => (
         tags.map<InputOptionType>((item) => ({
             key:         item.id,
@@ -112,8 +140,9 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         }))
     ), [tags]);
 
+    // concat the rawText & querying node from input value
     const newInput = useCallback((value: string, comboxProps: ComboboxOptionWithDataProps) => {
-        setStaticText((prev) => {
+        setRawText((prev) => {
             const lastChar = prev[prev.length - 1];
             if (lastChar === '+' || lastChar === '-') {
                 return prev + value;
@@ -147,6 +176,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         });
     }, []);
 
+    // Memerized the selectable options
     const selectableOptions = useMemo(() => {
         const mechine = inputStateMechine.get(currentInputStatus)!;
         return mechine.options
@@ -156,29 +186,34 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             .filter((item) => item.value.toLowerCase().includes(searchText.toLowerCase().trim()));
     }, [inputStateMechine, currentInputStatus, tagOptionProps, searchText]);
 
+    /**
+     * return previous status of search input */
     const backspaceInputSearch: () => InputStatusHistory = useCallback(() => {
         const history = popHistory();
         setCurrentInputStatus(history.status);
         setQueryingNode(history.display);
-        setStaticText(history.text);
+        setRawText(history.text);
         return history;
     }, [popHistory]);
 
+    /**
+     * process the next status of input search */
     const forwardInputSearch = useCallback((val: string, comboxOptionProps: ComboboxOptionWithDataProps) => {
         pushHistory({
             status:  currentInputStatus,
-            text:    staticText,
+            text:    rawText,
             display: queryingNode,
         });
+        // get next status by action
         const nextStatus = inputStateMechine.get(currentInputStatus)!.action(val);
         newInput(val, comboxOptionProps);
         setCurrentInputStatus(nextStatus);
-    }, [inputStateMechine, currentInputStatus, queryingNode, staticText, newInput, pushHistory]);
+    }, [inputStateMechine, currentInputStatus, queryingNode, rawText, newInput, pushHistory]);
 
     return {
         options:       selectableOptions,
         displayNode:   queryingNode,
-        rawText:       staticText,
+        rawText:       rawText,
         currentStatus: currentInputStatus,
         backspaceInputSearch,
         forwardInputSearch,
