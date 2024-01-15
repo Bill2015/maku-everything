@@ -1,113 +1,18 @@
-import React, { ReactNode, useCallback, useMemo, useRef, useState } from 'react';
-import { Combobox, ComboboxOptionProps, Flex, Group, Input, Stack, Text, useCombobox } from '@mantine/core';
+import { useCallback, useMemo, useState } from 'react';
+import { Combobox, ComboboxOptionProps, Flex, Group, Input, useCombobox } from '@mantine/core';
 import { FaSearch } from 'react-icons/fa';
 
 import { TagResDto } from '@api/tag';
+import { InputStatus, InputStatusHistory, useInputStatusMechine, useStateHistory, InputSymbol } from './hooks';
+import { InputOption, InputOptionType } from './InputOption';
+import { QueryingNode, QueryingNodeProps } from './QueryingNode';
 
 import classes from './ComplexSearchInput.module.scss';
 
-type InputOptionType = {
-    key: string;
-
-    description: string;
-
-    name: string;
-
-    value: string;
-
-    groupName: string;
-
-    isOperator?: boolean;
-}
-
-export interface InputOptionProps extends InputOptionType, Omit<ComboboxOptionProps, 'key'> { }
-
-export function InputOption(props: InputOptionProps) {
-    const { description, name, groupName, ...optionProps } = props;
-
-    return (
-        <Combobox.Option
-            aria-description={description}
-            data-groupName={groupName}
-            data-name={name}
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...optionProps}
-        >
-            <Stack gap={0} p={0}>
-                <Text component="span" h="0.75em" fz="0.75em" opacity="0.5">{groupName}</Text>
-                <Text component="span" h="1.1em">
-                    {name}
-                    <Text component="span" pl={5} fz="0.6em" opacity="0.6">
-                        {description}
-                    </Text>
-                </Text>
-            </Stack>
-        </Combobox.Option>
-    );
-}
-
-interface QueryingNodeProps {
-    type: 'tag' | 'string';
-
-    groupName?: string;
-
-    label: string;
-
-    prefix?: string;
-}
-
-function QueryingNode(props: QueryingNodeProps) {
-    const { type, groupName, label, prefix = '' } = props;
-    return (
-        <Stack gap={0} p={0}>
-            <Text component="span" h="0.65em" fz="0.65em" opacity="0.5">{groupName}</Text>
-            <Text component="span" h="1.1em">{prefix}{label}</Text>
-        </Stack>
-    );
-}
-
-const OPERATION_ITEM: { [key: string]: InputOptionType } = [
-    { name: '+', description: 'include tag' },
-    { name: '-', description: 'exclude tag' },
-    { name: '[', description: 'bracket' },
-    { name: ']', description: 'bracket' },
-].reduce<{ [key: string]: InputOptionType }>((prev, current) => ({
-    ...prev,
-    [current.name]: {
-        groupName:   'Operator',
-        key:         current.name,
-        itemID:      current.name,
-        name:        current.name,
-        value:       current.name,
-        description: current.description,
-        isOperator:  true,
-    },
-}), {});
-
-enum InputStatus {
-    Initial,
-    PrefixOperator, // -, +
-    TagName, // tag, left bracket
-    LeftBracket,
-}
-
-type InputStatusCache = {
-    status: InputStatus;
-    text: string;
-    display: QueryingNodeProps[];
-}
-
-type InputStatusMechine = {
-    name: InputStatus;
-
-    options: ('tag' | '+' | '-' | '[' | ']')[];
-
-    action: (val: string, option: ComboboxOptionProps) => InputStatus;
-}
-
 const useComplexSearch = (tags: TagResDto[], searchText: string) => {
+    const inputStateMechine = useInputStatusMechine();
     const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>(InputStatus.Initial);
-    const statusStackRef = useRef<InputStatusCache[]>([]);
+    const { popHistory, pushHistory } = useStateHistory();
 
     const [staticText, setStaticText] = useState<string>('');
     const [queryingNode, setQueryingNode] = useState<QueryingNodeProps[]>([]);
@@ -122,7 +27,7 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         }))
     ), [tags]);
 
-    const newInput = useCallback((value: string, node: QueryingNodeProps) => {
+    const newInput = useCallback((value: string, comboxProps: ComboboxOptionProps) => {
         setStaticText((prev) => {
             const lastChar = prev[prev.length - 1];
             if (lastChar === '+' || lastChar === '-') {
@@ -131,76 +36,40 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             return `${prev} ${value}`;
         });
         setQueryingNode((prev) => {
+            let newNode: QueryingNodeProps | null = null;
+            switch (value) {
+            case '+':
+            case '-':
+            case '[':
+            case ']':
+                newNode = { type: 'string', label: value };
+                break;
+            default:
+                newNode = {
+                    type:      'tag',
+                    label:     comboxProps['data-name'],
+                    groupName: comboxProps['data-groupName'],
+                };
+            }
             const lastElement = prev[prev.length - 1];
             if (lastElement && lastElement.type === 'string') {
                 switch (lastElement.label) {
                 case '+':
                 case '-':
-                    return [...prev.slice(0, prev.length - 1), { ...node, prefix: lastElement.label }];
+                    return [...prev.slice(0, prev.length - 1), { ...newNode, prefix: lastElement.label }];
                 default:
-                    break;
                 }
             }
-            return [...prev, node];
+            return [...prev, newNode];
         });
     }, []);
 
-    const statusMechine: Map<InputStatus, InputStatusMechine> = useMemo(() => {
-        const map = new Map<InputStatus, InputStatusMechine>();
-        const status: InputStatusMechine[] = [
-            {
-                name:    InputStatus.Initial,
-                options: ['+', '-'],
-                action:  (val, _option) => {
-                    newInput(val, { type: 'string', label: val });
-                    return InputStatus.PrefixOperator;
-                },
-            },
-            {
-                name:    InputStatus.PrefixOperator,
-                options: ['tag', '['],
-                action:  (val, option) => {
-                    if (val === '[') {
-                        newInput(val, { type: 'string', label: val });
-                        return InputStatus.LeftBracket;
-                    }
-                    newInput(val, { type: 'tag', label: option['data-name'], groupName: option['data-groupName'] });
-                    return InputStatus.Initial;
-                },
-            },
-            {
-                name:    InputStatus.TagName,
-                options: ['tag', ']'],
-                action:  (val, option) => {
-                    if (val === ']') {
-                        newInput(val, { type: 'string', label: val });
-                        return InputStatus.Initial;
-                    }
-                    newInput(val, { type: 'tag', label: option['data-name'], groupName: option['data-groupName'] });
-                    return InputStatus.TagName;
-                },
-            },
-            {
-                name:    InputStatus.LeftBracket,
-                options: ['tag'],
-                action:  (val, option) => {
-                    if (val === ']') {
-                        newInput(val, { type: 'string', label: val });
-                        return InputStatus.Initial;
-                    }
-                    newInput(val, { type: 'tag', label: option['data-name'], groupName: option['data-groupName'] });
-                    return InputStatus.TagName;
-                },
-            },
-        ];
-        status.forEach((val) => map.set(val.name, val));
-        return map;
-    }, [newInput]);
-
     const selectableOptions = useMemo(() => {
-        const mechine = statusMechine.get(currentInputStatus)!;
+        const mechine = inputStateMechine.get(currentInputStatus)!;
         return mechine.options
-            .reduce<InputOptionType[]>((prev, val) => (val === 'tag' ? [...prev, ...tagOptionProps] : [...prev, OPERATION_ITEM[val]]), [])
+            .reduce<InputOptionType[]>((prev, val) => (
+                (val === InputSymbol.Default) ? [...prev, ...tagOptionProps] : [...prev, InputOption.Operators[val]]
+            ), [])
             .filter((item) => item.value.toLowerCase().includes(searchText.toLowerCase().trim()))
             .map((item, index) => (
                 <InputOption
@@ -209,34 +78,26 @@ const useComplexSearch = (tags: TagResDto[], searchText: string) => {
                     selected={index === 0}
                 />
             ));
-    }, [statusMechine, currentInputStatus, tagOptionProps, searchText]);
+    }, [inputStateMechine, currentInputStatus, tagOptionProps, searchText]);
 
-    const backspaceInputSearch: () => InputStatusCache = useCallback(() => {
-        if (statusStackRef.current.length <= 0) {
-            setCurrentInputStatus(InputStatus.Initial);
-            setStaticText('');
-            return {
-                status:  InputStatus.Initial,
-                display: [],
-                text:    '',
-            };
-        }
-        const preStatus = statusStackRef.current.pop();
-        setCurrentInputStatus(preStatus!.status);
-        setQueryingNode(preStatus!.display);
-        setStaticText(preStatus!.text);
-        return preStatus!;
-    }, []);
+    const backspaceInputSearch: () => InputStatusHistory = useCallback(() => {
+        const history = popHistory();
+        setCurrentInputStatus(history.status);
+        setQueryingNode(history.display);
+        setStaticText(history.text);
+        return history;
+    }, [popHistory]);
 
     const forwardInputSearch = useCallback((val: string, comboxOptionProps: ComboboxOptionProps) => {
-        statusStackRef.current.push({
+        pushHistory({
             status:  currentInputStatus,
             text:    staticText,
             display: queryingNode,
         });
-        const nextStatus = statusMechine.get(currentInputStatus)!.action(val, comboxOptionProps);
+        const nextStatus = inputStateMechine.get(currentInputStatus)!.action(val);
+        newInput(val, comboxOptionProps);
         setCurrentInputStatus(nextStatus);
-    }, [statusMechine, currentInputStatus, queryingNode, staticText]);
+    }, [inputStateMechine, currentInputStatus, queryingNode, staticText, newInput, pushHistory]);
 
     return {
         options:       selectableOptions,
@@ -306,22 +167,3 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
         </Combobox>
     );
 }
-
-// Initial =| PrefixOperator
-
-// PrefixOperator =| TagName
-//                 | Left Bracket
-
-// TagName =| Initial
-//          | TagName
-//          | Right Bracket
-
-// LeftBracket =| TagName
-
-// +AI => 只顯示包含 AI 標籤的資源
-// -AI => 不顯示包含 AI 標籤的資源
-// +AI +Python => 顯示包含 AI 與 Python 標籤的資源
-// +(AI | Python) +Javascript => 顯示一定要有 Javascript 但是可能包含 AI 或 Python 標籤的資源
-// -(AI | Python) +Javascript === -AI -Python +Javascript;
-// -(AI & Python) +Javascript => 顯示一定要有 Javascript 但是不能同時包含 AI 與 Python 標籤的資源
-// +(AI & Python) +Javascript === +AI +Python +Javascript;

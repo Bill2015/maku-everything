@@ -13,7 +13,9 @@ import { CreateResourceModal } from '@modals/resource';
 import { ROUTE_OBJECTS } from './router/RoutingTable';
 import { Initializer } from './__test__/components/Initializer';
 
-import '@mantine/core/styles.css';
+// https://mantine.dev/styles/mantine-styles/#css-layers
+import '@mantine/core/styles.layer.css';
+
 import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
 import classes from './App.module.scss';

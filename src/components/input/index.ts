@@ -1,4 +1,4 @@
 export * from './SubjectSelect';
 export * from './ReturnButton';
 export * from './DropZone';
-export * from './ComplexSearchInput';
+export * from './ComplexSearch';
