@@ -23,7 +23,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
 
     const handleOptionSubmit = useCallback((val: string, comboxOptionProps: ComboboxOptionProps) => {
         forwardInputSearch(val, comboxOptionProps);
-        combobox.selectFirstOption();
+        combobox.resetSelectedOption();
         setSearchText('');
     }, [combobox, forwardInputSearch]);
 
@@ -51,7 +51,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                             }}
                             onClick={() => {
                                 combobox.toggleDropdown();
-                                combobox.selectFirstOption();
+                                combobox.resetSelectedOption();
                             }}
                         />
                     </Group>
@@ -65,7 +65,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                 <Combobox.Options mah="50dvh" style={{ overflowY: 'auto' }}>
                     {
                         (options.length > 0)
-                            ? options.map((val, index) => <InputOption {...val} selected={index === 0} />)
+                            ? options.map((val) => <InputOption {...val} />)
                             : <Combobox.Empty>Nothing found</Combobox.Empty>
                     }
                 </Combobox.Options>
