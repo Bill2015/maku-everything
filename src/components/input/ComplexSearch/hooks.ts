@@ -123,9 +123,6 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>(InputStatus.Initial);
     const { popHistory, pushHistory } = useStateHistory();
 
-    // for pass to backend search string
-    const [rawText, setRawText] = useState<string>('');
-
     // for the displaying search querying
     const [queryingNode, setQueryingNode] = useState<QueryingNodeProps[]>([]);
 
@@ -143,13 +140,6 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
 
     // concat the rawText & querying node from input value
     const newInput = useCallback((value: string, comboxProps: ComboboxOptionWithDataProps) => {
-        setRawText((prev) => {
-            const lastChar = prev[prev.length - 1];
-            if (lastChar === '+' || lastChar === '-') {
-                return prev + value;
-            }
-            return `${prev} ${value}`;
-        });
         setQueryingNode((prev) => {
             let newNode: QueryingNodeProps | null = null;
             switch (value) {
@@ -157,17 +147,22 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             case InputSymbol.Exclude:
             case InputSymbol.LeftBracket:
             case InputSymbol.RightBracket:
-                newNode = { type: 'string', label: value };
+                newNode = {
+                    type:   'string',
+                    prefix: '',
+                    label:  value,
+                };
                 break;
             default:
                 newNode = {
                     type:      'tag',
+                    prefix:    '',
                     label:     comboxProps['data-name']!,
                     groupName: comboxProps['data-groupname']!,
                 };
             }
             const lastElement = prev[prev.length - 1];
-            if (lastElement && lastElement.type === 'string') {
+            if (lastElement && lastElement.type === 'string' && newNode.type !== 'string') {
                 // Combine prefix operator with current node
                 if (lastElement.label === InputSymbol.Include || lastElement.label === InputSymbol.Exclude) {
                     return [...prev.slice(0, prev.length - 1), { ...newNode, prefix: lastElement.label }];
@@ -176,6 +171,26 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             return [...prev, newNode];
         });
     }, []);
+
+    // TODO: need refactoring
+    const rawText = useMemo(() => {
+        let str = '';
+        queryingNode.forEach((item, index) => {
+            if (item.type === 'tag') {
+                str += ` ${item.prefix}"${item.groupName}:${item.label}"`;
+            }
+            else {
+                const prevNode = queryingNode[index - 1]?.label;
+                if ((prevNode === InputSymbol.Exclude || prevNode === InputSymbol.Include) && item.label === InputSymbol.LeftBracket) {
+                    str += item.label;
+                }
+                else {
+                    str += ` ${item.label}`;
+                }
+            }
+        });
+        return str;
+    }, [queryingNode]);
 
     // Memerized the selectable options
     const selectableOptions = useMemo(() => {
@@ -193,7 +208,6 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         const history = popHistory();
         setCurrentInputStatus(history.status);
         setQueryingNode(history.display);
-        setRawText(history.text);
         return history;
     }, [popHistory]);
 
