@@ -13,3 +13,8 @@ pub use detail::*;
 #[path ="./query-resource.rs"]
 mod query;
 pub use query::*;
+
+#[path ="./qeury-string-resource.rs"]
+mod query_string;
+pub use query_string::*;
+

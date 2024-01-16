@@ -1,5 +1,7 @@
 use std::path::Path;
 use std::process::Command;
+use tauri::async_runtime;
+
 use crate::common::application::{ICommandHandler, IQueryHandler};
 use crate::category::repository::CategoryRepository;
 use crate::resource::domain::{ResourceError, ResourceGenericError};
@@ -197,6 +199,16 @@ impl<'a> ResourceService<'a> {
         };
         
         let handler = ListResourceHandler::register(self.resource_query_repo);
+
+        let res = handler.query(query).await?;
+
+        Ok(res)
+    }
+
+    pub async fn querying_by_string(&self, query_string: String) -> Result<Vec<ResourceResDto>, ResourceError> {
+        let query = StringResourceQuery { query_string };
+
+        let handler = StringResourceHandler::register(self.resource_query_repo);
 
         let res = handler.query(query).await?;
 

@@ -53,6 +53,7 @@ fn main() {
             resource::application::remove_resource_tag,
             resource::application::get_resource_detail,
             resource::application::list_resource,
+            resource::application::querying_by_string,
             tag::application::create_tag,
             tag::application::update_tag,
             tag::application::get_all_tag,

@@ -16,6 +16,10 @@ export namespace ResourceAPI {
         return invoke<ResourceResDto[]>('list_resource', queryDto as unknown as InvokeArgs);
     }
 
+    export function queryingByString(q: string) {
+        return invoke<ResourceResDto[]>('querying_by_string', { q: q });
+    }
+
     export function getDetail(id: string) {
         return invoke<ResourceDetailDto>('get_resource_detail', { id: id });
     }

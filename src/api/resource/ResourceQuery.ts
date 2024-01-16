@@ -92,4 +92,16 @@ export namespace ResourceQuery {
             ...query,
         };
     }
+
+    export function useStringQuering(qString: string) {
+        const queryfn = () => ResourceAPI.queryingByString(qString);
+
+        return useQuery({
+            queryKey:        ['resource-string-querying', qString],
+            queryFn:         queryfn,
+            enabled:         !!qString,
+            placeholderData: [],
+            initialData:     [],
+        });
+    }
 }

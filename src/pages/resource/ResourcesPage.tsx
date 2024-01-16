@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Box, Stack, Title, Skeleton, ScrollArea, Divider } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
@@ -13,11 +13,14 @@ import { ResourceCard } from './components/ResourceCard';
 export default function ResourcesPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const navigateResourceTo = useResourceDetailNavigate();
+    const [search, setSearch] = useState<string>('');
     const {
         data: resourceData,
         isFetching: isResourceFetching,
         refetch: resourceRefetch,
     } = ResourceQuery.useGetByCategory(activeCategory.id);
+
+    const { data: searchResult } = ResourceQuery.useStringQuering(search);
 
     const {
         data: tagData,
@@ -63,7 +66,7 @@ export default function ResourcesPage() {
                 <Title order={2}>
                     {activeCategory.name}
                 </Title>
-                <ComplexSearchInput tags={tagData} onSubmitSearch={(text) => console.log(text)} />
+                <ComplexSearchInput tags={tagData} onSubmitSearch={(text) => setSearch(text)} />
                 <Divider mt={10} />
             </Stack>
 
