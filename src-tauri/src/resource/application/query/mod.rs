@@ -14,7 +14,5 @@ pub use detail::*;
 mod query;
 pub use query::*;
 
-#[path ="./qeury-string-resource.rs"]
-mod query_string;
-pub use query_string::*;
-
+mod bystring;
+pub use bystring::*;
