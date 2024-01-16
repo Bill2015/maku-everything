@@ -1,9 +1,9 @@
 use std::str::FromStr;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct QueryToken {
-    value: String,
-    token_name: TokenSymbol,
+    pub value: String,
+    pub token_name: TokenSymbol,
 }
 
 impl QueryToken {

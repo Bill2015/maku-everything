@@ -6,8 +6,11 @@ use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::repository::ResourceQueryRepository;
 
 mod types;
+mod syntax;
+use syntax::Syntax;
 mod tokenizer;
 use tokenizer::Tokenizer;
+mod sqlgen;
 
 pub struct StringResourceQuery {
     pub query_string: String,
@@ -40,9 +43,13 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         dbg!(&q);
 
         let mut tokenizer = Tokenizer::new(&q);
-        let res = tokenizer.parse();
+        let tokens = tokenizer.parse();
+
+        let mut syntax_checker = Syntax::new(&tokens);
+        let res = syntax_checker.check()?;
+
         dbg!(res);
-    
+        
         Err(ResourceError::Query(ResourceGenericError::DBInternalError()))
         // match result {
         //     Ok(value) => Ok(value),

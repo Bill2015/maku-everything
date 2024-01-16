@@ -24,6 +24,9 @@ pub enum ResourceError {
     #[error("Query Resource failed")]
     Query(#[source] ResourceGenericError),
 
+    #[error("Querying by string failed")]
+    QueryingByString(#[source] ResourceGenericError),
+
     #[error("Add tag")]
     AddTag(#[source] ResourceGenericError),
     
@@ -61,6 +64,10 @@ impl Serialize for ResourceError {
                 command: self.to_string(),
             },
             ResourceError::Query(source) => ErrorBody {
+                message: source.to_string(),
+                command: self.to_string(),
+            },
+            ResourceError::QueryingByString(source) => ErrorBody {
                 message: source.to_string(),
                 command: self.to_string(),
             },
@@ -112,6 +119,9 @@ pub enum ResourceGenericError {
 
     #[error("Belong Category id is not exists")]
     BelongCategoryNotExists(),
+
+    #[error("Invalid querying string: {message}")]
+    InvalidQueryingString{ message: String },
 
     #[error("unknown Category error")]
     Unknown{ message: String },
