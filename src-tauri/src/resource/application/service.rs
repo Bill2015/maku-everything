@@ -7,7 +7,7 @@ use crate::category::repository::CategoryRepository;
 use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, ResourceQueryRepository, RESOURCE_QUERY_REPOSITORY};
 use crate::category::repository::CATEGORY_REPOSITORY;
-use crate::tag::repository::{TagRepository, TAG_REPOSITORY};
+use crate::tag::repository::{TagRepository, TAG_REPOSITORY, TagQueryRepository, TAG_QUERY_REPOSITORY};
 
 use super::command::*;
 use super::dto::*;
@@ -18,6 +18,7 @@ pub static RESOURCE_SERVICE: ResourceService = ResourceService::init(
     &RESOURCE_QUERY_REPOSITORY, 
     &CATEGORY_REPOSITORY,
     &TAG_REPOSITORY,
+    &TAG_QUERY_REPOSITORY,
 );
 
 pub struct ResourceService<'a> {
@@ -25,6 +26,7 @@ pub struct ResourceService<'a> {
     resource_query_repo: &'a ResourceQueryRepository<'a>,
     category_repository: &'a CategoryRepository<'a>,
     tag_respository: &'a TagRepository<'a>,
+    tag_query_repository: &'a TagQueryRepository<'a>,
 }
 impl<'a> ResourceService<'a> {
     pub const fn init(
@@ -32,12 +34,14 @@ impl<'a> ResourceService<'a> {
         resource_query_repo: &'a ResourceQueryRepository<'_>,
         category_repository: &'a CategoryRepository<'_>,
         tag_respository: &'a TagRepository<'_>,
+        tag_query_repository: &'a TagQueryRepository<'a>,
     ) -> Self {
         ResourceService { 
             resource_repository: resource_repository,
             resource_query_repo: resource_query_repo,
             category_repository: category_repository,
             tag_respository: tag_respository,
+            tag_query_repository: tag_query_repository,
         }
     }
 
@@ -208,7 +212,10 @@ impl<'a> ResourceService<'a> {
     pub async fn querying_by_string(&self, query_string: String) -> Result<Vec<ResourceResDto>, ResourceError> {
         let query = StringResourceQuery { query_string };
 
-        let handler = StringResourceHandler::register(self.resource_query_repo);
+        let handler = StringResourceHandler::register(
+            self.resource_query_repo,
+            self.tag_query_repository,
+        );
 
         let res = handler.query(query).await?;
 

@@ -115,6 +115,7 @@ impl<'a> TagService<'a> {
         name: Option<String>,
         belong_category: Option<String>, 
         belong_subject: Option<String>,
+        belong_subject_name: Option<String>,
         tagging_resource: Option<String>,
         order_by: Option<String>,
     ) -> Result<Vec<TagResDto>, TagError> {
@@ -123,6 +124,7 @@ impl<'a> TagService<'a> {
             name,
             belong_category,
             belong_subject,
+            belong_subject_name,
             tagging_resource,
             order_by
         };

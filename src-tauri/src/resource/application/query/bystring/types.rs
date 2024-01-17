@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{str::FromStr, ops};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct QueryToken {
@@ -49,3 +49,37 @@ impl FromStr for TokenSymbol {
     }
 }
 
+pub enum QueryingStringSymbol {
+    TagNameWrapper,
+    SubjectDelimiter,
+}
+
+
+impl PartialEq<char> for QueryingStringSymbol {
+    fn eq(&self, other: &char) -> bool {
+        match self {
+            Self::SubjectDelimiter => ':' == *other,
+            Self::TagNameWrapper => '\"' == *other,
+        }
+    }
+}
+
+impl FromStr for QueryingStringSymbol {
+    type Err = String;
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "\"" => Ok(Self::TagNameWrapper),
+            ":" => Ok(Self::SubjectDelimiter),
+            _ =>  Err(String::from("Not Match Querying String Symbol")) 
+        }
+    }
+}
+
+impl ToString for QueryingStringSymbol {
+    fn to_string(&self) -> String {
+        match self {
+            Self::SubjectDelimiter => "\"".to_string(),
+            Self::TagNameWrapper => ":".to_string(),
+        }
+    }
+}

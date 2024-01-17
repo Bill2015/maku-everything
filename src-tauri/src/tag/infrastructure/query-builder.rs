@@ -12,6 +12,8 @@ pub struct TagQueryBuilder {
 
     pub belong_subject: Option<String>,
 
+    pub belong_subject_name: Option<String>,
+
     pub tagging_resource: Option<String>,
 
     pub order_by: Option<String>,
@@ -24,6 +26,7 @@ impl TagQueryBuilder {
             name: None,
             belong_category: None,
             belong_subject: None,
+            belong_subject_name: None,
             tagging_resource: None,
             order_by: None,
         }
@@ -57,6 +60,15 @@ impl TagQueryBuilder {
         self
     }
 
+    pub fn set_belong_subject_name(mut self, subject_name: String) -> TagQueryBuilder {
+        if !subject_name.is_empty() {
+            self.belong_subject_name = Some(
+                format!("string::lowercase(belong_subject.name) == string::lowercase(\'{}\')", subject_name)
+            );
+        }
+        self
+    }
+
     pub fn set_tagging_resource(mut self, resource_id: String) -> TagQueryBuilder {
         if !resource_id.is_empty() {
             self.tagging_resource = Some(format!("->tagging.out CONTAINS {}", resource_id));
@@ -78,6 +90,7 @@ impl TagQueryBuilder {
         query_data.push(self.name.to_owned());
         query_data.push(self.belong_category.to_owned());
         query_data.push(self.belong_subject.to_owned());
+        query_data.push(self.belong_subject_name.to_owned());
         query_data.push(self.tagging_resource.to_owned());
         
         let query_string: String = query_data
@@ -115,6 +128,10 @@ impl From<ListTagQuery> for TagQueryBuilder {
 
         if let Some(subject_id) = value.belong_subject {
             builder = builder.set_belong_subject(subject_id);
+        }
+
+        if let Some(subject_name) = value.belong_subject_name {
+            builder = builder.set_belong_subject_name(subject_name);
         }
 
         if let Some(resource_id) = value.tagging_resource {

@@ -111,8 +111,11 @@ pub enum ResourceGenericError {
     #[error("Can't not add same tag")]
     AddSameTag(),
 
-    #[error("Add the tag that dose not exists")]
+    #[error("Tag that dose not exists")]
     TagNotExists(),
+
+    #[error("Find the ambiguous tags")]
+    FindAmbiguousTags(),
 
     #[error("Id not found")]
     IdNotFound(),

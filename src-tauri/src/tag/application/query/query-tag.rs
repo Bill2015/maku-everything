@@ -15,6 +15,8 @@ pub struct ListTagQuery {
 
     pub belong_subject: Option<String>,
 
+    pub belong_subject_name: Option<String>,
+
     pub tagging_resource: Option<String>,
 
     pub order_by: Option<String>,
