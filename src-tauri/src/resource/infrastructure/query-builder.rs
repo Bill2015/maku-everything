@@ -10,6 +10,10 @@ pub struct ResourceQueryBuilder {
 
     pub belong_category: Option<String>, 
 
+    pub exclude_tags: Vec<String>,
+
+    pub include_tags: Vec<String>,
+
     pub order_by: Option<String>,
 }
 
@@ -19,6 +23,8 @@ impl ResourceQueryBuilder {
             id: None,
             name: None,
             belong_category: None,
+            include_tags: Vec::new(),
+            exclude_tags: Vec::new(),
             order_by: None,
         }
     }
@@ -44,6 +50,20 @@ impl ResourceQueryBuilder {
         self
     }
 
+    pub fn add_include_tag(mut self, tag_id: String) -> ResourceQueryBuilder {
+        if !tag_id.is_empty() {
+            self.include_tags.push(tag_id);
+        }
+        self
+    }
+
+    pub fn add_exclude_tag(mut self, tag_id: String) -> ResourceQueryBuilder {
+        if !tag_id.is_empty() {
+            self.exclude_tags.push(tag_id);
+        }
+        self
+    }
+
     pub fn set_order_by(mut self, field_name: String) -> ResourceQueryBuilder {
         if !field_name.is_empty() {
             self.order_by = Some(format!("ORDER BY {}", field_name));
@@ -57,6 +77,13 @@ impl ResourceQueryBuilder {
         query_data.push(self.id.to_owned());
         query_data.push(self.name.to_owned());
         query_data.push(self.belong_category.to_owned());
+        
+        query_data.push((self.include_tags.len() > 0).then_some(
+            format!("(<-tagging<-tag.id) CONTAINSALL [{}]", self.include_tags.join(", "))
+        ));
+        query_data.push((self.exclude_tags.len() > 0).then_some( 
+           format!("!(<-tagging<-tag.id) CONTAINSALL [{}]", self.exclude_tags.join(", "))
+        ));
         
         let query_string: String = query_data
                                 .iter()

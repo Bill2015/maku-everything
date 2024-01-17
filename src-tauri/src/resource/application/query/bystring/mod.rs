@@ -56,6 +56,7 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
 
         let mut sql = SQLQueryGenerator::new(&tokens);
         sql.preprocessor(self.tag_repo).await?;
+        sql.gen();
 
         dbg!("Success");
 

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::resource::infrastructure::ResourceQueryBuilder;
 use crate::tag::repository::TagQueryRepository;
 use crate::tag::infrastructure::TagQueryBuilder;
 use crate::resource::domain::{ResourceError, ResourceGenericError};
@@ -68,5 +69,40 @@ impl<'a> SQLQueryGenerator<'a> {
         }
 
         Ok(())
+    }
+
+    pub fn gen(&self) {
+        let mut tag_stack: Vec<&QueryToken> = Vec::new();
+        let mut ops_stack: Vec<&QueryToken> = Vec::new();
+
+        let mut builder = ResourceQueryBuilder::new();
+
+        for token in self.tokens {
+
+
+            if (token.token_name == TokenSymbol::Include) || (token.token_name == TokenSymbol::Exclude) {
+                ops_stack.push(&token);
+            }
+            else if token.token_name == TokenSymbol::LeftBracket {
+                ops_stack.push(&token);
+            }
+            else if token.token_name == TokenSymbol::TagName {
+                if ops_stack.last().is_some_and(|x| x.token_name == TokenSymbol::LeftBracket) {
+                    tag_stack.push(&token);
+                }
+                else {
+                    let prefix_op = ops_stack.pop().unwrap();
+                    let tag_id = self.tag_id_map.get(&token.value).unwrap();
+                    if prefix_op.token_name == TokenSymbol::Include {
+                        builder = builder.add_include_tag(tag_id.to_string());
+                    }
+                    else if prefix_op.token_name == TokenSymbol::Exclude {
+                        builder = builder.add_exclude_tag(tag_id.to_string());
+                    }
+                }
+            }
+        }
+
+        dbg!(builder.build());
     }
 }
