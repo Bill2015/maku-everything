@@ -31,14 +31,11 @@ impl<'a> ResourceQueryRepository<'a> {
             FROM type::table($table)"#, 
             Self::ROOT_PATH_FIELD);
 
-        let mut response = self.db
+        let  result: Vec<ResourceResDto> = self.db
             .query(sql)
             .bind(("table", &tablens::RESOURCE))
-            .await?;
-
-        let result: Vec<ResourceResDto> = response
-            .take(0)
-            .unwrap();
+            .await?
+            .take(0)?;
 
         Ok(result)
     }
@@ -52,13 +49,11 @@ impl<'a> ResourceQueryRepository<'a> {
             WHERE id == $id"#, 
             Self::ROOT_PATH_FIELD);
 
-        let mut response = self.db
+        let result: Option<ResourceResDto>  = self.db
             .query(sql)
             .bind(("table", &tablens::RESOURCE))
             .bind(("id", thing(id.as_str()).unwrap()))
-            .await?;
-
-        let result: Option<ResourceResDto> = response
+            .await?
             .take(0)
             .unwrap_or(None);
 
@@ -82,15 +77,12 @@ impl<'a> ResourceQueryRepository<'a> {
             WHERE id == $id"#, 
             Self::ROOT_PATH_FIELD);
                     
-        let mut response = self.db
+        let result: Option<ResourceDetailDto> = self.db
             .query(sql)
             .bind(("table", &tablens::RESOURCE))
             .bind(("id", thing(id.as_str()).unwrap()))
-            .await?;
-
-        let result: Option<ResourceDetailDto> = response
-            .take(0)
-            .unwrap();
+            .await?
+            .take(0)?;
 
         Ok(result) 
     }
@@ -105,21 +97,17 @@ impl<'a> ResourceQueryRepository<'a> {
             FROM type::table($table) WHERE {query_string}"#, 
             Self::ROOT_PATH_FIELD, query_string = query_string);
 
-        let mut response = self.db
+        let result: Vec<ResourceResDto> = self.db
             .query(sql)
             .bind(("table", &tablens::RESOURCE))
-            .await?;
-
-        let result: Vec<ResourceResDto> = response
-            .take(0)
-            .unwrap();
+            .await?
+            .take(0)?;
 
         Ok(result) 
     }
 
     pub async fn string_ql(&self, ql: ResourceStringQL) -> surrealdb::Result<Vec<ResourceResDto>> {
         let query = ql.get();
-        dbg!(&query);
         
         let sql = format!(
             r#"SELECT 
@@ -132,8 +120,7 @@ impl<'a> ResourceQueryRepository<'a> {
             .query(sql)
             .bind(("table", &tablens::RESOURCE))
             .await?
-            .take(0)
-            .unwrap();
+            .take(0)?;
 
         Ok(result)
     }
