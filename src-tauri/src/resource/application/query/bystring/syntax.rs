@@ -35,13 +35,7 @@ impl<'a> Syntax<'a> {
     }
 
     fn match_token(&self, symbol: TokenSymbol) -> bool {
-        let token = self.peek();
-        if token.is_some_and(|val| val.token_name == symbol) {
-            true
-        }
-        else {
-            false
-        }
+        matches!(self.peek(), Some(token) if token.symbol == symbol)
     }
 
     fn comuse_token(&mut self) {
@@ -54,7 +48,7 @@ impl<'a> Syntax<'a> {
 
     fn express_tags(&mut self) -> Result<(), ResourceError> {
         let mut tag_count = 0;
-        while true {
+        loop {
             if self.match_token(TokenSymbol::TagName) {
                 self.comuse_token();
                 tag_count += 1;

@@ -1,108 +1,124 @@
 use std::collections::HashMap;
 
-use crate::resource::infrastructure::ResourceQueryBuilder;
-use crate::tag::repository::TagQueryRepository;
-use crate::tag::infrastructure::TagQueryBuilder;
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::ResourceError;
 
-use super::types::{QueryToken, TokenSymbol, QueryingStringSymbol};
+use super::types::{QueryToken, TokenSymbol};
 
- 
-pub struct SQLQueryGenerator<'a> {
-    tokens: &'a Vec<QueryToken>,
-    tag_id_map: HashMap<String, String>,
-    sql_string: String,
+#[derive(Debug)]
+pub enum SQLGroupPrefixType {
+    Include,
+    Exclude,
 }
 
-impl<'a> SQLQueryGenerator<'a> {
-    pub fn new(tokens: &'a Vec<QueryToken>) -> Self {
-        Self { 
-            tokens,
-            tag_id_map: HashMap::new(),
-            sql_string: "".to_string() 
-        }
+#[derive(Debug)]
+pub struct SqlGroup {
+    pub prefix: SQLGroupPrefixType,
+    pub items: Vec<String>,
+}
+
+#[derive(Debug)]
+pub struct SqlObjectData {
+    excludes: Vec<String>,
+    includes: Vec<String>,
+    groups: Vec<SqlGroup>,
+}
+
+impl SqlObjectData {
+    pub fn new() -> Self {
+        Self { excludes: Vec::new(), includes: Vec::new(), groups: Vec::new() }
+    }
+    
+    fn add_exclude(&mut self, item: String) {
+        self.excludes.push(item);
     }
 
-    pub async fn preprocessor(&mut self, tag_repo: &TagQueryRepository<'_>) -> Result<(), ResourceError> {
-        for token in self.tokens.iter() {
-            if token.token_name != TokenSymbol::TagName {
-                continue;
-            }
-
-            let tokenval = &token.value;
-            let mut builder = TagQueryBuilder::new();
-
-            // have subject name
-            if let Some(index) = tokenval.chars().position(|x| QueryingStringSymbol::SubjectDelimiter == x) {
-                // for unicode text
-                let unicode_index = tokenval
-                    .char_indices()
-                    .map(|(i, _)| i)
-                    .nth(index)
-                    .unwrap();
-                let subject_name = tokenval[0..unicode_index].to_string();
-                let tag_name = tokenval[unicode_index + 1..tokenval.len()].to_string();
-
-                builder = builder
-                    .set_name(tag_name)
-                    .set_belong_subject_name(subject_name);
-            }
-            // only tag name
-            else {
-                builder = builder.set_name(tokenval.to_string());
-            }
-
-            let result = tag_repo.query(builder).await
-                .or(Err(ResourceError::QueryingByString(ResourceGenericError::DBInternalError())))?;
-        
-            // find multiple same name tags
-            if result.len() >= 2 {
-                return Err(ResourceError::QueryingByString(ResourceGenericError::FindAmbiguousTags()));
-            }
-
-            if let Some(element) = result.get(0) {
-                self.tag_id_map.insert(tokenval.to_string(), element.id.to_string());
-            }
-            else {
-                return Err(ResourceError::QueryingByString(ResourceGenericError::TagNotExists()));
-            }
-        }
-
-        Ok(())
+    fn add_include(&mut self, item: String) {
+        self.includes.push(item);
     }
 
-    pub fn gen(&self) {
-        let mut tag_stack: Vec<&QueryToken> = Vec::new();
-        let mut ops_stack: Vec<&QueryToken> = Vec::new();
+    fn add_group(&mut self, item: SqlGroup) {
+        self.groups.push(item);
+    }
 
-        let mut builder = ResourceQueryBuilder::new();
+    pub fn get_excludes(&self) -> &Vec<String> {
+        &self.excludes
+    }
+
+    pub fn get_includes(&self) -> &Vec<String>{
+        &self.includes
+    }
+
+    pub fn get_groups(&self) ->  &Vec<SqlGroup> {
+        &self.groups
+    }
+    
+}
+
+
+pub struct SQLQueryObjectGenerator<'a> {
+    tokens: &'a Vec<QueryToken>,
+    tag_id_map: HashMap<String, String>,
+}
+
+impl<'a> SQLQueryObjectGenerator<'a> {
+    pub fn new(tokens: &'a Vec<QueryToken>, tag_id_map: HashMap<String, String>) -> Self {
+        Self { tokens, tag_id_map }
+    }
+
+    pub fn gen(&self) -> Result<SqlObjectData, ResourceError> {
+
+        let mut sqldata = SqlObjectData::new();
+
+        let mut stack: Vec<&QueryToken> = Vec::new();
 
         for token in self.tokens {
-
-
-            if (token.token_name == TokenSymbol::Include) || (token.token_name == TokenSymbol::Exclude) {
-                ops_stack.push(&token);
+            if (token.symbol == TokenSymbol::Include) || (token.symbol == TokenSymbol::Exclude) {
+                stack.push(&token);
             }
-            else if token.token_name == TokenSymbol::LeftBracket {
-                ops_stack.push(&token);
+            else if token.symbol == TokenSymbol::LeftBracket {
+                stack.push(&token);
             }
-            else if token.token_name == TokenSymbol::TagName {
-                if ops_stack.last().is_some_and(|x| x.token_name == TokenSymbol::LeftBracket) {
-                    tag_stack.push(&token);
-                }
-                else {
-                    let prefix_op = ops_stack.pop().unwrap();
-                    let tag_id = self.tag_id_map.get(&token.value).unwrap();
-                    if prefix_op.token_name == TokenSymbol::Include {
-                        builder = builder.add_include_tag(tag_id.to_string());
+            else if token.symbol == TokenSymbol::RightBracket {
+                let mut group_item: Vec<String> = Vec::new();
+
+                while let Some(top_token) = stack.last() {
+                    match top_token.symbol {
+                        TokenSymbol::Exclude => {
+                            sqldata.add_group(SqlGroup { prefix: SQLGroupPrefixType::Exclude, items: group_item });
+                            break;
+                        },
+                        TokenSymbol::Include => {
+                            sqldata.add_group(SqlGroup { prefix: SQLGroupPrefixType::Include, items: group_item });
+                            break;
+                        },
+                        TokenSymbol::LeftBracket => {},
+                        _ => {
+                            let tag_id = self.tag_id_map.get(&top_token.value).unwrap();
+                            group_item.push(tag_id.to_string());
+                        }
                     }
-                    else if prefix_op.token_name == TokenSymbol::Exclude {
-                        builder = builder.add_exclude_tag(tag_id.to_string());
+                    stack.pop();
+                }
+            }
+            else if token.symbol == TokenSymbol::TagName {
+                let tag_id = self.tag_id_map.get(&token.value).unwrap();
+
+                match stack.last().unwrap().symbol {
+                    TokenSymbol::Include => {
+                        sqldata.add_include(tag_id.to_string());
+                        stack.pop();
+                    },
+                    TokenSymbol::Exclude => {
+                        sqldata.add_exclude(tag_id.to_string());
+                        stack.pop();
+                    },
+                    _ => {
+                        stack.push(&token);
                     }
                 }
             }
-        }
+        };
 
-        dbg!(builder.build());
+        Ok(sqldata)
     }
 }

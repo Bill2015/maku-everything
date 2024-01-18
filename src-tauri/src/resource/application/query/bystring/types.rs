@@ -2,13 +2,14 @@ use std::{str::FromStr, ops};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct QueryToken {
+    pub symbol: TokenSymbol,
+    pub namespace: Option<String>,
     pub value: String,
-    pub token_name: TokenSymbol,
 }
 
 impl QueryToken {
-    pub fn new(value: String, token_name: TokenSymbol) -> Self {
-        Self { value, token_name }
+    pub fn new(symbol: TokenSymbol, namespace: Option<String>, value: String) -> Self {
+        Self { symbol, value, namespace: None }
     }
 }
 

@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use super::types::QueryToken;
+use super::types::QueryingStringSymbol;
 use super::types::TokenSymbol;
 
 pub struct Tokenizer<'a> {
@@ -21,6 +22,23 @@ impl<'a> Tokenizer<'a> {
         }
     }
 
+    fn separate_namespace(&self, str: String) -> (Option<String>, String) {
+        if let Some(index) = str.chars().position(|x| QueryingStringSymbol::SubjectDelimiter == x) {
+            // for unicode text
+            let unicode_index = str
+                .char_indices()
+                .map(|(i, _)| i)
+                .nth(index)
+                .unwrap();
+            let subject_name = str[0..unicode_index].to_string();
+            let value = str[unicode_index + 1..str.len()].to_string();
+
+            return (Some(subject_name), value);
+        }
+        
+        (None, str)
+    }
+
     fn is_end(&self) -> bool {
         self.current >= self.char_num
     }
@@ -32,10 +50,7 @@ impl<'a> Tokenizer<'a> {
     }
 
     fn peek_prev(&self) -> Option<char> {
-        if self.current <= 0 {
-           return None;
-        }
-        Some(self.query_string.chars().nth(self.current - 1).unwrap())
+        self.query_string.chars().nth(self.current.checked_sub(1)?)
     }
 
     fn peek(&self) -> char {
@@ -52,11 +67,8 @@ impl<'a> Tokenizer<'a> {
     }
 
     fn scan_tag_name(&mut self) -> String {
-        let mut chars: Vec<char> = Vec::new();
-
-        let prev_ch = self.peek_prev().unwrap();
-        let quoted = prev_ch == '"';
-        chars.push(prev_ch);  
+        let mut chars: Vec<char> = vec![self.peek_prev().unwrap_or('\0')];
+        let quoted = self.peek_prev().unwrap() == '"';
     
         while !self.is_end() {
             let ch = self.peek();
@@ -76,23 +88,23 @@ impl<'a> Tokenizer<'a> {
         }
 
         chars.iter()
-            .map(|c| if *c == '"' { "".to_string() } else { c.to_string() } )
-            .collect::<Vec<String>>()
-            .join("")
+            .filter(|c| **c != '"')
+            .collect::<String>()
     }
 
     fn scan(&mut self) {
         let ch = self.next_ch();
 
         if let Ok(symbol) = TokenSymbol::from_str(&ch.to_string()) {
-            self.add_token(QueryToken::new(ch.to_string(), symbol));
+            self.add_token(QueryToken::new(symbol, None, ch.to_string()));
         }
         else if ch.is_whitespace() {
             // do nothing
         }
         else {
             let tag_name = self.scan_tag_name();
-            self.add_token(QueryToken::new(tag_name, TokenSymbol::TagName))
+            let (subject_name, tag_name) = self.separate_namespace(tag_name);
+            self.add_token(QueryToken::new(TokenSymbol::TagName, subject_name, tag_name))
         }
     }
 
@@ -103,5 +115,4 @@ impl<'a> Tokenizer<'a> {
 
         self.tokens.clone()
     }
-
 }

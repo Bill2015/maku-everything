@@ -6,7 +6,7 @@ use surrealdb::sql::thing;
 use crate::common::repository::{env, tablens};
 use crate::resource::application::dto::ResourceResDto;
 use crate::resource::application::dto::ResourceDetailDto;
-use crate::resource::infrastructure::ResourceQueryBuilder;
+use crate::resource::infrastructure::{ResourceQueryBuilder, ResourceStringQL};
 
 pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQueryRepository::init(&env::DB);
 
@@ -115,5 +115,26 @@ impl<'a> ResourceQueryRepository<'a> {
             .unwrap();
 
         Ok(result) 
+    }
+
+    pub async fn string_ql(&self, ql: ResourceStringQL) -> surrealdb::Result<Vec<ResourceResDto>> {
+        let query = ql.get();
+        dbg!(&query);
+        
+        let sql = format!(
+            r#"SELECT 
+                *,
+                {}
+            FROM type::table($table) WHERE {query}"#,
+            Self::ROOT_PATH_FIELD, query = query);
+
+        let result: Vec<ResourceResDto> = self.db
+            .query(sql)
+            .bind(("table", &tablens::RESOURCE))
+            .await?
+            .take(0)
+            .unwrap();
+
+        Ok(result)
     }
 }
