@@ -5,7 +5,7 @@ use crate::common::application::{ICommandHandler, IQueryHandler};
 use crate::category::domain::CategoryError;
 
 use super::command::{UpdateCategoryCommand, UpdateCategoryHandler};
-use super::dto::CategoryResDto;
+use super::dto::{CategoryResDto, CreateCategoryDto, UpdateCategoryDto};
 use super::query::*;
 
 pub static CATEGORY_SERVICE: CategoryService = CategoryService::init(&CATEGORY_REPOSITORY, &CATEGORY_QUERY_REPOSITORY);
@@ -20,57 +20,48 @@ impl<'a> CategoryService<'a> {
         category_queryrepo: &'a CategoryQueryRepository<'a>
     ) -> Self {
         CategoryService { 
-            category_repository: category_repository,
-            category_queryrepo: category_queryrepo,
+            category_repository,
+            category_queryrepo,
         }
     }
 
-    pub async fn create_category(&self, name: String, description: String, root_path: String) -> Result<String, CategoryError> {
-        let command = CreateCategoryCommand {
-            name: name,
-            root_path: root_path,
-            description: description,
-            auth: false,
-        };
-        let handler = CreateCategoryHandler::register(self.category_repository);
+    pub async fn create(&self, data: CreateCategoryDto) -> Result<String, CategoryError> {
+        let command = CreateCategoryCommand::from(data);
+
+        let result = CreateCategoryHandler::register(self.category_repository)
+            .execute(command)
+            .await?;
         
-        let res = handler.execute(command).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
-    pub async fn update_category(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, CategoryError> {
-        let command = UpdateCategoryCommand {
-            id: id,
-            name: name,
-            description: description,
-            auth: auth,
-        };
+    pub async fn update(&self, data: UpdateCategoryDto) -> Result<String, CategoryError> {
+        let command  = UpdateCategoryCommand::from(data);
 
-        let handler = UpdateCategoryHandler::register(self.category_repository);
+        let result = UpdateCategoryHandler::register(self.category_repository)
+            .execute(command)
+            .await?;
 
-        let res = handler.execute(command).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
-    pub async fn get_all_category(&self) -> Result<Vec<CategoryResDto>, CategoryError> {
+    pub async fn get_all(&self) -> Result<Vec<CategoryResDto>, CategoryError> {
         let query = GetAllCategoryQuery { };
 
-        let handler = GetAllCategoryHandler::register(self.category_queryrepo);
+        let result = GetAllCategoryHandler::register(self.category_queryrepo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
-    pub async fn get_category_by_id(&self, id: String) -> Result<Option<CategoryResDto>, CategoryError> {
+    pub async fn get_by_id(&self, id: String) -> Result<Option<CategoryResDto>, CategoryError> {
         let query = GetByIdCategoryQuery { id: id };
         
-        let handler = GetByIdCategoryHandler::register(self.category_queryrepo);
+        let result = GetByIdCategoryHandler::register(self.category_queryrepo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 }

@@ -1,18 +1,24 @@
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::category::application::dto::CreateCategoryDto;
 use crate::category::domain::CategoryError;
 use crate::category::domain::CategoryAggregate;
 use crate::category::domain::CategoryGenericError;
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
+use crate::command_from_dto;
 
+#[derive(Deserialize)]
 pub struct CreateCategoryCommand {
     pub name: String,
+
     pub description: String,
+
     pub root_path: String,
-    pub auth: bool,
 }
+command_from_dto!(CreateCategoryCommand, CreateCategoryDto);
 
 // =====================================
 pub struct CreateCategoryHandler<'a> {
@@ -39,7 +45,6 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
             name,
             description,
             root_path,
-            auth,
         } = command;
 
         // create new category

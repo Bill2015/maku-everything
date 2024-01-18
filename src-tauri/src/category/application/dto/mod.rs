@@ -1,3 +1,5 @@
-#[path ="./response-category.rs"]
 mod response;
-pub use response::CategoryResDto;
+pub use response::*;
+
+mod request;
+pub use request::*;

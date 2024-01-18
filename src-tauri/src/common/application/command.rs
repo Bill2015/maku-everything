@@ -9,3 +9,15 @@ pub trait ICommandHandler<C> {
     type Output;
     async fn execute(&self, command: C) -> Self::Output;
 }
+
+#[macro_export]
+macro_rules! command_from_dto {
+    ($command: ty, $dto: ty) => {
+        impl From<$dto> for $command {
+            fn from(value: $dto) -> Self {
+                let v = serde_json::to_value(value).unwrap();
+                serde_json::from_value::<$command>(v).unwrap()
+            }
+        }
+    }
+}

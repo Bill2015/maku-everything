@@ -1,15 +1,20 @@
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::category::application::dto::UpdateCategoryDto;
 use crate::category::domain::{CategoryError, CategoryGenericError};
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
+use crate::command_from_dto;
 
+#[derive(Deserialize)]
 pub struct UpdateCategoryCommand {
     pub id: String,
     pub name: Option<String>,
     pub description: Option<String>,
     pub auth: Option<bool>,
 }
+command_from_dto!(UpdateCategoryCommand, UpdateCategoryDto);
 
 // =====================================
 pub struct UpdateCategoryHandler<'a> {
