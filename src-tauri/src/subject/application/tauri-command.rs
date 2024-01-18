@@ -1,21 +1,21 @@
 use crate::subject::domain::SubjectError;
 
 use super::service::SUBJECT_SERVICE;
-use super::dto::SubjectResDto;
+use super::dto::{SubjectResDto, CreateSubjectDto, UpdateSubjectDto};
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_subject(name: &str, description: &str, belong_category: &str) -> Result<String, SubjectError> {
+pub async fn create_subject(data: CreateSubjectDto) -> Result<String, SubjectError> {
     let result = SUBJECT_SERVICE
-        .create_subject(name.to_string(), description.to_string(), belong_category.to_string())
+        .create_subject(data)
         .await?;
 
     Ok(result)
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn update_subject(id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, SubjectError> {
+pub async fn update_subject(data: UpdateSubjectDto) -> Result<String, SubjectError> {
     let result = SUBJECT_SERVICE
-        .update_subject(id, name, description, auth)
+        .update_subject(data)
         .await?;
 
     Ok(result)

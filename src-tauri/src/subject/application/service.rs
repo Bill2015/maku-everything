@@ -6,7 +6,7 @@ use crate::subject::application::command::{CreateSubjectCommand, CreateSubjectHa
 use crate::common::application::{ICommandHandler, IQueryHandler};
 
 use super::command::{UpdateSubjectCommand, UpdateSubjectHandler};
-use super::dto::SubjectResDto;
+use super::dto::{SubjectResDto, CreateSubjectDto, UpdateSubjectDto};
 use super::query::*;
 
 pub static SUBJECT_SERVICE: SubjectService = SubjectService::init(
@@ -33,61 +33,44 @@ impl<'a> SubjectService<'a> {
         }
     }
 
-    pub async fn create_subject(&self, name: String, description: String, belong_category: String) -> Result<String, SubjectError> {
-        let category = self.category_repository
-            .find_by_id(&belong_category)
-            .await
-            .unwrap_or(None);
+    pub async fn create_subject(&self, data: CreateSubjectDto) -> Result<String, SubjectError> {
+        let command = CreateSubjectCommand::from(data);
 
-        if category.is_none() {
-            return Err(SubjectError::Create(SubjectGenericError::BelongCategoryNotExists()));
-        }
+        let result = CreateSubjectHandler::register(self.subject_repository, self.category_repository)
+            .execute(command)
+            .await?;
 
-        let command = CreateSubjectCommand {
-            name: name,
-            description: description,
-            belong_category: category.unwrap().id,
-        };
-        let handler = CreateSubjectHandler::register(self.subject_repository);
-
-        let res = handler.execute(command).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
-    pub async fn update_subject(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, SubjectError> {
-        let command = UpdateSubjectCommand {
-            id: id,
-            name: name,
-            description: description,
-            auth: auth,
-        };
+    pub async fn update_subject(&self, data: UpdateSubjectDto) -> Result<String, SubjectError> {
+        let command = UpdateSubjectCommand::from(data);
 
-        let handler = UpdateSubjectHandler::register(self.subject_repository);
+        let result = UpdateSubjectHandler::register(self.subject_repository)
+            .execute(command)
+            .await?;
 
-        let res = handler.execute(command).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn get_all_subject(&self) -> Result<Vec<SubjectResDto>, SubjectError> {
         let query = GetAllSubjectQuery { };
 
-        let handler = GetAllSubjectHandler::register(self.subject_queryrepo);
+        let result = GetAllSubjectHandler::register(self.subject_queryrepo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn get_subject_by_id(&self, id: String) -> Result<Option<SubjectResDto>, SubjectError> {
         let query = GetByIdSubjectQuery { id: id };
         
-        let handler = GetByIdSubjectHandler::register(self.subject_queryrepo);
+        let result = GetByIdSubjectHandler::register(self.subject_queryrepo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn list_subjects(
@@ -104,10 +87,10 @@ impl<'a> SubjectService<'a> {
             order_by
         };
         
-        let handler = ListSubjectHandler::register(self.subject_queryrepo);
+        let result = ListSubjectHandler::register(self.subject_queryrepo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 }

@@ -1,16 +1,20 @@
 use async_trait::async_trait;
+use serde::Deserialize;
 
-use crate::subject;
-use crate::subject::domain::{SubjectAggregate, SubjectError, SubjectGenericError};
+use crate::command_from_dto;
+use crate::subject::application::dto::UpdateSubjectDto;
+use crate::subject::domain::{SubjectError, SubjectGenericError};
 use crate::subject::repository::SubjectRepository;
 use crate::common::application::ICommandHandler;
 
+#[derive(Deserialize)]
 pub struct UpdateSubjectCommand {
     pub id: String,
     pub name: Option<String>,
     pub description: Option<String>,
     pub auth: Option<bool>,
 }
+command_from_dto!(UpdateSubjectCommand, UpdateSubjectDto);
 
 // =====================================
 pub struct UpdateSubjectHandler<'a> {
@@ -27,7 +31,7 @@ impl<'a> UpdateSubjectHandler<'a> {
 impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
 
     fn get_name() -> String {
-        String::from("Change Subject Command")
+        String::from("Update Subject Command")
     }
 
     type Output = Result<String, SubjectError>;
@@ -41,15 +45,12 @@ impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
         } = command;
 
         // find by id
-        let subject_result = self.subject_repo
+        let mut subject = self.subject_repo
             .find_by_id(&id)
-            .await;
+            .await
+            .or(Err(SubjectError::Update(SubjectGenericError::DBInternalError())))?
+            .ok_or(SubjectError::Update(SubjectGenericError::IdNotFounded()))?;
 
-        let mut subject = subject_result
-            .ok()
-            .flatten()
-            .ok_or_else(|| SubjectError::Update(SubjectGenericError::IdNotFounded()))?;
- 
         // change name
         if name.is_some() {
             subject.change_name(name.unwrap())?;

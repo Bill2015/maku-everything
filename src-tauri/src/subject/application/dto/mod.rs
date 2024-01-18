@@ -1,3 +1,5 @@
-#[path ="./response-subject.rs"]
 mod response;
-pub use response::SubjectResDto;
+pub use response::*;
+
+mod request;
+pub use request::*;
