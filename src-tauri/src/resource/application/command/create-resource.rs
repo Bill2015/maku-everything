@@ -18,8 +18,6 @@ pub struct CreateResourceCommand {
 
     pub belong_category: String,
 
-    pub root_path: String,
-
     pub file_path: String,
 
     pub url_path: String,
@@ -52,15 +50,14 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
             name,
             description,
             belong_category, 
-            root_path,
             file_path,
             url_path,
         } = command;
 
-        let category_id = self.category_repo
-            .is_exist(&belong_category)
+        let category = self.category_repo
+            .find_by_id(&belong_category)
             .await
-            .then(|| CategoryID::from(belong_category))
+            .or(Err(ResourceError::Create(ResourceGenericError::DBInternalError())))?
             .ok_or(ResourceError::Create(ResourceGenericError::BelongCategoryNotExists()))?;
 
 
@@ -68,8 +65,8 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         let new_resource = ResourceAggregate::new(
             name,
             description,
-            category_id,
-            root_path,
+            category.id,
+            category.root_path,
             file_path,
             url_path
         )?;

@@ -25,7 +25,7 @@ export namespace ResourceAPI {
     }
 
     export function create(data: ResourceCreateDto) {
-        return invoke<string>('create_resource', data as unknown as InvokeArgs);
+        return invoke<string>('create_resource', { data });
     }
 
     export function exporeTheFile(filePath: string) {
@@ -33,10 +33,10 @@ export namespace ResourceAPI {
     }
 
     export function addTag(data: ResourceTagOperateDto) {
-        return invoke('add_resource_tag', data as unknown as InvokeArgs);
+        return invoke('add_resource_tag', { data });
     }
 
     export function removeTag(data: ResourceTagOperateDto) {
-        return invoke('remove_resource_tag', data as unknown as InvokeArgs);
+        return invoke('remove_resource_tag', { data });
     }
 }

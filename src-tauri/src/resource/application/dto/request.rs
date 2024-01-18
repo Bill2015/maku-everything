@@ -8,8 +8,6 @@ pub struct CreateResourceDto {
 
     pub belong_category: String,
 
-    pub root_path: String,
-
     pub file_path: String,
 
     pub url_path: String,

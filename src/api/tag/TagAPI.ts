@@ -12,7 +12,7 @@ export namespace TagAPI {
     }
 
     export function create(data: TagCreateDto) {
-        return invoke<string>('create_tag', data as unknown as InvokeArgs);
+        return invoke<string>('create_tag', { data });
     }
 
     export function query(queryDto: QueryTagDto) {

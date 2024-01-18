@@ -16,6 +16,6 @@ export namespace SubjectAPI {
     }
 
     export function create(data: SubjectCreateDto) {
-        return invoke<string>('create_subject', data as unknown as InvokeArgs);
+        return invoke<string>('create_subject', { data });
     }
 }
