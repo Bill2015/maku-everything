@@ -1,3 +1,5 @@
-#[path ="./response-tag.rs"]
 mod response;
-pub use response::TagResDto;
+pub use response::*;
+
+mod reqeust;
+pub use reqeust::*;

@@ -1,15 +1,21 @@
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::command_from_dto;
+use crate::tag::application::dto::UpdateTagDto;
 use crate::tag::domain::{TagError, TagGenericError};
 use crate::tag::repository::TagRepository;
 use crate::common::application::ICommandHandler;
 
+#[derive(Deserialize)]
 pub struct UpdateTagCommand {
     pub id: String,
     pub name: Option<String>,
     pub description: Option<String>,
     pub auth: Option<bool>,
 }
+
+command_from_dto!(UpdateTagCommand, UpdateTagDto);
 
 // =====================================
 pub struct UpdateTagHandler<'a> {
@@ -40,15 +46,12 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
         } = command;
 
         // find by id
-        let tag_result = self.tag_repo
+        let mut tag = self.tag_repo
             .find_by_id(&id)
-            .await;
+            .await
+            .or(Err(TagError::Update(TagGenericError::DBInternalError())))?
+            .ok_or(TagError::Update(TagGenericError::IdNotFounded()))?;
 
-        let mut tag = tag_result
-            .ok()
-            .flatten()
-            .ok_or_else(|| TagError::Update(TagGenericError::IdNotFounded()))?;
- 
         // change name
         if name.is_some() {
             tag.change_name(name.unwrap())?;

@@ -35,8 +35,8 @@ impl<'a> CategoryRepository<'a> {
         CategoryRepository { db: db }
     }
 
-    pub async fn is_exist(&self, id: String) -> bool {
-        let thing_id = thing(id.as_str()).unwrap();
+    pub async fn is_exist(&self, id: &String) -> bool {
+        let thing_id = thing(id).unwrap();
         let result: Option<CategoryDO> = self.db
             .select(thing_id)
             .await

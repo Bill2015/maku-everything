@@ -1,13 +1,13 @@
 
 use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
 use crate::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
-use crate::tag::domain::{TagError, TagGenericError};
+use crate::tag::domain::TagError;
 use crate::tag::repository::{TAG_REPOSITORY, TAG_QUERY_REPOSITORY, TagRepository, TagQueryRepository};
 use crate::tag::application::command::{CreateTagCommand, CreateTagHandler};
 use crate::common::application::{ICommandHandler, IQueryHandler};
 
 use super::command::{UpdateTagCommand, UpdateTagHandler};
-use super::dto::TagResDto;
+use super::dto::{TagResDto, CreateTagDto, UpdateTagDto};
 use super::query::*;
 
 pub static TAG_SERVICE: TagService = TagService::init(
@@ -30,83 +30,55 @@ impl<'a> TagService<'a> {
         tag_repository: &'a TagRepository<'a>,
         tag_queryrepo: &'a TagQueryRepository<'a>
     ) -> Self {
-        TagService { 
-            category_repository: category_repository,
-            subject_repository: subject_repository,
-            tag_repository: tag_repository,
-            tag_queryrepo: tag_queryrepo,
+        Self { 
+            category_repository,
+            subject_repository,
+            tag_repository,
+            tag_queryrepo,
         }
     }
 
-    pub async fn create_tag(&self, name: String, description: String, belong_category: String, belong_subject: String) -> Result<String, TagError> {
-        // Category
-        let category = self.category_repository
-            .find_by_id(&belong_category)
-            .await
-            .unwrap_or(None);
-
-        if category.is_none() {
-            println!("Category Not Exist");
-            return Err(TagError::Create(TagGenericError::BelongCategoryNotExists()));
-        }
+    pub async fn create_tag(&self, data: CreateTagDto) -> Result<String, TagError> {
+        let command = CreateTagCommand::from(data);
+        let result = CreateTagHandler::register(
+                self.tag_repository,
+                self.category_repository,
+                self.subject_repository,
+            )
+            .execute(command)
+            .await?;
         
-        // Subject 
-        let subject = self.subject_repository
-            .find_by_id(&belong_subject)
-            .await
-            .unwrap_or(None);
-
-        if subject.is_none() {
-            println!("Subject Not Exist");
-            return Err(TagError::Create(TagGenericError::BelongSubjectNotExists()));
-        }
-
-        let command = CreateTagCommand {
-            name: name,
-            description: description,
-            belong_category: category.unwrap().id,
-            belong_subject: subject.unwrap().id,
-        };
-        let handler = CreateTagHandler::register(self.tag_repository);
-        
-        let res = handler.execute(command).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
-    pub async fn update_tag(&self, id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, TagError> {
-        let command = UpdateTagCommand {
-            id: id,
-            name: name,
-            description: description,
-            auth: auth,
-        };
+    pub async fn update_tag(&self, data: UpdateTagDto) -> Result<String, TagError> {
+        let command = UpdateTagCommand::from(data);
 
-        let handler = UpdateTagHandler::register(self.tag_repository);
+        let result = UpdateTagHandler::register(self.tag_repository)
+            .execute(command)
+            .await?;
 
-        let res = handler.execute(command).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn get_all_tag(&self) -> Result<Vec<TagResDto>, TagError> {
         let query = GetAllTagQuery { };
 
-        let handler = GetAllTagHandler::register(self.tag_queryrepo);
+        let result = GetAllTagHandler::register(self.tag_queryrepo)
+            .query(query).
+            await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn get_tag_by_id(&self, id: String) -> Result<Option<TagResDto>, TagError> {
         let query = GetByIdTagQuery { id: id };
         
-        let handler = GetByIdTagHandler::register(self.tag_queryrepo);
+        let result = GetByIdTagHandler::register(self.tag_queryrepo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn list_tags(
@@ -129,10 +101,10 @@ impl<'a> TagService<'a> {
             order_by
         };
         
-        let handler = ListTagHandler::register(self.tag_queryrepo);
+        let result = ListTagHandler::register(self.tag_queryrepo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 }
