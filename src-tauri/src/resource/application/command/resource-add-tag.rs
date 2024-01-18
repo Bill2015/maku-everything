@@ -1,26 +1,31 @@
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::command_from_dto;
+use crate::resource::application::dto::ResourceAddTagDto;
 use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 use crate::common::domain::ID;
 use crate::tag::domain::TagID;
+use crate::tag::repository::TagRepository;
 
+#[derive(Deserialize)]
 pub struct ResourceAddTagCommand {
     pub id: String,
-    pub tag_id: TagID,
+    pub tag_id: String,
 }
+command_from_dto!(ResourceAddTagCommand, ResourceAddTagDto);
 
 // =====================================
 pub struct ResourceAddTagHandler<'a> {
     resource_repo: &'a ResourceRepository<'a>,
+    tag_repo: &'a TagRepository<'a>,
 }
 
 impl<'a> ResourceAddTagHandler<'a> {
-    pub fn register(resource_repo: &'a ResourceRepository) -> Self {
-        ResourceAddTagHandler { 
-            resource_repo: &resource_repo,
-        }
+    pub fn register(resource_repo: &'a ResourceRepository, tag_repo: &'a TagRepository) -> Self {
+        Self { resource_repo, tag_repo }
     }
 }
 
@@ -39,16 +44,19 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
             tag_id,
         } = command;
 
+        //get TagID
+        let tag_id = self.tag_repo
+            .is_exist(&tag_id)
+            .await
+            .then(|| TagID::from(tag_id))
+            .ok_or(ResourceError::AddTag(ResourceGenericError::TagNotExists()))?;   
 
         // find by id
-        let resource_result = self.resource_repo
+        let mut resource = self.resource_repo
             .find_by_id(id)
-            .await;
-
-        let mut resource = resource_result
-            .ok()
-            .flatten()
-            .ok_or_else(|| ResourceError::AddTag(ResourceGenericError::IdNotFound()))?;
+            .await
+            .or(Err(ResourceError::AddTag(ResourceGenericError::DBInternalError())))?
+            .ok_or(ResourceError::AddTag(ResourceGenericError::IdNotFound()))?;
 
         // add tag  
         resource.add_tag(tag_id)?;

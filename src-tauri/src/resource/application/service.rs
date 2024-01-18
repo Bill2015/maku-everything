@@ -1,6 +1,5 @@
 use std::path::Path;
 use std::process::Command;
-use tauri::async_runtime;
 
 use crate::common::application::{ICommandHandler, IQueryHandler};
 use crate::category::repository::CategoryRepository;
@@ -36,109 +35,52 @@ impl<'a> ResourceService<'a> {
         tag_respository: &'a TagRepository<'_>,
         tag_query_repository: &'a TagQueryRepository<'a>,
     ) -> Self {
-        ResourceService { 
-            resource_repository: resource_repository,
-            resource_query_repo: resource_query_repo,
-            category_repository: category_repository,
-            tag_respository: tag_respository,
-            tag_query_repository: tag_query_repository,
+        Self { 
+            resource_repository,
+            resource_query_repo,
+            category_repository,
+            tag_respository,
+            tag_query_repository,
         }
     }
 
-    pub async fn create_resource(
-        &self,
-        name: String,
-        description: String,
-        file_path: String,
-        url_path: String,
-        belong_category: String,
-    ) -> Result<String, ResourceError> {
-        let category = self.category_repository
-            .find_by_id(&belong_category)
-            .await
-            .unwrap_or(None)
-            .ok_or(ResourceError::Create(ResourceGenericError::BelongCategoryNotExists()))?;
-        
-        let command = CreateResourceCommand {
-            name,
-            description,
-            belong_category: category.id,
-            root_path: category.root_path,
-            file_path,
-            url_path,
-        };
+    pub async fn create_resource(&self, data: CreateResourceDto) -> Result<String, ResourceError> {
+        let command = CreateResourceCommand::from(data);
 
-        let handler = CreateResourceHandler::register(self.resource_repository);
+        let result = CreateResourceHandler::register(self.resource_repository, self.category_repository)
+            .execute(command)
+            .await?;
 
-        let _ = handler.execute(command).await?;
-
-        Ok(String::from("Ok"))
+        Ok(result)
     }
 
-    pub async fn update_resource(&self,
-        id: String,
-        name: Option<String>,
-        description: Option<String>,
-        auth: Option<bool>
-    ) -> Result<String, ResourceError> {
-        let command = UpdateResourceCommand {
-            id,
-            name,
-            description,
-            auth,
-        };
+    pub async fn update_resource(&self, data: UpdateResourceDto) -> Result<String, ResourceError> {
+        let command = UpdateResourceCommand::from(data);
 
-        let handler = UpdateResourceHandler::register(self.resource_repository);
+        let result = UpdateResourceHandler::register(self.resource_repository)
+            .execute(command)
+            .await?;
 
-        let _  = handler.execute(command).await?;
-
-        Ok(String::from("Ok"))
+        Ok(result)
     }
 
-    pub async fn add_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, ResourceError> {
-        // Category
-        let tag = self.tag_respository
-            .find_by_id(&tag_id)
-            .await
-            .unwrap_or(None);
+    pub async fn add_resource_tag(&self, data: ResourceAddTagDto) -> Result<String, ResourceError> {
+        let command = ResourceAddTagCommand::from(data);
 
-        if tag.is_none() {
-            return Err(ResourceError::AddTag(ResourceGenericError::TagNotExists()));
-        }
-        
-        let command = ResourceAddTagCommand {
-            id: resource_id,
-            tag_id: tag.unwrap().id,
-        };
+        let result = ResourceAddTagHandler::register(self.resource_repository, self.tag_respository)
+            .execute(command)
+            .await?;
 
-        let handler = ResourceAddTagHandler::register(self.resource_repository);
-        
-        let _  = handler.execute(command).await?;
-
-        Ok(String::from("Ok"))
+        Ok(result)
     }
 
-    pub async fn remove_resource_tag(&self, resource_id: String, tag_id: String) -> Result<String, ResourceError> {
-        // Category
-        let tag = self.tag_respository
-            .find_by_id(&tag_id)
-            .await
-            .unwrap_or(None);
+    pub async fn remove_resource_tag(&self, data: ResourceRemoveTagDto) -> Result<String, ResourceError> {
+        let command = ResourceRemoveTagCommand::from(data);
 
-        if tag.is_none() {
-            return Err(ResourceError::AddTag(ResourceGenericError::TagNotExists()));
-        }
-        
-        let command = ResourceRemoveTagCommand {
-            id: resource_id,
-            tag_id: tag.unwrap().id,
-        };
+        let result = ResourceRemoveTagHandler::register(self.resource_repository, self.tag_respository)
+            .execute(command).await?;
 
-        let handler = ResourceRemoveTagHandler::register(self.resource_repository);
-        
-        let _  = handler.execute(command).await?;
-
-        Ok(String::from("Ok"))
+        Ok(result)
     }
 
 
@@ -146,21 +88,21 @@ impl<'a> ResourceService<'a> {
     pub async fn get_resource_by_id(&self, resource_id: String) -> Result<Option<ResourceResDto>, ResourceError> {
         let query = GetByIdResourceQuery { id: resource_id };
 
-        let handler = GetByIdResourceHandler::register(self.resource_query_repo);
+        let result = GetByIdResourceHandler::register(self.resource_query_repo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn get_all_resource(&self) -> Result<Vec<ResourceResDto>, ResourceError> {
         let query = GetAllResourceQuery {};
 
-        let handler = GetAllResourceHandler::register(self.resource_query_repo);
+        let result = GetAllResourceHandler::register(self.resource_query_repo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn resource_detail(&self, resource_id: String) -> Result<Option<ResourceDetailDto>, ResourceError> {
@@ -202,23 +144,23 @@ impl<'a> ResourceService<'a> {
             order_by
         };
         
-        let handler = ListResourceHandler::register(self.resource_query_repo);
+        let result = ListResourceHandler::register(self.resource_query_repo)
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn querying_by_string(&self, query_string: String) -> Result<Vec<ResourceResDto>, ResourceError> {
         let query = StringResourceQuery { query_string };
 
-        let handler = StringResourceHandler::register(
-            self.resource_query_repo,
-            self.tag_query_repository,
-        );
+        let result = StringResourceHandler::register(
+                self.resource_query_repo,
+                self.tag_query_repository,
+            )
+            .query(query)
+            .await?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 }

@@ -1,15 +1,23 @@
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::command_from_dto;
+use crate::resource::application::dto::UpdateResourceDto;
 use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 
+#[derive(Deserialize)]
 pub struct UpdateResourceCommand {
     pub id: String,
+
     pub name: Option<String>,
+
     pub description: Option<String>,
+
     pub auth: Option<bool>,
 }
+command_from_dto!(UpdateResourceCommand, UpdateResourceDto);
 
 // =====================================
 pub struct UpdateResourceHandler<'a> {
@@ -40,15 +48,12 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
         } = command;
 
         // find by id
-        let resource_result = self.resource_repo
+        let  mut resource = self.resource_repo
             .find_by_id(id)
-            .await;
+            .await
+            .or(Err(ResourceError::Update(ResourceGenericError::DBInternalError())))?
+            .ok_or(ResourceError::Update(ResourceGenericError::IdNotFound()))?;
 
-        let mut resource = resource_result
-            .ok()
-            .flatten()
-            .ok_or_else(|| ResourceError::Update(ResourceGenericError::IdNotFound()))?;
- 
         // change name
         if name.is_some() {
             resource.change_name(name.unwrap());

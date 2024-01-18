@@ -67,9 +67,10 @@ impl<'a> TagRepository<'a> {
         Ok(aggregate)
     }
 
-    pub async fn is_exist(&self, id: String) -> bool {
+    pub async fn is_exist(&self, id: &String) -> bool {
+        let thing_id = thing(id).unwrap();
         let result: Option<TagDO> = self.db
-            .select((tablens::SUBJECT, id))
+            .select(thing_id)
             .await
             .unwrap_or(None);
 

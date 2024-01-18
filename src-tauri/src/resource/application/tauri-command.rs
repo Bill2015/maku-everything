@@ -1,26 +1,20 @@
 use crate::resource::domain::ResourceError;
 
-use super::{service::RESOURCE_SERVICE, dto::{ResourceResDto, ResourceDetailDto}};
+use super::{service::RESOURCE_SERVICE, dto::{ResourceResDto, ResourceDetailDto, CreateResourceDto, UpdateResourceDto, ResourceAddTagDto, ResourceRemoveTagDto}};
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_resource(name: &str, description: &str, file_path: &str, url_path: &str, belong_category: &str) -> Result<String, ResourceError> {
+pub async fn create_resource(data: CreateResourceDto) -> Result<String, ResourceError> {
     let result = RESOURCE_SERVICE
-        .create_resource(
-            name.to_string(),
-            description.to_string(),
-            file_path.to_string(),
-            url_path.to_string(),
-            belong_category.to_string()
-        )
+        .create_resource(data)
         .await?;
 
     Ok(result)
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn update_resource(id: String, name: Option<String>, description: Option<String>, auth: Option<bool>) -> Result<String, ResourceError> {
+pub async fn update_resource(data: UpdateResourceDto) -> Result<String, ResourceError> {
     let result = RESOURCE_SERVICE
-        .update_resource(id, name, description, auth)
+        .update_resource(data)
         .await?;
 
     Ok(result)
@@ -28,18 +22,18 @@ pub async fn update_resource(id: String, name: Option<String>, description: Opti
 
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn add_resource_tag(id: String, tag_id: String) -> Result<String, ResourceError> {
+pub async fn add_resource_tag(data: ResourceAddTagDto) -> Result<String, ResourceError> {
     let result = RESOURCE_SERVICE
-        .add_resource_tag(id, tag_id)
+        .add_resource_tag(data)
         .await?;
 
     Ok(result)
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn remove_resource_tag(id: String, tag_id: String) -> Result<String, ResourceError> {
+pub async fn remove_resource_tag(data: ResourceRemoveTagDto) -> Result<String, ResourceError> {
     let result = RESOURCE_SERVICE
-        .remove_resource_tag(id, tag_id)
+        .remove_resource_tag(data)
         .await?;
 
     Ok(result)

@@ -106,8 +106,8 @@ impl<'a> ResourceRepository<'a> {
         Ok(aggregate)
     }
 
-    pub async fn is_exist(&self, id: String) -> bool {
-        let thing_id = thing(id.as_str()).unwrap();
+    pub async fn is_exist(&self, id: &String) -> bool {
+        let thing_id = thing(id).unwrap();
         let result: Option<ResourceDO> = self.db
             .select(thing_id)
             .await
