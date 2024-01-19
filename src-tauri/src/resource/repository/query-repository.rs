@@ -69,9 +69,11 @@ impl<'a> ResourceQueryRepository<'a> {
             (SELECT 
                 *,
                 (->belong->subject.name)[0] AS subject_name,
+                (->tagging.added_at)[0] AS added_at,
                 array::len(->tagging.out) as tagged_count
                 FROM tag 
                 WHERE ->tagging->resource.id CONTAINS $parent.id
+                ORDER BY added_at ASC
             ) AS tags
             FROM type::table($table)
             WHERE id == $id"#, 

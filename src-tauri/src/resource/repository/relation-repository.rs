@@ -34,7 +34,10 @@ impl<'a> ResourceTagRelationRepository<'a> {
     }
 
     async fn create_relation(&self, tag: &String, resource: &String) -> surrealdb::Result<()> {
-        let sql: String = format!("RELATE $in_id->{}->$out_id", relatens::TAGGING);
+        let sql: String = format!(r#"
+            RELATE $in_id->{}->$out_id
+                SET added_at = time::now()
+        "#, relatens::TAGGING);
         let _ = self.db
             .query(sql)
             .bind(("in_id", thing(tag).unwrap()))

@@ -34,7 +34,7 @@ impl IQueryHandler<ResourceDetailQuery> for ResourceDetailHandler<'_>{
         let result = self.resource_repo
             .detail(&id)
             .await;
-    
+
         match result {
             Ok(value) => Ok(value),
             _ => Err(ResourceError::Detail(ResourceGenericError::DBInternalError())),

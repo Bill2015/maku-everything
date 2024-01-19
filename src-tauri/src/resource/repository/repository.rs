@@ -127,8 +127,6 @@ impl<'a> ResourceRepository<'a> {
     }
 
     pub async fn save(&self, data: ResourceAggregate) -> surrealdb::Result<ResourceAggregate> {
-        dbg!(&data);
-
         let belong_category = data.belong_category.clone(); 
         let new_tags = data.new_tags.clone();
         let del_tags = data.del_tags.clone();
