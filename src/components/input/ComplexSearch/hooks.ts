@@ -108,9 +108,14 @@ export const useStateHistory = () => {
         statusStackRef.current.push(history);
     }, []);
 
+    const clearHistory = useCallback(() => {
+        statusStackRef.current = [];
+    }, []);
+
     return {
         popHistory,
         pushHistory,
+        clearHistory,
     };
 };
 
@@ -121,7 +126,7 @@ export const useStateHistory = () => {
 export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     const inputStateMechine = useInputStatusMechine();
     const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>(InputStatus.Initial);
-    const { popHistory, pushHistory } = useStateHistory();
+    const { popHistory, pushHistory, clearHistory } = useStateHistory();
 
     // for the displaying search querying
     const [queryingNode, setQueryingNode] = useState<QueryingNodeProps[]>([]);
@@ -225,6 +230,12 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         setCurrentInputStatus(nextStatus);
     }, [inputStateMechine, currentInputStatus, queryingNode, rawText, newInput, pushHistory]);
 
+    const clearSearch = useCallback(() => {
+        setCurrentInputStatus(InputStatus.Initial);
+        setQueryingNode([]);
+        clearHistory();
+    }, [clearHistory]);
+
     return {
         options:       selectableOptions,
         displayNode:   queryingNode,
@@ -232,5 +243,6 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         currentStatus: currentInputStatus,
         backspaceInputSearch,
         forwardInputSearch,
+        clearSearch,
     };
 };

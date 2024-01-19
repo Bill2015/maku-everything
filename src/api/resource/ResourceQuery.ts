@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ResourceAPI } from './ResourceAPI';
 import { ResourceTagDto } from './Dto';
@@ -93,15 +93,26 @@ export namespace ResourceQuery {
         };
     }
 
-    export function useStringQuering(qString: string) {
+    export function useStringQuering(qString: string, onError: (error: Error) => void) {
         const queryfn = () => ResourceAPI.queryingByString(qString);
 
-        return useQuery({
+        const { error, ...other } = useQuery({
             queryKey:        ['resource-string-querying', qString],
             queryFn:         queryfn,
+            retry:           0,
+            staleTime:       0,
             enabled:         !!qString,
             placeholderData: [],
             initialData:     [],
         });
+
+        useEffect(() => {
+            if (error && onError) {
+                onError(error);
+            }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [error]);
+
+        return { error, ...other };
     }
 }

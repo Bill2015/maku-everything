@@ -6,6 +6,7 @@ import { useResourceDetailNavigate } from '@router/navigateHook';
 import { ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
 import { ComplexSearchInput, TauriDropZone } from '@components/input';
 import { StackGrid } from '@components/layout';
+import { showNotification } from '@components/notification';
 import { TagQuery } from '@api/tag';
 
 import { ResourceCard } from './components/ResourceCard';
@@ -20,12 +21,11 @@ export default function ResourcesPage() {
         refetch: resourceRefetch,
     } = ResourceQuery.useGetByCategory(activeCategory.id);
 
-    const { data: searchResult } = ResourceQuery.useStringQuering(search);
+    const { data: searchResult } = ResourceQuery.useStringQuering(search, (error) => {
+        showNotification('Search Failed', error.message, 'error');
+    });
 
-    const {
-        data: tagData,
-        isFetching: isTagFetching,
-    } = TagQuery.useGetByCategory(activeCategory.id);
+    const { data: tagData } = TagQuery.useGetByCategory(activeCategory.id);
 
     const createResource = ResourceMutation.useCreate();
 
@@ -35,14 +35,6 @@ export default function ResourcesPage() {
             navigateResourceTo(activeCategory.name, data.id);
         }
     }, [activeCategory, navigateResourceTo]);
-
-    const resourceItems = resourceData.map((val) => (
-        <ResourceCard
-            key={val.id}
-            data={val}
-            onDetailClick={handleResoruceDetail}
-        />
-    ));
 
     const onDropFiles = useCallback(async (filePaths: string[]) => {
         if (filePaths.length === 1) {
@@ -66,14 +58,26 @@ export default function ResourcesPage() {
                 <Title order={2}>
                     {activeCategory.name}
                 </Title>
-                <ComplexSearchInput tags={tagData} onSubmitSearch={(text) => setSearch(text)} />
+                <ComplexSearchInput
+                    tags={tagData}
+                    onSubmitSearch={(text) => setSearch(text)}
+                    onClearSearch={() => setSearch('')}
+                />
                 <Divider mt={10} />
             </Stack>
 
             <ScrollArea h="100%" style={{ textAlign: 'start', margin: 0 }}>
                 <Skeleton visible={isResourceFetching}>
                     <StackGrid w={270}>
-                        {resourceItems}
+                        {
+                            (search ? searchResult : resourceData).map((val) => (
+                                <ResourceCard
+                                    key={val.id}
+                                    data={val}
+                                    onDetailClick={handleResoruceDetail}
+                                />
+                            ))
+                        }
                     </StackGrid>
                 </Skeleton>
                 <TauriDropZone onDropFiles={onDropFiles} />

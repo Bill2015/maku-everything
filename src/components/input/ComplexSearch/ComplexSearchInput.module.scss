@@ -31,8 +31,25 @@
 }
 
 .searchBtn {
-    width: 2.35rem;
-    height: 2.35rem;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    width: 2.38rem;
+    min-width: 2.38rem;
+    height: 100%;
+    border-radius: 0;
+
+    &:last-child {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
+}
+
+.clearBtn {
+    width: 2.38rem;
+    min-width: 2.38rem;
+    height: 100%;
+    background-color: rgb(200, 83, 83);
+    border-radius: 0 0.25rem 0.25rem 0;
+
+    @include hover {
+        background-color: darken($color: rgb(200, 83, 83), $amount: 5);
+    }
 }

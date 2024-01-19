@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { ActionIcon, Combobox, ComboboxOptionProps, Flex, Group, Input, useCombobox } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import { FaSearch } from 'react-icons/fa';
+import { ImCross } from 'react-icons/im';
 
 import { TagResDto } from '@api/tag';
 import { useComplexSearch } from './hooks';
@@ -15,13 +16,15 @@ export interface ComplexSearchInputProps {
     tags: TagResDto[];
 
     onSubmitSearch: (searchText: string) => void;
+
+    onClearSearch: () => void;
 }
 
 export function ComplexSearchInput(props: ComplexSearchInputProps) {
-    const { tags, onSubmitSearch } = props;
+    const { tags, onSubmitSearch, onClearSearch } = props;
     const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
     const [searchText, setSearchText] = useState<string>('');
-    const { options, displayNode, rawText, backspaceInputSearch, forwardInputSearch } = useComplexSearch(tags, searchText);
+    const { options, displayNode, rawText, backspaceInputSearch, forwardInputSearch, clearSearch } = useComplexSearch(tags, searchText);
 
     const handleOptionSubmit = useCallback((val: string, comboxOptionProps: ComboboxOptionProps) => {
         forwardInputSearch(val, comboxOptionProps);
@@ -65,6 +68,20 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                     >
                         <FaSearch />
                     </ActionIcon>
+                    {
+                        rawText && (
+                            <ActionIcon
+                                className={classes.clearBtn}
+                                onClick={() => {
+                                    clearSearch();
+                                    setSearchText('');
+                                    onClearSearch();
+                                }}
+                            >
+                                <ImCross />
+                            </ActionIcon>
+                        )
+                    }
                 </Flex>
             </Combobox.Target>
 
