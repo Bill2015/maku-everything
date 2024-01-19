@@ -34,6 +34,13 @@ impl<'a> Syntax<'a> {
         self.tokens.get(self.current)
     }
 
+    fn tag_valid(&self, token: &QueryToken) -> Result<bool, ResourceError> {
+        if token.value.is_empty() {
+            return syntax_err!("The 'Tag Name' is empty");
+        }
+        return Ok(true);
+    }
+
     fn match_token(&self, symbol: TokenSymbol) -> bool {
         matches!(self.peek(), Some(token) if token.symbol == symbol)
     }
@@ -50,6 +57,7 @@ impl<'a> Syntax<'a> {
         let mut tag_count = 0;
         loop {
             if self.match_token(TokenSymbol::TagName) {
+                self.tag_valid(self.peek().unwrap())?;
                 self.comuse_token();
                 tag_count += 1;
             }
@@ -57,11 +65,11 @@ impl<'a> Syntax<'a> {
                 break;
             }
             else {
-                return syntax_err!("Brackets inside can only contain 'Tag Name'")
+                return syntax_err!("Brackets inside can only contain 'Tag Name'");
             }
         }
         if tag_count < 2 {
-            return syntax_err!("Brackets inside it must be contain at least 2 'Tag Name'")
+            return syntax_err!("Brackets inside it must be contain at least 2 'Tag Name'");
         }
 
         Ok(())
@@ -69,6 +77,7 @@ impl<'a> Syntax<'a> {
 
     fn express_body(&mut self) -> Result<(), ResourceError> {
         if self.match_token(TokenSymbol::TagName) {
+            self.tag_valid(self.peek().unwrap())?;
             self.comuse_token();
             Ok(())
         }

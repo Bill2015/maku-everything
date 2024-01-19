@@ -19,7 +19,6 @@ mod tokenizer;
 use tokenizer::Tokenizer;
 mod sqlgen;
 use sqlgen::SQLQueryObjectGenerator;
-pub use sqlgen::{SQLGroupPrefixType, SqlGroup, SqlObjectData};
 
 pub struct StringResourceQuery {
     pub query_string: String,
@@ -52,22 +51,22 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
     async fn query(&self, query: StringResourceQuery) -> Self::Output {
         let StringResourceQuery { query_string } = query;
 
-        // Add EOF
+        // add EOF symbol
         let q = format!("{}$", query_string.trim());
 
+        // get token
         let mut tokenizer = Tokenizer::new(&q);
         let tokens = tokenizer.parse();
 
+        // syntax check
         let _ = Syntax::new(&tokens).check()?;
 
-        // Generate tag id map
-        let tag_tokens = tokens
-            .iter()
-            .filter(|x| x.symbol == TokenSymbol::TagName)
-            .collect::<Vec<&QueryToken>>();
-
+        // generate tag id map
         let mut tag_id_map: HashMap<String, String> = HashMap::new();
-        for QueryToken { value, namespace, symbol: _ } in tag_tokens {
+        for QueryToken { value, namespace, symbol } in &tokens {
+            if *symbol != TokenSymbol::TagName {
+                continue;
+            }
             let mut builder = TagQueryBuilder::new()
                 .set_name(value.to_string());
 
@@ -80,16 +79,15 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
                 .or(Err(ResourceError::QueryingByString(ResourceGenericError::DBInternalError())))?;
 
             // find multiple same name tags
-            if result.len() >= 2 {
-                return Err(ResourceError::QueryingByString(ResourceGenericError::FindAmbiguousTags()));
-            }
-            else if result.len() <= 0 {
-                return Err(ResourceError::QueryingByString(ResourceGenericError::TagNotExists()));
-            }
-            else {
-                let result = result.first().unwrap();
-                tag_id_map.insert(value.to_string(), result.id.to_string());
-            }
+            let _ = match result.len() {
+                0 => Err(ResourceError::QueryingByString(ResourceGenericError::TagNotExists())),
+                1 => {
+                    let result = result.first().unwrap();
+                    tag_id_map.insert(value.to_string(), result.id.to_string());
+                    Ok(())
+                },
+                _ => Err(ResourceError::QueryingByString(ResourceGenericError::FindAmbiguousTags()))
+            }?;
         }
 
         // generate QL string

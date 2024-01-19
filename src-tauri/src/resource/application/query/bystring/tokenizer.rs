@@ -22,21 +22,29 @@ impl<'a> Tokenizer<'a> {
         }
     }
 
-    fn separate_namespace(&self, str: String) -> (Option<String>, String) {
-        if let Some(index) = str.chars().position(|x| QueryingStringSymbol::SubjectDelimiter == x) {
+    ///
+    /// Separate namespace \
+    /// 
+    /// Example: \
+    /// ```
+    /// separate_namespace("Language:Typescript") => ("Language", "Typescript")
+    /// separate_namespace("Typescript") => (None, "Typescript")
+    /// ```
+    fn separate_namespace(&self, value: String) -> (Option<String>, String) {
+        if let Some(index) = value.chars().position(|x| QueryingStringSymbol::SubjectDelimiter == x) {
             // for unicode text
-            let unicode_index = str
+            let unicode_index = value
                 .char_indices()
                 .map(|(i, _)| i)
                 .nth(index)
                 .unwrap();
-            let subject_name = str[0..unicode_index].to_string();
-            let value = str[unicode_index + 1..str.len()].to_string();
+            let subject_name = value[0..unicode_index].to_string();
+            let value = value[unicode_index + 1..value.len()].to_string();
 
             return (Some(subject_name), value);
         }
         
-        (None, str)
+        (None, value)
     }
 
     fn is_end(&self) -> bool {
@@ -54,11 +62,9 @@ impl<'a> Tokenizer<'a> {
     }
 
     fn peek(&self) -> char {
-        if self.is_end() {
-            '\0'
-        }
-        else {
-            self.query_string.chars().nth(self.current).unwrap()
+        match self.is_end() {
+            true => '\0',
+            false => self.query_string.chars().nth(self.current).unwrap()
         }
     }
 
@@ -93,26 +99,26 @@ impl<'a> Tokenizer<'a> {
     }
 
     fn scan(&mut self) {
-        let ch = self.next_ch();
+        while !self.is_end() {
+            let ch = self.next_ch();
 
-        if let Ok(symbol) = TokenSymbol::from_str(&ch.to_string()) {
-            self.add_token(QueryToken::new(symbol, None, ch.to_string()));
-        }
-        else if ch.is_whitespace() {
-            // do nothing
-        }
-        else {
-            let tag_name = self.scan_tag_name();
-            let (subject_name, tag_name) = self.separate_namespace(tag_name);
-            self.add_token(QueryToken::new(TokenSymbol::TagName, subject_name, tag_name))
+            // general symbol
+            if let Ok(symbol) = TokenSymbol::from_str(&ch.to_string()) {
+                self.add_token(QueryToken::new(symbol, None, ch.to_string()));
+            }
+            else if ch.is_whitespace() {
+                // do nothing
+            }
+            else {
+                let tag_name = self.scan_tag_name();
+                let (subject_name, tag_name) = self.separate_namespace(tag_name);
+                self.add_token(QueryToken::new(TokenSymbol::TagName, subject_name, tag_name))
+            }
         }
     }
 
     pub fn parse(&mut self) -> Vec<QueryToken> {
-        while !self.is_end() {
-            self.scan();
-        }
-
+        self.scan();
         self.tokens.clone()
     }
 }

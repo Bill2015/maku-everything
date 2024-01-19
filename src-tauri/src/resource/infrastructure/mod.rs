@@ -7,4 +7,7 @@ mod builder;
 pub use builder::ResourceQueryBuilder;
 
 mod stringql;
-pub use stringql::ResourceStringQL;
+pub use stringql::*;
+
+mod stringqlobj;
+pub use stringqlobj::*;
