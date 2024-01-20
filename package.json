@@ -20,6 +20,7 @@
 		"@tanstack/react-query": "^5.17.9",
 		"@tauri-apps/api": "^1.5.3",
 		"embla-carousel-react": "^7.1.0",
+		"lodash": "^4.17.21",
 		"millify": "^6.1.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
@@ -30,6 +31,7 @@
 	"devDependencies": {
 		"@simbathesailor/use-what-changed": "^2.0.0",
 		"@tauri-apps/cli": "^1.5.9",
+		"@types/lodash": "^4.14.202",
 		"@types/node": "^20.10.8",
 		"@types/react": "^18.2.47",
 		"@types/react-dom": "^18.2.18",
