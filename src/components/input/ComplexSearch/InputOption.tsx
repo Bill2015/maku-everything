@@ -2,6 +2,8 @@ import { Combobox, ComboboxOptionProps, Stack, Text } from '@mantine/core';
 import { InputSymbol } from './enums';
 import classses from './InputOption.module.scss';
 
+export type AttributeType = 'none' | 'text' | 'number' | 'date';
+
 export type ComboboxOptionWithDataProps = ComboboxOptionProps & {
     'data-groupname'?: string;
 
@@ -19,6 +21,8 @@ export type InputOptionType = {
 
     groupName: string;
 
+    attributeType: AttributeType;
+
     suffix?: string;
 }
 
@@ -27,7 +31,7 @@ export interface InputOptionProps extends InputOptionType, Omit<ComboboxOptionPr
 /**
  * Display the input options */
 export function InputOption(props: InputOptionProps) {
-    const { description, name, groupName, suffix, ...optionProps } = props;
+    const { description, name, groupName, suffix, attributeType: _, ...optionProps } = props;
 
     return (
         <Combobox.Option
@@ -61,16 +65,38 @@ type Operators = { [key in InputSymbol]?: InputOptionType };
 InputOption.Operators = [
     { name: InputSymbol.Include, description: 'include tag' },
     { name: InputSymbol.Exclude, description: 'exclude tag' },
-    { name: InputSymbol.LeftBracket, description: 'bracket' },
-    { name: InputSymbol.RightBracket, description: 'bracket' },
+    { name: InputSymbol.LeftGroupBracket, description: 'bracket' },
+    { name: InputSymbol.RightGroupBracket, description: 'bracket' },
+    { name: InputSymbol.LeftAttrBracket, description: 'bracket' },
+    { name: InputSymbol.RightAttrBracket, description: 'bracket' },
 ].reduce<Operators>((prev, current) => ({
     ...prev,
     [current.name]: {
-        groupName:   'Operator',
-        key:         current.name,
-        itemID:      current.name,
-        name:        current.name,
-        value:       current.name,
-        description: current.description,
-    },
+        groupName:     'Operator',
+        key:           current.name,
+        itemID:        current.name,
+        name:          current.name,
+        value:         current.name,
+        description:   current.description,
+        attributeType: 'none',
+    } as InputOptionType,
 }), {});
+
+/**
+ * Functional tag */
+InputOption.FunctionalTags = [
+    {
+        name: 'url', description: 'Resource url path', attributeType: 'none',
+    },
+    {
+        name: 'tagnum', description: 'Resource tag num', attributeType: 'number',
+    },
+].map<InputOptionType>((item) => ({
+    groupName:     '@maku',
+    key:           item.name,
+    itemID:        item.name,
+    name:          item.name,
+    value:         `@maku:${item.name}`,
+    description:   item.description,
+    attributeType: item.attributeType as AttributeType,
+}));

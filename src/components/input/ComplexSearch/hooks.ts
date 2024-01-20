@@ -1,20 +1,25 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
+import * as lodash from 'lodash';
 import { TagResDto } from '@api/tag';
 
 import { QueryingNodeProps } from './QueryingNode';
-import { InputStatus, InputSymbol } from './enums';
+import { SearchStatus, InputSymbol } from './enums';
 import { ComboboxOptionWithDataProps, InputOption, InputOptionType } from './InputOption';
 
 // Initial =| PrefixOperator
 
 // PrefixOperator =| TagName
-//                 | Left Bracket
+//                 | LeftGroupBracket
 
 // TagName =| Initial
 //          | TagName
-//          | Right Bracket
+//          | RightGroupBracket
+//          | LeftAttrBracket
 
-// LeftBracket =| TagName
+// LeftAttrBracket =| Attribute
+
+// LeftGroupBracket =| TagName
+//                   | Functional Tag
 
 // +AI => 只顯示包含 AI 標籤的資源
 // -AI => 不顯示包含 AI 標籤的資源
@@ -24,57 +29,112 @@ import { ComboboxOptionWithDataProps, InputOption, InputOptionType } from './Inp
 // -(AI & Python) +Javascript => 顯示一定要有 Javascript 但是不能同時包含 AI 與 Python 標籤的資源
 // +(AI & Python) +Javascript === +AI +Python +Javascript;
 
+type InputStatus = {
+    status: SearchStatus;
+
+    inGroup: boolean;
+
+    inAttribute: boolean;
+}
+
 export type InputStatusMechine = {
     /** Status name */
-    name: InputStatus;
+    name: SearchStatus;
 
     /**
-     * Available options in this status */
-    options: InputSymbol[];
+     * Available options in this status
+     * @param prevStatus previous status
+     * @returns selectable array */
+    options: (prevStatus: InputStatus) => InputSymbol[];
 
     /**
      * When user select the option's action \
      * Can contain side-effect operate but not recommanded
      * @param val input value
+     * @param prevStatus previous status
      * @returns Next Status */
-    action: (val: string) => InputStatus;
+    action: (val: string, prevStatus: InputStatus) => InputStatus;
 }
 
 /**
- * Define Input Status Mechine \
- * But I wrapped with `useMemo`, maybe in the future will contain side-effect function in action. \
- * Therefore wrapped with `useMemo` instead of pure object */
-export const useInputStatusMechine = () => {
-    const statusMechine: Map<InputStatus, InputStatusMechine> = useMemo(() => {
-        const map = new Map<InputStatus, InputStatusMechine>();
-        const status: InputStatusMechine[] = [
-            {
-                name:    InputStatus.Initial,
-                options: [InputSymbol.Include, InputSymbol.Exclude],
-                action:  (_val) => InputStatus.PrefixOperator,
+ * Define Input Status Mechine */
+const STATUS_MAP: Map<SearchStatus, InputStatusMechine> = (() => {
+    const map = new Map<SearchStatus, InputStatusMechine>();
+    const status: InputStatusMechine[] = [
+        {
+            name:    SearchStatus.Initial,
+            options: () => [InputSymbol.Include, InputSymbol.Exclude],
+            action:  (_, prevStatus) => ({ ...prevStatus, status: SearchStatus.PrefixOperator }),
+        },
+        {
+            name:    SearchStatus.PrefixOperator,
+            options: () => [InputSymbol.Default, InputSymbol.LeftGroupBracket],
+            action:  (val, prevStatus) => ({
+                ...prevStatus,
+                status:  ((val === InputSymbol.LeftGroupBracket) ? SearchStatus.Group : SearchStatus.TagName),
+                inGroup: (val === InputSymbol.LeftGroupBracket),
+            }),
+        },
+        {
+            name:    SearchStatus.TagName,
+            options: (prevStatus) => {
+                const option = [];
+                if (prevStatus.inGroup) {
+                    option.push(InputSymbol.Default);
+                    option.push(InputSymbol.RightGroupBracket);
+                }
+                else {
+                    option.push(InputSymbol.Include);
+                    option.push(InputSymbol.Exclude);
+                }
+                if (prevStatus.inAttribute === false) {
+                    option.push(InputSymbol.LeftAttrBracket);
+                }
+                return option;
             },
-            {
-                name:    InputStatus.PrefixOperator,
-                options: [InputSymbol.Default, InputSymbol.LeftBracket],
-                action:  (val) => ((val === InputSymbol.LeftBracket) ? InputStatus.LeftBracket : InputStatus.Initial),
+            action: (val, prevStatus) => {
+                if (InputSymbol.isPrefix(val)) {
+                    return {
+                        ...prevStatus, status: SearchStatus.PrefixOperator, inGroup: false,
+                    };
+                }
+                if (val === InputSymbol.RightGroupBracket) {
+                    return {
+                        ...prevStatus, status: SearchStatus.Initial, inGroup: false,
+                    };
+                }
+                if (val === InputSymbol.LeftAttrBracket) {
+                    return {
+                        ...prevStatus, status: SearchStatus.Attribute, inAttribute: true,
+                    };
+                }
+                if (prevStatus.inGroup) {
+                    return { ...prevStatus, status: SearchStatus.TagName };
+                }
+                return { ...prevStatus, status: SearchStatus.Initial };
             },
-            {
-                name:    InputStatus.TagName,
-                options: [InputSymbol.Default, InputSymbol.RightBracket],
-                action:  (val) => ((val === InputSymbol.RightBracket) ? InputStatus.Initial : InputStatus.TagName),
-            },
-            {
-                name:    InputStatus.LeftBracket,
-                options: [InputSymbol.Default],
-                action:  (val) => ((val === InputSymbol.RightBracket) ? InputStatus.Initial : InputStatus.TagName),
-            },
-        ];
-        status.forEach((val) => map.set(val.name, val));
-        return map;
-    }, []);
-
-    return statusMechine;
-};
+        },
+        {
+            name:    SearchStatus.Group,
+            options: () => [InputSymbol.Default],
+            action:  (val, prevStatus) => ({
+                ...prevStatus,
+                status: SearchStatus.TagName,
+            }),
+        },
+        {
+            name:    SearchStatus.Attribute,
+            options: () => [],
+            action:  (val, prevStatus) => ({
+                ...prevStatus,
+                inAttribute: false,
+                status:      (prevStatus.inGroup) ? SearchStatus.TagName : SearchStatus.Initial,
+            }),
+        },
+    ];
+    status.forEach((val) => map.set(val.name, val));
+    return map;
+})();
 
 export type InputStatusHistory = {
     /** Current status */
@@ -96,7 +156,9 @@ export const useStateHistory = () => {
     const popHistory = useCallback(() => {
         if (statusStackRef.current.length <= 0) {
             return {
-                status:  InputStatus.Initial,
+                status: {
+                    status: SearchStatus.Initial, inGroup: false, inAttribute: false,
+                },
                 display: [],
                 text:    '',
             };
@@ -124,8 +186,11 @@ export const useStateHistory = () => {
  * @param tags tag data
  * @param searchText search text */
 export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
-    const inputStateMechine = useInputStatusMechine();
-    const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>(InputStatus.Initial);
+    const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>({
+        status:      SearchStatus.Initial,
+        inGroup:     false,
+        inAttribute: false,
+    });
     const { popHistory, pushHistory, clearHistory } = useStateHistory();
 
     // for the displaying search querying
@@ -134,78 +199,77 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     // Memerized the tags options props
     const tagOptionProps: InputOptionType[] = useMemo(() => (
         tags.map<InputOptionType>((item) => ({
-            key:         item.id,
-            name:        item.name,
-            groupName:   item.subject_name,
-            description: item.description,
-            value:       `${item.subject_name}:${item.name}`,
-            suffix:      `(${item.tagged_count})`,
+            key:           item.id,
+            name:          item.name,
+            groupName:     item.subject_name,
+            description:   item.description,
+            value:         `${item.subject_name}:${item.name}`,
+            suffix:        `(${item.tagged_count})`,
+            attributeType: 'none',
         }))
     ), [tags]);
 
     // concat the rawText & querying node from input value
-    const newInput = useCallback((value: string, comboxProps: ComboboxOptionWithDataProps) => {
+    const newInput = useCallback((value: string, comboxProps: ComboboxOptionWithDataProps | null) => {
         setQueryingNode((prev) => {
-            let newNode: QueryingNodeProps | null = null;
-            switch (value) {
-            case InputSymbol.Include:
-            case InputSymbol.Exclude:
-            case InputSymbol.LeftBracket:
-            case InputSymbol.RightBracket:
-                newNode = {
-                    type:   'string',
-                    prefix: '',
-                    label:  value,
-                };
-                break;
-            default:
-                newNode = {
-                    type:      'tag',
-                    prefix:    '',
-                    label:     comboxProps['data-name']!,
-                    groupName: comboxProps['data-groupname']!,
-                };
+            let newNode: QueryingNodeProps = {
+                type:   'tag',
+                prefix: '',
+                suffix: '',
+                label:  '',
+            };
+            if (!comboxProps) {
+                newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, { type: 'attribute', label: value });
             }
+            else if (InputSymbol.isValid(value)) {
+                newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, { type: 'operator', label: value });
+            }
+            else {
+                newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, {
+                    type: 'tag', label: comboxProps['data-name']!, groupName: comboxProps['data-groupname']!,
+                });
+            }
+
             const lastElement = prev[prev.length - 1];
-            if (lastElement && lastElement.type === 'string' && newNode.type !== 'string') {
-                // Combine prefix operator with current node
-                if (lastElement.label === InputSymbol.Include || lastElement.label === InputSymbol.Exclude) {
-                    return [...prev.slice(0, prev.length - 1), { ...newNode, prefix: lastElement.label }];
-                }
+            if (!lastElement) {
+                return [newNode];
+            }
+            // Combine prefix operator with current node
+            if (InputSymbol.isPrefix(lastElement.label)) {
+                return [...prev.slice(0, prev.length - 1), { ...newNode, prefix: lastElement.label }];
+            }
+            // Combine suffix with attribute bracket
+            if (lastElement.type === 'tag' && newNode.label === '{') {
+                return [...prev.slice(0, prev.length - 1), { ...lastElement, suffix: newNode.label }];
+            }
+            // Combine suffix with attribute value
+            if (lastElement.type === 'tag' && newNode.type === 'attribute') {
+                return [...prev.slice(0, prev.length - 1), { ...lastElement, suffix: `${lastElement.suffix}${newNode.label}}` }];
             }
             return [...prev, newNode];
         });
     }, []);
 
-    // TODO: need refactoring
-    const rawText = useMemo(() => {
-        let str = '';
-        queryingNode.forEach((item, index) => {
+    /**
+     * This text is for pass to backend and search used  */
+    const rawText = useMemo(() => (
+        queryingNode.map((item) => {
             if (item.type === 'tag') {
-                str += ` ${item.prefix}"${item.groupName}:${item.label}"`;
+                return `${item.prefix}"${item.groupName}:${item.label}"${item.suffix}`;
             }
-            else {
-                const prevNode = queryingNode[index - 1]?.label;
-                if ((prevNode === InputSymbol.Exclude || prevNode === InputSymbol.Include) && item.label === InputSymbol.LeftBracket) {
-                    str += item.label;
-                }
-                else {
-                    str += ` ${item.label}`;
-                }
-            }
-        });
-        return str;
-    }, [queryingNode]);
+            return `${item.prefix}${item.label}${item.suffix}`;
+        }).join(' ')
+    ), [queryingNode]);
 
     // Memerized the selectable options
     const selectableOptions = useMemo(() => {
-        const mechine = inputStateMechine.get(currentInputStatus)!;
-        return mechine.options
+        const mechine = STATUS_MAP.get(currentInputStatus.status)!;
+        return mechine.options(currentInputStatus)
             .reduce<InputOptionType[]>((prev, val) => (
-                (val === InputSymbol.Default) ? [...prev, ...tagOptionProps] : [...prev, InputOption.Operators[val]!]
+                (val === InputSymbol.Default) ? [...prev, ...tagOptionProps, ...InputOption.FunctionalTags] : [...prev, InputOption.Operators[val]!]
             ), [])
             .filter((item) => item.value.toLowerCase().includes(searchText.toLowerCase().trim()));
-    }, [inputStateMechine, currentInputStatus, tagOptionProps, searchText]);
+    }, [currentInputStatus, tagOptionProps, searchText]);
 
     /**
      * return previous status of search input */
@@ -218,20 +282,27 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
 
     /**
      * process the next status of input search */
-    const forwardInputSearch = useCallback((val: string, comboxOptionProps: ComboboxOptionWithDataProps) => {
+    const forwardInputSearch = useCallback((val: string, comboxOptionProps: ComboboxOptionWithDataProps | null) => {
+        if (!comboxOptionProps && currentInputStatus.status !== SearchStatus.Attribute) {
+            return;
+        }
         pushHistory({
             status:  currentInputStatus,
             text:    rawText,
             display: queryingNode,
         });
         // get next status by action
-        const nextStatus = inputStateMechine.get(currentInputStatus)!.action(val);
+        const nextStatus = STATUS_MAP.get(currentInputStatus.status)!.action(val, currentInputStatus);
         newInput(val, comboxOptionProps);
         setCurrentInputStatus(nextStatus);
-    }, [inputStateMechine, currentInputStatus, queryingNode, rawText, newInput, pushHistory]);
+    }, [currentInputStatus, queryingNode, rawText, newInput, pushHistory]);
 
+    /**
+     * Clear the search */
     const clearSearch = useCallback(() => {
-        setCurrentInputStatus(InputStatus.Initial);
+        setCurrentInputStatus({
+            status: SearchStatus.Initial, inGroup: false, inAttribute: false,
+        });
         setQueryingNode([]);
         clearHistory();
     }, [clearHistory]);

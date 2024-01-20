@@ -53,6 +53,10 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                                 if (e.key === 'Backspace' && searchText === '') {
                                     backspaceInputSearch();
                                 }
+                                if (e.key === 'Enter') {
+                                    forwardInputSearch(e.currentTarget.value, null);
+                                    setSearchText('');
+                                }
                             }}
                             onClick={() => {
                                 combobox.toggleDropdown();

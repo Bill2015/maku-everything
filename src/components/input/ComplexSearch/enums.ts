@@ -6,17 +6,34 @@ export enum InputSymbol {
     Default = 'default',
     Include = '+',
     Exclude = '-',
-    LeftBracket = '[',
-    RightBracket = ']',
+    LeftGroupBracket = '[',
+    RightGroupBracket = ']',
+    LeftAttrBracket = '{',
+    RightAttrBracket = '}',
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace, no-redeclare
+export namespace InputSymbol {
+    export function isValid(val: string) {
+        if (val === 'default') {
+            return false;
+        }
+        return Object.values(InputSymbol).indexOf(val as InputSymbol) > 0;
+    }
+
+    export function isPrefix(val: string) {
+        return (val === InputSymbol.Exclude || val === InputSymbol.Include);
+    }
 }
 
 /**
- * Input Status \
+ * Search Status \
  * define the status mechine here
  * @see useInputStatusMechine */
-export enum InputStatus {
+export enum SearchStatus {
     Initial,
     PrefixOperator, // -, +
     TagName, // tag, left bracket
-    LeftBracket,
+    Attribute,
+    Group,
 }
