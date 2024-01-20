@@ -15,15 +15,19 @@ impl QueryToken {
     }
 }
 
+// ---------------------------------------------------------
 /// For Token Definition
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenSymbol {
     TagName,
+    Attribute,
     Include,
     Exclude,
     EOF,
-    LeftBracket,
-    RightBracket,
+    LeftGroupBracket,
+    RightGroupBracket,
+    LeftAttrBracket,
+    RightAttrBracket,
 }
 
 impl FromStr for TokenSymbol {
@@ -32,14 +36,33 @@ impl FromStr for TokenSymbol {
         match s.to_ascii_lowercase().as_str() {
             "+" => Ok(Self::Include),
             "-" => Ok(Self::Exclude),
-            "[" => Ok(Self::LeftBracket),
-            "]" => Ok(Self::RightBracket),
+            "[" => Ok(Self::LeftGroupBracket),
+            "]" => Ok(Self::RightGroupBracket),
+            "{" => Ok(Self::LeftAttrBracket),
+            "}" => Ok(Self::RightAttrBracket),
             "$" => Ok(Self::EOF),
             _ => Err(String::from("Not Match Operator Symbol")) 
         }
     }
 }
 
+impl PartialEq<char> for TokenSymbol {
+    fn eq(&self, other: &char) -> bool {
+        match self {
+            Self::TagName => false,
+            Self::Attribute => false,
+            Self::Include => '+' == *other,
+            Self::Exclude => '\"' == *other,
+            Self::LeftGroupBracket => '[' == *other,
+            Self::RightGroupBracket => ']' == *other,
+            Self::LeftAttrBracket => '{' == *other,
+            Self::RightAttrBracket => '{' == *other,
+            Self::EOF => '$' == *other,
+        }
+    }
+}
+
+// ---------------------------------------------------------
 pub enum QueryingStringSymbol {
     TagNameWrapper,
     SubjectDelimiter,

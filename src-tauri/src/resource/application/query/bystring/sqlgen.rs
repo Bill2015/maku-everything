@@ -26,10 +26,10 @@ impl<'a> SQLQueryObjectGenerator<'a> {
             if (token.symbol == TokenSymbol::Include) || (token.symbol == TokenSymbol::Exclude) {
                 stack.push(&token);
             }
-            else if token.symbol == TokenSymbol::LeftBracket {
+            else if token.symbol == TokenSymbol::LeftGroupBracket {
                 stack.push(&token);
             }
-            else if token.symbol == TokenSymbol::RightBracket {
+            else if token.symbol == TokenSymbol::RightGroupBracket {
                 let mut group_item: Vec<String> = Vec::new();
 
                 while let Some(top_token) = stack.last() {
@@ -42,7 +42,7 @@ impl<'a> SQLQueryObjectGenerator<'a> {
                             builder = builder.add_group(StringQLGroupPrefix::Include, group_item);
                             break;
                         },
-                        TokenSymbol::LeftBracket => {},
+                        TokenSymbol::LeftGroupBracket => {},
                         _ => {
                             let tag_id = self.tag_id_map.get(&top_token.value).unwrap();
                             group_item.push(tag_id.to_string());

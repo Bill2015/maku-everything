@@ -61,7 +61,7 @@ impl<'a> Syntax<'a> {
                 self.comuse_token();
                 tag_count += 1;
             }
-            else if self.match_token(TokenSymbol::RightBracket) {
+            else if self.match_token(TokenSymbol::RightGroupBracket) {
                 break;
             }
             else {
@@ -81,7 +81,7 @@ impl<'a> Syntax<'a> {
             self.comuse_token();
             Ok(())
         }
-        else if self.match_token(TokenSymbol::LeftBracket) {
+        else if self.match_token(TokenSymbol::LeftGroupBracket) {
             self.comuse_token();
             self.express_tags()?;
             self.comuse_token();

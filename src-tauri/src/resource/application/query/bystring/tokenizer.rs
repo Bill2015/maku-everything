@@ -38,8 +38,8 @@ impl<'a> Tokenizer<'a> {
                 .map(|(i, _)| i)
                 .nth(index)
                 .unwrap();
-            let subject_name = value[0..unicode_index].to_string();
-            let value = value[unicode_index + 1..value.len()].to_string();
+            let subject_name = value[0..unicode_index].trim().to_string();
+            let value = value[unicode_index + 1..value.len()].trim().to_string();
 
             return (Some(subject_name), value);
         }
@@ -72,7 +72,7 @@ impl<'a> Tokenizer<'a> {
         self.tokens.push(token);
     }
 
-    fn scan_tag_name(&mut self) -> String {
+    fn scan_tag_name(&mut self) {
         let mut chars: Vec<char> = vec![self.peek_prev().unwrap_or('\0')];
         let quoted = self.peek_prev().unwrap() == '"';
     
@@ -83,7 +83,6 @@ impl<'a> Tokenizer<'a> {
                 break;
             }
             else if ch == '"' {
-                chars.push(ch);
                 self.next_ch();
                 break;
             }
@@ -93,9 +92,28 @@ impl<'a> Tokenizer<'a> {
             }
         }
 
-        chars.iter()
+        let tag_val = chars.iter()
             .filter(|c| **c != '"')
-            .collect::<String>()
+            .collect::<String>();
+        let (subject_name, tag_name) = self.separate_namespace(tag_val);
+        self.add_token(QueryToken::new(TokenSymbol::TagName, subject_name, tag_name));
+    }
+
+    fn scan_attribute(&mut self) {
+        let mut chars: Vec<char> = Vec::new();
+
+        while !self.is_end() {
+            let ch = self.peek();
+            if TokenSymbol::from_str(&ch.to_string()).is_ok() {
+                let attribute_val = chars.iter().collect::<String>();
+                self.add_token(QueryToken::new(TokenSymbol::Attribute, None, attribute_val));
+                break;
+            }
+            else {
+                chars.push(ch);
+                self.next_ch();
+            }
+        }
     }
 
     fn scan(&mut self) {
@@ -104,15 +122,18 @@ impl<'a> Tokenizer<'a> {
 
             // general symbol
             if let Ok(symbol) = TokenSymbol::from_str(&ch.to_string()) {
+                let symbol_cloned = symbol.clone();
                 self.add_token(QueryToken::new(symbol, None, ch.to_string()));
+
+                if symbol_cloned == TokenSymbol::LeftAttrBracket {
+                    self.scan_attribute();
+                }
             }
             else if ch.is_whitespace() {
                 // do nothing
             }
             else {
                 let tag_name = self.scan_tag_name();
-                let (subject_name, tag_name) = self.separate_namespace(tag_name);
-                self.add_token(QueryToken::new(TokenSymbol::TagName, subject_name, tag_name))
             }
         }
     }
