@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use super::types::QueryToken;
 use super::types::QueryingStringSymbol;
 use super::types::TokenSymbol;
+use super::token::QueryToken;
 
 pub struct Tokenizer<'a> {
     query_string: &'a str,
@@ -96,7 +96,7 @@ impl<'a> Tokenizer<'a> {
             .filter(|c| **c != '"')
             .collect::<String>();
         let (subject_name, tag_name) = self.separate_namespace(tag_val);
-        self.add_token(QueryToken::new(TokenSymbol::TagName, subject_name, tag_name));
+        self.add_token(QueryToken::new_tag(TokenSymbol::TagName, subject_name, tag_name));
     }
 
     fn scan_attribute(&mut self) {
@@ -106,7 +106,7 @@ impl<'a> Tokenizer<'a> {
             let ch = self.peek();
             if TokenSymbol::from_str(&ch.to_string()).is_ok() {
                 let attribute_val = chars.iter().collect::<String>();
-                self.add_token(QueryToken::new(TokenSymbol::Attribute, None, attribute_val));
+                self.add_token(QueryToken::new_attribute(TokenSymbol::Attribute, attribute_val));
                 break;
             }
             else {
@@ -123,7 +123,7 @@ impl<'a> Tokenizer<'a> {
             // general symbol
             if let Ok(symbol) = TokenSymbol::from_str(&ch.to_string()) {
                 let symbol_cloned = symbol.clone();
-                self.add_token(QueryToken::new(symbol, None, ch.to_string()));
+                self.add_token(QueryToken::new_symbol(symbol, ch.to_string()));
 
                 if symbol_cloned == TokenSymbol::LeftAttrBracket {
                     self.scan_attribute();

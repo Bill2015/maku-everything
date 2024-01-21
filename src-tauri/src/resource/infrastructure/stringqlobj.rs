@@ -1,23 +1,41 @@
-
-#[derive(Clone)]
+// ---------------------------------------------------------
+#[derive(Debug, Clone)]
 pub enum StringQLGroupPrefix {
     Include,
     Exclude,
 }
 
-#[derive(Clone)]
-pub struct StringQLGroup {
-    pub prefix: StringQLGroupPrefix,
-    pub items: Vec<String>,
+// ---------------------------------------------------------
+#[derive(Debug, Clone)]
+pub struct StringQLTagItem {
+    tag_id: String,
+
+    attribute: Option<String>,
+}
+impl StringQLTagItem {
+    pub fn new(tag_id: String, attribute: Option<String>) -> Self {
+        Self { tag_id, attribute }
+    }
+
+    pub fn set_attribute(&mut self, attribute: String) {
+        self.attribute = Some(attribute);
+    }
 }
 
+#[derive(Debug, Clone)]
+pub struct StringQLGroup {
+    pub prefix: StringQLGroupPrefix,
+    pub items: Vec<StringQLTagItem>,
+}
+
+// ---------------------------------------------------------
 /// Immutable String QL Object \
 /// Using `StringQLObjectBuilder` to build object
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct StringQLObject {
-    excludes: Vec<String>,
+    excludes: Vec<StringQLTagItem>,
 
-    includes: Vec<String>,
+    includes: Vec<StringQLTagItem>,
 
     groups: Vec<StringQLGroup>,
 }
@@ -27,11 +45,11 @@ impl StringQLObject {
         Self { excludes: Vec::new(), includes: Vec::new(), groups: Vec::new() }
     }
 
-    pub fn get_excludes(&self) -> &Vec<String> {
+    pub fn get_excludes(&self) -> &Vec<StringQLTagItem> {
         &self.excludes
     }
 
-    pub fn get_includes(&self) -> &Vec<String>{
+    pub fn get_includes(&self) -> &Vec<StringQLTagItem>{
         &self.includes
     }
 
@@ -41,6 +59,7 @@ impl StringQLObject {
     
 }
 
+// ---------------------------------------------------------
 pub struct StringQLObjectBuilder {
     obj: StringQLObject,
 }
@@ -50,19 +69,16 @@ impl StringQLObjectBuilder {
         Self { obj: StringQLObject::new() }
     }
 
-    pub fn add_exclude(mut self, item: String) -> Self {
+    pub fn add_exclude(&mut self, item: StringQLTagItem) {
         self.obj.excludes.push(item);
-        self
     }
 
-    pub fn add_include(mut self, item: String) -> Self {
+    pub fn add_include(&mut self, item: StringQLTagItem) {
         self.obj.includes.push(item);
-        self
     }
 
-    pub fn add_group(mut self, prefix: StringQLGroupPrefix, items: Vec<String>) -> Self {
+    pub fn add_group(&mut self, prefix: StringQLGroupPrefix, items: Vec<StringQLTagItem>) {
         self.obj.groups.push(StringQLGroup { prefix, items });
-        self
     }
 
     pub fn build(&self) -> StringQLObject {

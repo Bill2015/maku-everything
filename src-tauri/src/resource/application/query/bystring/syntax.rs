@@ -1,6 +1,7 @@
 use crate::resource::domain::{ResourceError, ResourceGenericError};
 
-use super::types::{QueryToken, TokenSymbol};
+use super::types::TokenSymbol;
+use super::token::QueryToken;
 
 macro_rules! syntax_err {
     ($msg: literal) => {
@@ -34,15 +35,23 @@ impl<'a> Syntax<'a> {
         self.tokens.get(self.current)
     }
 
-    fn tag_valid(&self, token: &QueryToken) -> Result<bool, ResourceError> {
-        if token.value.is_empty() {
+    fn check_tagname(&self, value: &String) -> Result<bool, ResourceError> {
+        if value.is_empty() {
             return syntax_err!("The 'Tag Name' is empty");
         }
         return Ok(true);
     }
 
-    fn match_token(&self, symbol: TokenSymbol) -> bool {
-        matches!(self.peek(), Some(token) if token.symbol == symbol)
+    fn match_token(&self, target: TokenSymbol) -> bool {
+        if self.peek().is_none() {
+            return false
+        }
+        match self.peek().unwrap() {
+            QueryToken::SymbolToken{ symbol, value: _ } => *symbol == target,
+            QueryToken::AttributeToken{ symbol, value: _ } => *symbol == target,
+            QueryToken::TagToken{ symbol, namespace: _, value: _ } => *symbol == target,
+            _ => false,
+        }
     }
 
     fn comuse_token(&mut self) {
@@ -53,12 +62,35 @@ impl<'a> Syntax<'a> {
         self.match_token(TokenSymbol::EOF)
     }
 
+    fn express_attribute(&mut self) -> Result<(), ResourceError> {
+        if self.match_token(TokenSymbol::LeftAttrBracket) == false {
+            return Ok(())
+        }
+        
+        self.comuse_token();
+        if let Some(QueryToken::AttributeToken{ symbol: _, value: _ }) = self.peek() {
+            self.comuse_token();
+            if self.match_token(TokenSymbol::RightAttrBracket) {
+                self.comuse_token();
+                return Ok(());
+            }
+            else {
+                return syntax_err!("Attribute missing '}'");
+            }
+        }
+        else {
+            return syntax_err!("Attribute can't be empty");
+        }
+        
+    }
+
     fn express_tags(&mut self) -> Result<(), ResourceError> {
         let mut tag_count = 0;
         loop {
-            if self.match_token(TokenSymbol::TagName) {
-                self.tag_valid(self.peek().unwrap())?;
+            if let Some(QueryToken::TagToken{ symbol: _, namespace: _, value }) = self.peek() {
+                self.check_tagname(value)?;
                 self.comuse_token();
+                self.express_attribute()?;
                 tag_count += 1;
             }
             else if self.match_token(TokenSymbol::RightGroupBracket) {
@@ -76,9 +108,10 @@ impl<'a> Syntax<'a> {
     }
 
     fn express_body(&mut self) -> Result<(), ResourceError> {
-        if self.match_token(TokenSymbol::TagName) {
-            self.tag_valid(self.peek().unwrap())?;
+        if let Some(QueryToken::TagToken{ symbol: _, namespace: _, value }) = self.peek() {
+            self.check_tagname(value)?;
             self.comuse_token();
+            self.express_attribute()?;
             Ok(())
         }
         else if self.match_token(TokenSymbol::LeftGroupBracket) {

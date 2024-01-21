@@ -11,14 +11,15 @@ use crate::tag::infrastructure::TagQueryBuilder;
 use crate::tag::repository::TagQueryRepository;
 
 mod types;
-use types::TokenSymbol;
-use types::QueryToken;
 mod syntax;
 use syntax::Syntax;
 mod tokenizer;
 use tokenizer::Tokenizer;
 mod sqlgen;
 use sqlgen::SQLQueryObjectGenerator;
+mod token;
+use token::QueryToken;
+
 
 pub struct StringResourceQuery {
     pub query_string: String,
@@ -58,40 +59,44 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         let mut tokenizer = Tokenizer::new(&q);
         let tokens = tokenizer.parse();
 
+        dbg!(&tokens);
+
         // syntax check
         let _ = Syntax::new(&tokens).check()?;
 
         // generate tag id map
         let mut tag_id_map: HashMap<String, String> = HashMap::new();
-        for QueryToken { value, namespace, symbol } in &tokens {
-            if *symbol != TokenSymbol::TagName {
-                continue;
+
+        for token in &tokens {
+            if let QueryToken::TagToken{ symbol: _, namespace, value } = token {
+                let mut builder = TagQueryBuilder::new()
+                    .set_name(value.to_string());
+
+                if let Some(namepace) = namespace {
+                    builder = builder.set_belong_subject_name(namepace.to_string());
+                }
+
+                let result = &self.tag_repo.query(builder)
+                    .await
+                    .or(Err(ResourceError::QueryingByString(ResourceGenericError::DBInternalError())))?;
+
+                // find multiple same name tags
+                let _ = match result.len() {
+                    0 => Err(ResourceError::QueryingByString(ResourceGenericError::TagNotExists())),
+                    1 => {
+                        let result = result.first().unwrap();
+                        tag_id_map.insert(value.to_string(), result.id.to_string());
+                        Ok(())
+                    },
+                    _ => Err(ResourceError::QueryingByString(ResourceGenericError::FindAmbiguousTags()))
+                }?;
             }
-            let mut builder = TagQueryBuilder::new()
-                .set_name(value.to_string());
-
-            if let Some(namepace) = namespace {
-                builder = builder.set_belong_subject_name(namepace.to_string());
-            }
-
-            let result = &self.tag_repo.query(builder)
-                .await
-                .or(Err(ResourceError::QueryingByString(ResourceGenericError::DBInternalError())))?;
-
-            // find multiple same name tags
-            let _ = match result.len() {
-                0 => Err(ResourceError::QueryingByString(ResourceGenericError::TagNotExists())),
-                1 => {
-                    let result = result.first().unwrap();
-                    tag_id_map.insert(value.to_string(), result.id.to_string());
-                    Ok(())
-                },
-                _ => Err(ResourceError::QueryingByString(ResourceGenericError::FindAmbiguousTags()))
-            }?;
         }
 
         // generate QL string
         let sql_data = SQLQueryObjectGenerator::new(&tokens, tag_id_map).gen()?;
+
+        dbg!(&sql_data);
         let ql = ResourceStringQL::from(sql_data);
 
         let result = self.resource_repo.string_ql(ql)

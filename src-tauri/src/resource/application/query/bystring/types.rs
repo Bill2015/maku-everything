@@ -1,20 +1,5 @@
 use std::str::FromStr;
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct QueryToken {
-    pub symbol: TokenSymbol,
-    /// to defined the namespace of value
-    pub namespace: Option<String>,
-
-    pub value: String,
-}
-
-impl QueryToken {
-    pub fn new(symbol: TokenSymbol, namespace: Option<String>, value: String) -> Self {
-        Self { symbol, value, namespace }
-    }
-}
-
 // ---------------------------------------------------------
 /// For Token Definition
 #[derive(Debug, Clone, PartialEq)]
