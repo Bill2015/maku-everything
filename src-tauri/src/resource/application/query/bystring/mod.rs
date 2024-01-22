@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
@@ -7,7 +5,6 @@ use crate::resource::application::dto::ResourceResDto;
 use crate::resource::domain::{ResourceError, ResourceGenericError};
 use crate::resource::infrastructure::ResourceStringQL;
 use crate::resource::repository::ResourceQueryRepository;
-use crate::tag::infrastructure::TagQueryBuilder;
 use crate::tag::repository::TagQueryRepository;
 
 mod types;
@@ -18,7 +15,8 @@ use tokenizer::Tokenizer;
 mod sqlgen;
 use sqlgen::SQLQueryObjectGenerator;
 mod token;
-use token::QueryToken;
+mod semetic;
+use semetic::Semantic;
 
 
 pub struct StringResourceQuery {
@@ -64,40 +62,19 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         // syntax check
         let _ = Syntax::new(&tokens).check()?;
 
-        // generate tag id map
-        let mut tag_id_map: HashMap<String, String> = HashMap::new();
+        // semantic check
+        let mut semantic = Semantic::new(&tokens, self.tag_repo);
+        let new_token = semantic.parse().await?;
 
-        for token in &tokens {
-            if let QueryToken::TagToken{ symbol: _, namespace, value } = token {
-                let mut builder = TagQueryBuilder::new()
-                    .set_name(value.to_string());
-
-                if let Some(namepace) = namespace {
-                    builder = builder.set_belong_subject_name(namepace.to_string());
-                }
-
-                let result = &self.tag_repo.query(builder)
-                    .await
-                    .or(Err(ResourceError::QueryingByString(ResourceGenericError::DBInternalError())))?;
-
-                // find multiple same name tags
-                let _ = match result.len() {
-                    0 => Err(ResourceError::QueryingByString(ResourceGenericError::TagNotExists())),
-                    1 => {
-                        let result = result.first().unwrap();
-                        tag_id_map.insert(value.to_string(), result.id.to_string());
-                        Ok(())
-                    },
-                    _ => Err(ResourceError::QueryingByString(ResourceGenericError::FindAmbiguousTags()))
-                }?;
-            }
-        }
+        dbg!(&new_token);
 
         // generate QL string
-        let sql_data = SQLQueryObjectGenerator::new(&tokens, tag_id_map).gen()?;
+        let sql_data = SQLQueryObjectGenerator::new(&new_token).gen()?;
 
         dbg!(&sql_data);
         let ql = ResourceStringQL::from(sql_data);
+
+        dbg!(&ql);
 
         let result = self.resource_repo.string_ql(ql)
             .await;

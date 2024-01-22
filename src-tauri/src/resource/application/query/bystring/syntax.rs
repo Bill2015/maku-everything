@@ -47,10 +47,10 @@ impl<'a> Syntax<'a> {
             return false
         }
         match self.peek().unwrap() {
-            QueryToken::SymbolToken{ symbol, value: _ } => *symbol == target,
-            QueryToken::AttributeToken{ symbol, value: _ } => *symbol == target,
-            QueryToken::TagToken{ symbol, namespace: _, value: _ } => *symbol == target,
-            _ => false,
+            QueryToken::SymbolToken{ symbol, .. } => *symbol == target,
+            QueryToken::AttributeToken{ symbol, .. } => *symbol == target,
+            QueryToken::TagToken{ symbol, .. } => *symbol == target,
+            QueryToken::SystemTagToken { symbol, .. } => *symbol == target,
         }
     }
 
@@ -68,7 +68,7 @@ impl<'a> Syntax<'a> {
         }
         
         self.comuse_token();
-        if let Some(QueryToken::AttributeToken{ symbol: _, value: _ }) = self.peek() {
+        if let Some(QueryToken::AttributeToken{ .. }) = self.peek() {
             self.comuse_token();
             if self.match_token(TokenSymbol::RightAttrBracket) {
                 self.comuse_token();
@@ -87,7 +87,13 @@ impl<'a> Syntax<'a> {
     fn express_tags(&mut self) -> Result<(), ResourceError> {
         let mut tag_count = 0;
         loop {
-            if let Some(QueryToken::TagToken{ symbol: _, namespace: _, value }) = self.peek() {
+            if let Some(QueryToken::TagToken{ value, .. }) = self.peek() {
+                self.check_tagname(value)?;
+                self.comuse_token();
+                self.express_attribute()?;
+                tag_count += 1;
+            }
+            else if let Some(QueryToken::SystemTagToken{ value, .. }) = self.peek() {
                 self.check_tagname(value)?;
                 self.comuse_token();
                 self.express_attribute()?;
@@ -108,7 +114,13 @@ impl<'a> Syntax<'a> {
     }
 
     fn express_body(&mut self) -> Result<(), ResourceError> {
-        if let Some(QueryToken::TagToken{ symbol: _, namespace: _, value }) = self.peek() {
+        if let Some(QueryToken::TagToken{ value, .. }) = self.peek() {
+            self.check_tagname(value)?;
+            self.comuse_token();
+            self.express_attribute()?;
+            Ok(())
+        }
+        else if let Some(QueryToken::SystemTagToken{ value, .. }) = self.peek() {
             self.check_tagname(value)?;
             self.comuse_token();
             self.express_attribute()?;

@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use crate::resource::infrastructure::SystemTag;
+
 use super::types::QueryingStringSymbol;
 use super::types::TokenSymbol;
 use super::token::QueryToken;
@@ -95,8 +97,14 @@ impl<'a> Tokenizer<'a> {
         let tag_val = chars.iter()
             .filter(|c| **c != '"')
             .collect::<String>();
-        let (subject_name, tag_name) = self.separate_namespace(tag_val);
-        self.add_token(QueryToken::new_tag(TokenSymbol::TagName, subject_name, tag_name));
+        let is_system = SystemTag::is_defined(&tag_val);
+
+        let (namespace, name) = self.separate_namespace(tag_val);
+
+        match is_system {
+            true => self.add_token(QueryToken::new_system_tag(TokenSymbol::TagName, namespace.clone().unwrap(), name)),
+            false => self.add_token(QueryToken::new_tag(TokenSymbol::TagName, namespace, name)),
+        }
     }
 
     fn scan_attribute(&mut self) {
@@ -133,7 +141,7 @@ impl<'a> Tokenizer<'a> {
                 // do nothing
             }
             else {
-                let tag_name = self.scan_tag_name();
+                self.scan_tag_name();
             }
         }
     }

@@ -1,7 +1,5 @@
-use std::collections::HashMap;
-
 use crate::resource::domain::ResourceError;
-use crate::resource::infrastructure::{StringQLGroupPrefix, StringQLObject, StringQLObjectBuilder, StringQLTagItem};
+use crate::resource::infrastructure::{StringQLObject, StringQLObjectBuilder, StringQLPrefix, StringQLTagItem, SystemTag};
 
 use super::types::TokenSymbol;
 use super::token::QueryToken;
@@ -10,17 +8,14 @@ struct Symbol<'a>(&'a TokenSymbol);
 
 pub struct SQLQueryObjectGenerator<'a> {
     tokens: &'a Vec<QueryToken>,
-    /** For tag id mapping  */
-    tag_id_map: HashMap<String, String>,
 
     builder: StringQLObjectBuilder,
 }
 
 impl<'a> SQLQueryObjectGenerator<'a> {
-    pub fn new(tokens: &'a Vec<QueryToken>, tag_id_map: HashMap<String, String>) -> Self {
+    pub fn new(tokens: &'a Vec<QueryToken>) -> Self {
         Self { 
             tokens, 
-            tag_id_map,
             builder: StringQLObjectBuilder::new(),
         }
     }
@@ -34,26 +29,8 @@ impl<'a> SQLQueryObjectGenerator<'a> {
         for token in self.tokens {
             match token {
                 QueryToken::SymbolToken{ symbol, value: _ } => {
-                    // only one tag in stack stack, and current can't be 'LeftAttrBracket'
-                    if tag_stack.len() == 1 && *symbol != TokenSymbol::LeftAttrBracket {
-                        let item = tag_stack.last().unwrap().clone();
-
-                        match ops_stack.last().unwrap().0 {
-                            TokenSymbol::Include => {
-                                self.builder.add_include(item);
-                                tag_stack.pop();
-                                ops_stack.pop();
-                            },
-                            TokenSymbol::Exclude => {
-                                self.builder.add_exclude(item);
-                                tag_stack.pop();
-                                ops_stack.pop();
-                            },
-                            _ => {},
-                        }
-                    }
                     // if match the 'Right Group Bracket', start popup tags
-                    else if *symbol == TokenSymbol::RightGroupBracket {
+                    if *symbol == TokenSymbol::RightGroupBracket {
                         let mut tags: Vec<StringQLTagItem> = Vec::new();
 
                         while !tag_stack.is_empty() {
@@ -68,11 +45,11 @@ impl<'a> SQLQueryObjectGenerator<'a> {
                         ops_stack.pop();
                         match ops_stack.last().unwrap().0 {
                             TokenSymbol::Include => {
-                                self.builder.add_group(StringQLGroupPrefix::Include, tags);
+                                self.builder.add_group(StringQLPrefix::Include, tags);
                                 ops_stack.pop();
                             },
                             TokenSymbol::Exclude => {
-                                self.builder.add_group(StringQLGroupPrefix::Exclude, tags);
+                                self.builder.add_group(StringQLPrefix::Exclude, tags);
                                 ops_stack.pop();
                             },
                             _ => {},
@@ -86,17 +63,34 @@ impl<'a> SQLQueryObjectGenerator<'a> {
                         _ => {}
                     };
                 },
-                QueryToken::AttributeToken { symbol: _, value } => {
-                    dbg!(&tag_stack);
-                    if let Some(top_tag) = tag_stack.last_mut() {
-                        top_tag.set_attribute(value.to_string());
+                QueryToken::AttributeToken { .. } => { },
+                QueryToken::TagToken { id, .. } => {
+                    match ops_stack.last().unwrap().0 {
+                        TokenSymbol::Include => {
+                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Include, id.to_string(), None));
+                        },
+                        TokenSymbol::Exclude => {
+                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Exclude, id.to_string(), None));
+                        }
+                        _ => {
+                            tag_stack.push(StringQLTagItem::new(StringQLPrefix::Inherit, id.to_string(), None));
+                        },
                     }
                 },
-                QueryToken::TagToken { symbol: _, namespace: _, value } => {
-                    let tag_id = self.tag_id_map.get(value).unwrap();
-                    tag_stack.push(StringQLTagItem::new(tag_id.to_string(), None));
-                },
-                _ => {}
+                QueryToken::SystemTagToken { namespace, value, attrval, .. } => {
+                    let name = SystemTag::full_name(namespace, value);
+                    match ops_stack.last().unwrap().0 {
+                        TokenSymbol::Include => {
+                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Include, name, attrval.clone()));
+                        },
+                        TokenSymbol::Exclude => {
+                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Exclude, name, attrval.clone()));
+                        }
+                        _ => {
+                            tag_stack.push(StringQLTagItem::new(StringQLPrefix::Inherit, name, attrval.clone()));
+                        },
+                    }
+                }
             }
         };
 
