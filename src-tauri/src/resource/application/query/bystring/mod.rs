@@ -15,8 +15,8 @@ use tokenizer::StringQLTokenizer;
 mod sqlgen;
 use sqlgen::StringQLObjectGenerator;
 mod token;
-mod semetic;
-use semetic::StringQLSemantic;
+mod semantic;
+use semantic::StringQLSemantic;
 
 
 pub struct StringResourceQuery {
