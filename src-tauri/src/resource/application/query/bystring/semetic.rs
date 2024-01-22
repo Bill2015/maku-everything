@@ -1,9 +1,21 @@
 use crate::tag::repository::TagQueryRepository;
 use crate::tag::infrastructure::TagQueryBuilder;
-use crate::resource::infrastructure::{SystemTag, AttributeValue};
+use crate::resource::infrastructure::{AttributeValue, AttributeValueType, SystemTag};
 use crate::resource::domain::{ResourceError, ResourceGenericError};
 use super::token::QueryToken;
 use super::types::TokenSymbol;
+
+macro_rules! semantic_err {
+    ($msg: literal) => {
+        Err(
+            ResourceError::QueryingByString(
+                ResourceGenericError::InvalidQueryingString { 
+                    message: $msg.to_string()
+                }
+            )
+        )
+    };
+}
 
 pub struct StringQLSemantic<'a>  {
     tokens: Vec<QueryToken>,
@@ -20,13 +32,10 @@ impl<'a> StringQLSemantic<'a> {
     }
 
     fn peek_attribute(&self, index: usize) -> Option<String> {
-        if let Some(val) = self.tokens.get(index) {
-            return match val {
-                QueryToken::AttributeToken { value, .. } => Some(value.clone()),
-                _ => None,
-            }
+        match self.tokens.get(index) {
+            Some(QueryToken::AttributeToken { value, .. }) => Some(value.clone()),
+            _ => None,
         }
-        None
     }
 
     fn parse_value(&mut self) -> Result<(), ResourceError> {
@@ -49,19 +58,23 @@ impl<'a> StringQLSemantic<'a> {
                     new_tokens.push(token.clone())
                 },
                 QueryToken::SystemTagToken { namespace, value, .. } => {
-                    let attribute = self.peek_attribute(current + 2);
-
                     let mut new_token = token.clone();
 
-                    if let (Ok(attr_type), Some(attr)) = (SystemTag::attr_type(namespace, value), attribute) {
-                
-                        let new_attrval = AttributeValue::parse_from(attr, attr_type)
-                            .or(Err(ResourceError::QueryingByString(
-                                ResourceGenericError::InvalidQueryingString{ message: "Attribute invalid".to_string() }
-                            )))?;
+                    if let Ok(attr_type) = SystemTag::attr_type(namespace, value) {
+
+                        // peek next 2 token, if it is attribute
+                        // syntax check will make this to be true
+                        if let Some(attr) = self.peek_attribute(current + 2) {
+                            let new_attrval = AttributeValue::parse_from(attr, attr_type)
+                                .or(semantic_err!("Invalid Attribute"))?;
     
-                        new_token.set_attribute(new_attrval);                           
-                    } 
+                            new_token.set_attribute(new_attrval);   
+                        }
+                        else if attr_type != AttributeValueType::OptionText {
+                            return semantic_err!("Attribute can't be empty");
+                        }    
+                    }
+                    
                     new_tokens.push(new_token);
                 },
                 QueryToken::AttributeToken { .. } => {},

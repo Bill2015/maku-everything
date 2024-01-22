@@ -1,4 +1,4 @@
-use std::num::{IntErrorKind, ParseIntError};
+use std::{fmt::Debug, num::{IntErrorKind, ParseIntError}};
 
 use chrono::NaiveDate;
 
@@ -21,7 +21,9 @@ pub enum AttributeValueType {
 pub enum AttributeParseError {
     MultipleRangeFound,
     InvlidRangeNumberFormat,
+    NumberStartIsLargerThanEnd,
     InvlidRangeDateFormat,
+    DateStartIsLargerThenEnd,
     RangeEmpty,
 }
 
@@ -30,7 +32,7 @@ pub enum AttributeValue {
     Text(String),
     OptionText(Option<String>),
     NumberRange(Option<usize>, Option<usize>),
-    DateRange(Option<String>, Option<String>),
+    DateRange(Option<NaiveDate>, Option<NaiveDate>),
     None,
 }
 impl AttributeValue {
@@ -62,27 +64,33 @@ impl AttributeValue {
             return Err(AttributeParseError::RangeEmpty);
         }
 
+        if let (Some(start), Some(end)) = (nums[0], nums[1]) {
+            if start > end {
+                return Err(AttributeParseError::NumberStartIsLargerThanEnd);
+            }
+        }
+
         Ok(Self::NumberRange(nums[0], nums[1]))
     }
 
     fn parse_date_range(value: &str) -> Result<Self, AttributeParseError> {
         // single date
-        if let Ok(_) = NaiveDate::parse_from_str(value, "%Y/%m/%d") {
-            return Ok(Self::DateRange(Some(value.to_string()), Some(value.to_string())));
+        if let Ok(val) = NaiveDate::parse_from_str(value, "%Y/%m/%d") {
+            return Ok(Self::DateRange(Some(val), Some(val)));
         }
 
         let date = Self::get_range(value)?
             .iter()
             .map(|val| {
-                if let Ok(_) = NaiveDate::parse_from_str(val, "%Y/%m/%d") {
-                    return Ok(Some(val.to_string()))
+                if let Ok(date) = NaiveDate::parse_from_str(val, "%Y/%m/%d") {
+                    return Ok(Some(date))
                 }
                 if val.is_empty() {
                     return Ok(None)
                 }
                 Err(())
             })
-            .collect::<Vec<Result<Option<String>, ()>>>();
+            .collect::<Vec<Result<Option<NaiveDate>, ()>>>();
     
         if !date.iter().all(Result::is_ok) {
             return Err(AttributeParseError::InvlidRangeDateFormat);
@@ -93,7 +101,13 @@ impl AttributeValue {
             return Err(AttributeParseError::RangeEmpty);
         }
 
-        Ok(Self::DateRange(date[0].to_owned(), date[1].to_owned()))
+        if let (Some(start), Some(end)) = (date[0], date[1]) {
+            if start > end {
+                return Err(AttributeParseError::DateStartIsLargerThenEnd);
+            }
+        }
+
+        Ok(Self::DateRange(date[0], date[1].to_owned()))
     }
 
     /// separate the range from string

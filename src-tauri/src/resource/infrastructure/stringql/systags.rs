@@ -1,3 +1,5 @@
+use chrono::NaiveDate;
+
 use crate::common::repository::sql_predefn;
 
 use super::{AttributeValue, AttributeValueType};
@@ -11,8 +13,8 @@ pub enum SystemTag {
     File(Option<String>),
     FileExt(String),
     Name(String),
-    CreatedAt((Option<String>, Option<String>)),
-    UpdatedAt((Option<String>, Option<String>)),
+    CreatedAt((Option<NaiveDate>, Option<NaiveDate>)),
+    UpdatedAt((Option<NaiveDate>, Option<NaiveDate>)),
 }
 
 impl SystemTag {
@@ -126,9 +128,10 @@ impl SystemTag {
                 if start.is_some() {
                     return format!("(count(<-tagging<-tag.id) >= {})", start.unwrap())
                 }
-                else {
+                if end.is_some() {
                     return format!("(count(<-tagging<-tag.id) <= {})", end.unwrap())
                 }
+                return "(true)".to_string();
             },
             // TODO:
             _ => { "".to_string() }
