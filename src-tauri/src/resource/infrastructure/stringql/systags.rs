@@ -1,3 +1,5 @@
+use crate::common::repository::sql_predefn;
+
 use super::{AttributeValue, AttributeValueType};
 
 pub enum SystemTag {
@@ -77,16 +79,41 @@ impl SystemTag {
     }
 
     pub fn to_qlstring(&self, not_flag: bool) -> String {
-        let not_symbol = if not_flag { "!" } else { "" };
-        match self {
+        let content = match self {
             SystemTag::URL(text) => {
                 match text {
-                    Some(text) => format!("{}(url.full CONTAINS \"{}\")", not_symbol, text),
-                    None => format!("{}(url)", not_symbol),
+                    Some(text) => format!("(url.full CONTAINS \"{}\")", text),
+                    None => "(url)".to_string(),
+                }
+            },
+            SystemTag::File(text) => {
+                match text {
+                    Some(text) => format!("(file.name CONTAINS \"{}\")", text),
+                    None => "(file)".to_string(),
+                }
+            },
+            SystemTag::Name(text) => {
+                format!("(name CONTAINS \"{}\")", text)
+            },
+            SystemTag::FileExt(text) => {
+                format!("(file.ext CONTAINS \"{}\")", text)
+            },
+            SystemTag::TagNums((start, end)) => {
+                if start.is_some() && end.is_some() {
+                    return sql_predefn::between("count(<-tagging<-tag.id)", start.unwrap(), end.unwrap())
+                }
+                if start.is_some() {
+                    return format!("(count(<-tagging<-tag.id) >= {})", start.unwrap())
+                }
+                else {
+                    return format!("(count(<-tagging<-tag.id) <= {})", end.unwrap())
                 }
             },
             // TODO:
             _ => { "".to_string() }
-        }
+        };
+
+        let not_symbol = if not_flag { "!" } else { "" };
+        format!("{}{}", not_symbol, content)
     }
 }
