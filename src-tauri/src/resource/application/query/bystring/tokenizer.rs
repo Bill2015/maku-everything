@@ -1,26 +1,30 @@
-use std::str::FromStr;
-
 use crate::resource::infrastructure::SystemTag;
+use crate::utils::StringUtils;
 
-use super::types::QueryingStringSymbol;
+use super::types::QueryingStrChar;
 use super::types::TokenSymbol;
 use super::token::QueryToken;
 
-pub struct Tokenizer<'a> {
-    query_string: &'a str,
+pub struct StringQLTokenizer {
+    query_string: String,
+
     current: usize,
+
     char_num: usize,
+
     tokens: Vec<QueryToken>,
 }
 
-impl<'a> Tokenizer<'a> {
+impl StringQLTokenizer {
     
-    pub fn new(query_string: &'a str) -> Self {
+    pub fn new<S: Into<String>>(query_string: S) -> Self {
+        // add EOF symbol
+        let s: String = format!("{}$", query_string.into().trim().to_string());
         Self {
-            query_string,
             current: 0,
-            char_num: query_string.chars().count(),
             tokens: Vec::new(),
+            char_num: s.chars().count(),
+            query_string: s,
         }
     }
 
@@ -33,15 +37,9 @@ impl<'a> Tokenizer<'a> {
     /// separate_namespace("Typescript") => (None, "Typescript")
     /// ```
     fn separate_namespace(&self, value: String) -> (Option<String>, String) {
-        if let Some(index) = value.chars().position(|x| QueryingStringSymbol::SubjectDelimiter == x) {
-            // for unicode text
-            let unicode_index = value
-                .char_indices()
-                .map(|(i, _)| i)
-                .nth(index)
-                .unwrap();
-            let subject_name = value[0..unicode_index].trim().to_string();
-            let value = value[unicode_index + 1..value.len()].trim().to_string();
+        if let Some(index) = value.chars().position(|x| QueryingStrChar::NamespaceDelimiter == x) {
+            let subject_name = value.slice(0..index).trim().to_string();
+            let value = value.slice(index + 1..value.len()).trim().to_string();
 
             return (Some(subject_name), value);
         }
@@ -76,7 +74,7 @@ impl<'a> Tokenizer<'a> {
 
     fn scan_tag_name(&mut self) {
         let mut chars: Vec<char> = vec![self.peek_prev().unwrap_or('\0')];
-        let quoted = self.peek_prev().unwrap() == '"';
+        let quoted = QueryingStrChar::StringWrapper == self.peek_prev().unwrap();
     
         while !self.is_end() {
             let ch = self.peek();
@@ -84,7 +82,7 @@ impl<'a> Tokenizer<'a> {
             if symbol.is_ok() || (quoted == false && ch.is_whitespace()) {
                 break;
             }
-            else if ch == '"' {
+            else if QueryingStrChar::StringWrapper == ch {
                 self.next_ch();
                 break;
             }
@@ -94,8 +92,8 @@ impl<'a> Tokenizer<'a> {
             }
         }
 
-        let tag_val = chars.iter()
-            .filter(|c| **c != '"')
+        let tag_val = chars.into_iter()
+            .filter(|c| QueryingStrChar::StringWrapper != *c )
             .collect::<String>();
         let is_system = SystemTag::is_defined(&tag_val);
 
@@ -130,10 +128,9 @@ impl<'a> Tokenizer<'a> {
 
             // general symbol
             if let Ok(symbol) = TokenSymbol::from_str(&ch.to_string()) {
-                let symbol_cloned = symbol.clone();
-                self.add_token(QueryToken::new_symbol(symbol, ch.to_string()));
+                self.add_token(QueryToken::new_symbol(symbol.clone(), ch.to_string()));
 
-                if symbol_cloned == TokenSymbol::LeftAttrBracket {
+                if symbol == TokenSymbol::LeftAttrBracket {
                     self.scan_attribute();
                 }
             }

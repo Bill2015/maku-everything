@@ -22,7 +22,6 @@ impl From<StringQLObject> for ResourceStringQL {
     fn from(qloject: StringQLObject) -> Self {
         let mut q: Vec<String> = Vec::new();
 
-        // +Typescript +Javascript
         let mut contains_all: Vec<&str> = Vec::new();
 
         let mut contains_not: Vec<&str> = Vec::new();
@@ -32,7 +31,7 @@ impl From<StringQLObject> for ResourceStringQL {
             
             match item.get_prefix() {
                 StringQLPrefix::Include => {
-                    if let Ok(function_tag) = SystemTag::from_str(item.get_value().as_str(), attribute.clone()) {
+                    if let Ok(function_tag) = SystemTag::from_str(item.get_value(), attribute) {
                         q.push(function_tag.to_qlstring(false));
                     }
                     else {
@@ -40,7 +39,7 @@ impl From<StringQLObject> for ResourceStringQL {
                     }
                 },
                 StringQLPrefix::Exclude => {
-                    if let Ok(function_tag) = SystemTag::from_str(item.get_value().as_str(), attribute.clone()) {
+                    if let Ok(function_tag) = SystemTag::from_str(item.get_value(), attribute) {
                         q.push(function_tag.to_qlstring(true));
                     }
                     else {
@@ -65,13 +64,15 @@ impl From<StringQLObject> for ResourceStringQL {
 
             for item in group.items.iter() {
                 let attribute = item.get_attribute().clone().unwrap_or(AttributeValue::None);
-                if let Ok(function_tag) = SystemTag::from_str(item.get_value().as_str(), attribute.clone()) {
-                    group_items.push(function_tag.to_qlstring(false));
+                if let Ok(system_tag) = SystemTag::from_str(item.get_value(), attribute) {
+                    group_items.push(system_tag.to_qlstring(false));
                 }
                 else {
                     pure_items.push(item.get_value().to_string());
                 }
             }
+            
+            // determine the group prefix
             match group.prefix {
                 StringQLPrefix::Include => {
                     if !pure_items.is_empty() {

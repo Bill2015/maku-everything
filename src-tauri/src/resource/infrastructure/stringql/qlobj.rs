@@ -130,25 +130,26 @@ impl AttributeValue {
     /// assert_eq!(b, Ok(AttributeValue::NumberRange(None, Some(45))));
     /// assert_eq!(c, Ok(AttributeValue::DateRange(Some("2021/06/23..".to_string()), None)));
     /// ```
-    pub fn parse_from(val: &str, attr_type: AttributeValueType) -> Result<Self, AttributeParseError> {
+    pub fn parse_from<T: Into<String>>(s: T, attr_type: AttributeValueType) -> Result<Self, AttributeParseError> {
+        let val = s.into();
         match attr_type {
             AttributeValueType::Text => {
-                Ok(Self::Text(val.to_string()))
+                Ok(Self::Text(val))
             },
             AttributeValueType::OptionText => {
                 Ok(Self::OptionText(
                     match !val.is_empty() {
-                        true => Some(val.to_string()),
+                        true => Some(val),
                         false => None,
                     }
                 ))
             },
             AttributeValueType::NumberRange => {
-                let result = Self::parse_number_range(val)?;
+                let result = Self::parse_number_range(&val)?;
                 Ok(result)
             },
             AttributeValueType::DateRange => {
-                let result = Self::parse_date_range(val)?;
+                let result = Self::parse_date_range(&val)?;
                 Ok(result)
             },
         }
@@ -165,14 +166,14 @@ pub enum StringQLPrefix {
 
 // ---------------------------------------------------------
 #[derive(Debug, Clone)]
-pub struct StringQLTagItem {
+pub struct StringQLItem {
     prefix: StringQLPrefix,
 
     value: String,
 
     attribute: Option<AttributeValue>,
 }
-impl StringQLTagItem {
+impl StringQLItem {
     pub fn new( prefix: StringQLPrefix, value: String, attribute: Option<AttributeValue>) -> Self {
         Self { prefix, value, attribute }
     }
@@ -194,7 +195,7 @@ impl StringQLTagItem {
 pub struct StringQLGroup {
     pub prefix: StringQLPrefix,
 
-    pub items: Vec<StringQLTagItem>,
+    pub items: Vec<StringQLItem>,
 }
 
 // ---------------------------------------------------------
@@ -202,7 +203,7 @@ pub struct StringQLGroup {
 /// Using `StringQLObjectBuilder` to build object
 #[derive(Debug, Clone)]
 pub struct StringQLObject {
-    item: Vec<StringQLTagItem>,
+    item: Vec<StringQLItem>,
 
     groups: Vec<StringQLGroup>,
 }
@@ -212,7 +213,7 @@ impl StringQLObject {
         Self { item: Vec::new(), groups: Vec::new() }
     }
 
-    pub fn get_items(&self) -> &Vec<StringQLTagItem> {
+    pub fn get_items(&self) -> &Vec<StringQLItem> {
         &self.item
     }
 
@@ -232,11 +233,11 @@ impl StringQLObjectBuilder {
         Self { obj: StringQLObject::new() }
     }
 
-    pub fn add_group(&mut self, prefix: StringQLPrefix, items: Vec<StringQLTagItem>) {
+    pub fn add_group(&mut self, prefix: StringQLPrefix, items: Vec<StringQLItem>) {
         self.obj.groups.push(StringQLGroup { prefix, items });
     }
 
-    pub fn add_item(&mut self, item: StringQLTagItem) {
+    pub fn add_item(&mut self, item: StringQLItem) {
         self.obj.item.push(item);
     }
 

@@ -1,18 +1,18 @@
 use crate::resource::domain::ResourceError;
-use crate::resource::infrastructure::{StringQLObject, StringQLObjectBuilder, StringQLPrefix, StringQLTagItem, SystemTag};
+use crate::resource::infrastructure::{StringQLObject, StringQLObjectBuilder, StringQLPrefix, StringQLItem, SystemTag};
 
 use super::types::TokenSymbol;
 use super::token::QueryToken;
 
 struct Symbol<'a>(&'a TokenSymbol);
 
-pub struct SQLQueryObjectGenerator<'a> {
+pub struct StringQLObjectGenerator<'a> {
     tokens: &'a Vec<QueryToken>,
 
     builder: StringQLObjectBuilder,
 }
 
-impl<'a> SQLQueryObjectGenerator<'a> {
+impl<'a> StringQLObjectGenerator<'a> {
     pub fn new(tokens: &'a Vec<QueryToken>) -> Self {
         Self { 
             tokens, 
@@ -24,23 +24,15 @@ impl<'a> SQLQueryObjectGenerator<'a> {
 
         let mut ops_stack: Vec<Symbol> = Vec::new();
 
-        let mut tag_stack: Vec<StringQLTagItem> = Vec::new();
+        let mut tag_stack: Vec<StringQLItem> = Vec::new();
 
         for token in self.tokens {
             match token {
                 QueryToken::SymbolToken{ symbol, value: _ } => {
                     // if match the 'Right Group Bracket', start popup tags
                     if *symbol == TokenSymbol::RightGroupBracket {
-                        let mut tags: Vec<StringQLTagItem> = Vec::new();
+                        let tags: Vec<StringQLItem> = tag_stack.drain(..).collect();
 
-                        while !tag_stack.is_empty() {
-                            if let Some(item) = tag_stack.pop() {
-                                tags.push(item);
-                            }
-                            else {
-                                break;
-                            }
-                        }
                         // pop the 'LeftGroupBracket'
                         ops_stack.pop();
                         match ops_stack.last().unwrap().0 {
@@ -63,17 +55,16 @@ impl<'a> SQLQueryObjectGenerator<'a> {
                         _ => {}
                     };
                 },
-                QueryToken::AttributeToken { .. } => { },
                 QueryToken::TagToken { id, .. } => {
                     match ops_stack.last().unwrap().0 {
                         TokenSymbol::Include => {
-                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Include, id.to_string(), None));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Include, id.to_string(), None));
                         },
                         TokenSymbol::Exclude => {
-                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Exclude, id.to_string(), None));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Exclude, id.to_string(), None));
                         }
                         _ => {
-                            tag_stack.push(StringQLTagItem::new(StringQLPrefix::Inherit, id.to_string(), None));
+                            tag_stack.push(StringQLItem::new(StringQLPrefix::Inherit, id.to_string(), None));
                         },
                     }
                 },
@@ -81,16 +72,18 @@ impl<'a> SQLQueryObjectGenerator<'a> {
                     let name = SystemTag::full_name(namespace, value);
                     match ops_stack.last().unwrap().0 {
                         TokenSymbol::Include => {
-                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Include, name, attrval.clone()));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Include, name, attrval.clone()));
                         },
                         TokenSymbol::Exclude => {
-                            self.builder.add_item(StringQLTagItem::new(StringQLPrefix::Exclude, name, attrval.clone()));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Exclude, name, attrval.clone()));
                         }
                         _ => {
-                            tag_stack.push(StringQLTagItem::new(StringQLPrefix::Inherit, name, attrval.clone()));
+                            tag_stack.push(StringQLItem::new(StringQLPrefix::Inherit, name, attrval.clone()));
                         },
                     }
-                }
+                },
+                // semantic will merge all the attribute tokens in tag token
+                QueryToken::AttributeToken { .. } => { },
             }
         };
 

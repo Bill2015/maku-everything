@@ -14,19 +14,30 @@ macro_rules! syntax_err {
         )
     };
 }
-// Syntax Tree
-// entry |= express + $
-// express |= prefix + express_body
-// express_body |= tagname
-//              |= bracket + express_tags + bracket
-// express_tags |= tagname
 
-pub struct Syntax<'a> {
+/// ## Syntax Tree
+/// ```r
+///             entry |= express + $
+/// 
+///           express |= prefix + express_body
+/// 
+///      express_body |= normal tag + express_attribute?
+///                   |= system tag + express_attribute?
+///                   |= [ express_tags ]
+/// 
+///      express_tags |= normal tag + express_attribute?
+///                   |= system tag + express_attribute?
+/// 
+/// express_attribute |= { content }
+/// ```
+///
+pub struct StringQLSyntaxChecker<'a> {
     tokens: &'a Vec<QueryToken>,
+
     current: usize,
 }
 
-impl<'a> Syntax<'a> {
+impl<'a> StringQLSyntaxChecker<'a> {
     pub fn new(tokens: &'a Vec<QueryToken>) -> Self {
         Self { tokens, current: 0 }
     }
@@ -43,14 +54,12 @@ impl<'a> Syntax<'a> {
     }
 
     fn match_token(&self, target: TokenSymbol) -> bool {
-        if self.peek().is_none() {
-            return false
-        }
-        match self.peek().unwrap() {
-            QueryToken::SymbolToken{ symbol, .. } => *symbol == target,
-            QueryToken::AttributeToken{ symbol, .. } => *symbol == target,
-            QueryToken::TagToken{ symbol, .. } => *symbol == target,
-            QueryToken::SystemTagToken { symbol, .. } => *symbol == target,
+        match self.peek() {
+            Some(QueryToken::SymbolToken{ symbol, .. }) => *symbol == target,
+            Some(QueryToken::AttributeToken{ symbol, .. }) => *symbol == target,
+            Some(QueryToken::TagToken{ symbol, .. }) => *symbol == target,
+            Some(QueryToken::SystemTagToken { symbol, .. }) => *symbol == target,
+            None => false,
         }
     }
 

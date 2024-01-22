@@ -1,12 +1,17 @@
-use crate::{tag::{repository::TagQueryRepository, infrastructure::TagQueryBuilder}, resource::{infrastructure::{SystemTag, AttributeValue}, domain::{ResourceError, ResourceGenericError}}};
+use crate::tag::repository::TagQueryRepository;
+use crate::tag::infrastructure::TagQueryBuilder;
+use crate::resource::infrastructure::{SystemTag, AttributeValue};
+use crate::resource::domain::{ResourceError, ResourceGenericError};
 use super::token::QueryToken;
+use super::types::TokenSymbol;
 
-pub struct Semantic<'a>  {
+pub struct StringQLSemantic<'a>  {
     tokens: Vec<QueryToken>,
+
     repo: &'a TagQueryRepository<'a>,
 }
 
-impl<'a> Semantic<'a> {
+impl<'a> StringQLSemantic<'a> {
     pub fn new(tokens: &Vec<QueryToken>, repo: &'a TagQueryRepository) -> Self {
         Self {
             repo,
@@ -34,13 +39,12 @@ impl<'a> Semantic<'a> {
             match token {
                 QueryToken::SymbolToken { symbol, .. } => {
                     match symbol {
-                        super::types::TokenSymbol::Attribute => {},
-                        super::types::TokenSymbol::LeftAttrBracket => {},
-                        super::types::TokenSymbol::RightAttrBracket => {},
+                        TokenSymbol::Attribute => {},
+                        TokenSymbol::LeftAttrBracket => {},
+                        TokenSymbol::RightAttrBracket => {},
                         _ => new_tokens.push(token.clone())
                     }
                 },
-                QueryToken::AttributeToken { .. } => {},
                 QueryToken::TagToken { .. } => {
                     new_tokens.push(token.clone())
                 },
@@ -49,17 +53,18 @@ impl<'a> Semantic<'a> {
 
                     let mut new_token = token.clone();
 
-                    if attribute.is_some() {
-                        if let Ok(attr_type) = SystemTag::attr_type(&namespace, &value) {
-                    
-                            let new_attrval = AttributeValue::parse_from(&attribute.unwrap(), attr_type)
-                                .or(Err(ResourceError::QueryingByString(ResourceGenericError::InvalidQueryingString{ message: "Attribute invalid".to_string() })))?;
-        
-                            new_token.set_attribute(new_attrval);                           
-                        } 
-                    }
+                    if let (Ok(attr_type), Some(attr)) = (SystemTag::attr_type(namespace, value), attribute) {
+                
+                        let new_attrval = AttributeValue::parse_from(attr, attr_type)
+                            .or(Err(ResourceError::QueryingByString(
+                                ResourceGenericError::InvalidQueryingString{ message: "Attribute invalid".to_string() }
+                            )))?;
+    
+                        new_token.set_attribute(new_attrval);                           
+                    } 
                     new_tokens.push(new_token);
                 },
+                QueryToken::AttributeToken { .. } => {},
             }
 
             current += 1;

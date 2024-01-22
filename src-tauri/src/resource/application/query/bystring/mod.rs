@@ -9,14 +9,14 @@ use crate::tag::repository::TagQueryRepository;
 
 mod types;
 mod syntax;
-use syntax::Syntax;
+use syntax::StringQLSyntaxChecker;
 mod tokenizer;
-use tokenizer::Tokenizer;
+use tokenizer::StringQLTokenizer;
 mod sqlgen;
-use sqlgen::SQLQueryObjectGenerator;
+use sqlgen::StringQLObjectGenerator;
 mod token;
 mod semetic;
-use semetic::Semantic;
+use semetic::StringQLSemantic;
 
 
 pub struct StringResourceQuery {
@@ -50,26 +50,21 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
     async fn query(&self, query: StringResourceQuery) -> Self::Output {
         let StringResourceQuery { query_string } = query;
 
-        // add EOF symbol
-        let q = format!("{}$", query_string.trim());
-
         // get token
-        let mut tokenizer = Tokenizer::new(&q);
-        let tokens = tokenizer.parse();
+        let tokens = StringQLTokenizer::new(&query_string).parse();
 
         dbg!(&tokens);
 
         // syntax check
-        let _ = Syntax::new(&tokens).check()?;
+        let _ = StringQLSyntaxChecker::new(&tokens).check()?;
 
         // semantic check
-        let mut semantic = Semantic::new(&tokens, self.tag_repo);
-        let new_token = semantic.parse().await?;
+        let new_token = StringQLSemantic::new(&tokens, self.tag_repo).parse().await?;
 
         dbg!(&new_token);
 
         // generate QL string
-        let sql_data = SQLQueryObjectGenerator::new(&new_token).gen()?;
+        let sql_data = StringQLObjectGenerator::new(&new_token).gen()?;
 
         dbg!(&sql_data);
         let ql = ResourceStringQL::from(sql_data);

@@ -1,6 +1,3 @@
-use std::str::FromStr;
-
-// ---------------------------------------------------------
 /// For Token Definition
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenSymbol {
@@ -15,10 +12,9 @@ pub enum TokenSymbol {
     RightAttrBracket,
 }
 
-impl FromStr for TokenSymbol {
-    type Err = String;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_ascii_lowercase().as_str() {
+impl TokenSymbol {
+    pub fn from_str<S: Into<String>>(s: S) -> Result<Self, String> {
+        match s.into().to_lowercase().as_str() {
             "+" => Ok(Self::Include),
             "-" => Ok(Self::Exclude),
             "[" => Ok(Self::LeftGroupBracket),
@@ -48,37 +44,17 @@ impl PartialEq<char> for TokenSymbol {
 }
 
 // ---------------------------------------------------------
-pub enum QueryingStringSymbol {
-    TagNameWrapper,
-    SubjectDelimiter,
+pub enum QueryingStrChar {
+    StringWrapper,
+    NamespaceDelimiter,
 }
 
 
-impl PartialEq<char> for QueryingStringSymbol {
+impl PartialEq<char> for QueryingStrChar {
     fn eq(&self, other: &char) -> bool {
         match self {
-            Self::SubjectDelimiter => ':' == *other,
-            Self::TagNameWrapper => '\"' == *other,
-        }
-    }
-}
-
-impl FromStr for QueryingStringSymbol {
-    type Err = String;
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        match value {
-            "\"" => Ok(Self::TagNameWrapper),
-            ":" => Ok(Self::SubjectDelimiter),
-            _ =>  Err(String::from("Not Match Querying String Symbol")) 
-        }
-    }
-}
-
-impl ToString for QueryingStringSymbol {
-    fn to_string(&self) -> String {
-        match self {
-            Self::SubjectDelimiter => "\"".to_string(),
-            Self::TagNameWrapper => ":".to_string(),
+            Self::NamespaceDelimiter => ':' == *other,
+            Self::StringWrapper => '"' == *other,
         }
     }
 }
