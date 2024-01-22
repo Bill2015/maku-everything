@@ -1,8 +1,15 @@
-use std::num::IntErrorKind;
+use std::num::{IntErrorKind, ParseIntError};
 
 use chrono::NaiveDate;
 
 // ---------------------------------------------------------
+/// Defined type of attribute
+/// ```
+/// Text => String
+/// OptionText => Option<String>
+/// NumberRange => (Option<usize>, Option<usize>)
+/// DateRange => (Option<String>, Option<String>)
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub enum AttributeValueType {
     Text,
@@ -27,82 +34,84 @@ pub enum AttributeValue {
     None,
 }
 impl AttributeValue {
-    fn parse_number_range(val: &str) -> Result<Self, AttributeParseError> {
-                
+
+    fn parse_number_range(value: &str) -> Result<Self, AttributeParseError> {
         // single number
-        if let Ok(num) = val.parse::<usize>() {
+        if let Ok(num) = value.parse::<usize>() {
             return Ok(Self::NumberRange(Some(num), Some(num)));
         }
 
-        let (start, end) = Self::get_range(val)?;
-        let string_nums: Vec<&str> = vec![start, end];
-        let nums: Vec<_> = string_nums.iter()
+        let nums = Self::get_range(value)?
+            .iter()
             .map(|val| {
                 val.parse::<i64>()
-                    .or_else(|x| match x.kind() {
-                        IntErrorKind::Empty => Ok(-1),
-                        _ => Err(x),
+                    .or_else(|x| match x.kind() { IntErrorKind::Empty => Ok(-1), _ => Err(x) })
+                    .and_then(|x| match x {
+                        x if x >= 0 => Ok(Some(x as usize)),
+                        _ => Ok(None),
                     })
             })
-            .collect();
-        
-        if nums[0].is_ok() && nums[1].is_ok() {
-            let start_num = nums[0].clone().unwrap();
-            let end_num = nums[1].clone().unwrap();
+            .collect::<Vec<Result<Option<usize>, ParseIntError>>>();
 
-            return Ok(
-                Self::NumberRange(
-                    if start_num < 0 { None } else { Some(start_num as usize) },
-                    if end_num < 0 { None } else { Some(end_num as usize) },
-                )
-            )
+        if !nums.iter().all(Result::is_ok) {
+            return Err(AttributeParseError::InvlidRangeNumberFormat);
         }
 
-        Err(AttributeParseError::InvlidRangeNumberFormat)
+        let nums: Vec<_> = nums.into_iter().map(|x| x.unwrap()).collect();
+        if nums.iter().all(Option::is_none) {
+            return Err(AttributeParseError::RangeEmpty);
+        }
+
+        Ok(Self::NumberRange(nums[0], nums[1]))
     }
 
-    fn parse_date_range(val: &str) -> Result<Self, AttributeParseError> {
+    fn parse_date_range(value: &str) -> Result<Self, AttributeParseError> {
         // single date
-        if let Ok(_) = NaiveDate::parse_from_str(val, "%Y/%m/%d") {
-            return Ok(Self::DateRange(Some(val.to_string()), Some(val.to_string())));
+        if let Ok(_) = NaiveDate::parse_from_str(value, "%Y/%m/%d") {
+            return Ok(Self::DateRange(Some(value.to_string()), Some(value.to_string())));
         }
 
-        let (start, end) = Self::get_range(val)?;
-        let string_date: Vec<&str> = vec![start, end];
-        let date: Vec<_> = string_date.iter()
+        let date = Self::get_range(value)?
+            .iter()
             .map(|val| {
                 if let Ok(_) = NaiveDate::parse_from_str(val, "%Y/%m/%d") {
-                    return Ok(val)
+                    return Ok(Some(val.to_string()))
                 }
                 if val.is_empty() {
-                    return Ok(val)
+                    return Ok(None)
                 }
-                return Err(());
+                Err(())
             })
-            .collect();
-
-        if date[0].is_ok() && date[1].is_ok() {
-            let start_date = date[0].unwrap();
-            let end_date = date[1].unwrap();
-
-            return Ok(
-                Self::DateRange(
-                    if start_date.is_empty() { None } else { Some(start_date.to_string()) },
-                    if end_date.is_empty() { None } else { Some(end_date.to_string()) },
-                )
-            )
+            .collect::<Vec<Result<Option<String>, ()>>>();
+    
+        if !date.iter().all(Result::is_ok) {
+            return Err(AttributeParseError::InvlidRangeDateFormat);
         }
 
-        Err(AttributeParseError::InvlidRangeDateFormat)
+        let date: Vec<_> = date.into_iter().map(|x| x.unwrap()).collect();
+        if date.iter().all(Option::is_none) {
+            return Err(AttributeParseError::RangeEmpty);
+        }
+
+        Ok(Self::DateRange(date[0].to_owned(), date[1].to_owned()))
     }
 
-    fn get_range(val: &str) -> Result<(&str, &str), AttributeParseError> {
+    /// separate the range from string
+    /// 
+    /// ### example:
+    /// ```
+    /// let range1 = get_range("1..45");
+    /// let range2 = get_range("1..");
+    /// let range3 = get_range("1..15..40");
+    /// 
+    /// assert_eq!(range1, Ok(vect!["1", "45"])); 
+    /// assert_eq!(range1, Ok(vect!["1", ""])); 
+    /// assert_eq!(range1, Err(AttributeParseError::MultipleRangeFound)); 
+    /// ```
+    fn get_range(val: &str) -> Result<Vec<&str>, AttributeParseError> {
         let separated: Vec<&str> = val.split("..").collect();
         if separated.len() == 2 {
-            return Ok((
-                separated.get(0).unwrap(), 
-                separated.get(1).unwrap(),
-            ));
+            return Ok(vec![separated.get(0).unwrap(), separated.get(1).unwrap()]);
         }
         if separated.len() > 2 {
             return Err(AttributeParseError::MultipleRangeFound)
@@ -110,6 +119,17 @@ impl AttributeValue {
         Err(AttributeParseError::MultipleRangeFound)
     }
 
+    /// depend on `AttributeValueType` and converte val to `AttributeValue`
+    /// ### example:
+    /// ```
+    /// let a = parse_from("45", AttributeValueType.Text);
+    /// let b = parse_from("..45", AttributeValueType.NumberRange);
+    /// let c = parse_from("2021/06/23..", AttributeValueType.DateRange);
+    /// 
+    /// assert_eq!(a, Ok(AttributeValue::Text("45".to_string())));
+    /// assert_eq!(b, Ok(AttributeValue::NumberRange(None, Some(45))));
+    /// assert_eq!(c, Ok(AttributeValue::DateRange(Some("2021/06/23..".to_string()), None)));
+    /// ```
     pub fn parse_from(val: &str, attr_type: AttributeValueType) -> Result<Self, AttributeParseError> {
         match attr_type {
             AttributeValueType::Text => {
@@ -184,24 +204,12 @@ pub struct StringQLGroup {
 pub struct StringQLObject {
     item: Vec<StringQLTagItem>,
 
-    excludes: Vec<StringQLTagItem>,
-
-    includes: Vec<StringQLTagItem>,
-
     groups: Vec<StringQLGroup>,
 }
 
 impl StringQLObject {
     pub fn new() -> Self {
-        Self { item: Vec::new(), excludes: Vec::new(), includes: Vec::new(), groups: Vec::new() }
-    }
-
-    pub fn get_excludes(&self) -> &Vec<StringQLTagItem> {
-        &self.excludes
-    }
-
-    pub fn get_includes(&self) -> &Vec<StringQLTagItem>{
-        &self.includes
+        Self { item: Vec::new(), groups: Vec::new() }
     }
 
     pub fn get_items(&self) -> &Vec<StringQLTagItem> {
