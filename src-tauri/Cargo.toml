@@ -24,6 +24,7 @@ async-trait = "0.1.72"
 thiserror = "1.0.44"
 once_cell = "1.19.0"
 url = "2.4.1"
+num-traits = "0.2.17"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

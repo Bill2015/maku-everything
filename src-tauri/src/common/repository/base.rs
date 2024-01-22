@@ -40,6 +40,7 @@ pub mod env {
     use surrealdb::engine::remote::ws::Ws;
     use surrealdb::opt::auth::Root;
 
+    use crate::common::repository::PRE_DEFINED_REPOSITORY;
     pub static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
     pub async fn connent_db() -> Result<String, surrealdb::Error> {
@@ -55,6 +56,9 @@ pub mod env {
 
         // Select a specific namespace / database
         DB.use_ns("test").use_db("test").await?;
+
+        // pre defined sql function
+        PRE_DEFINED_REPOSITORY.define_fns().await?;
 
         Ok(String::from("Success Connect to DB"))
     }
