@@ -143,6 +143,9 @@ export type InputStatusHistory = {
     /** Current raw text */
     text: string;
 
+    /** input text array */
+    inputs: string[];
+
     /** Current displayed querying node */
     display: QueryingNodeProps[];
 }
@@ -153,12 +156,13 @@ export type InputStatusHistory = {
 export const useStateHistory = () => {
     const statusStackRef = useRef<InputStatusHistory[]>([]);
 
-    const popHistory = useCallback(() => {
+    const pop = useCallback(() => {
         if (statusStackRef.current.length <= 0) {
             return {
                 status: {
                     status: SearchStatus.Initial, inGroup: false, inAttribute: false,
                 },
+                inputs:  [],
                 display: [],
                 text:    '',
             };
@@ -166,19 +170,25 @@ export const useStateHistory = () => {
         return statusStackRef.current.pop()!;
     }, []);
 
-    const pushHistory = useCallback((history: InputStatusHistory) => {
+    const peekCurrent = useCallback(() => statusStackRef.current.at(-1), []);
+
+    const isEmpty = useCallback(() => statusStackRef.current.length <= 0, []);
+
+    const push = useCallback((history: InputStatusHistory) => {
         statusStackRef.current.push(history);
     }, []);
 
-    const clearHistory = useCallback(() => {
+    const clear = useCallback(() => {
         statusStackRef.current = [];
     }, []);
 
-    return {
-        popHistory,
-        pushHistory,
-        clearHistory,
-    };
+    return useMemo(() => ({
+        pop,
+        push,
+        clear,
+        isEmpty,
+        peekCurrent,
+    }), [pop, push, clear, isEmpty, peekCurrent]);
 };
 
 /**
@@ -191,7 +201,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         inGroup:     false,
         inAttribute: false,
     });
-    const { popHistory, pushHistory, clearHistory } = useStateHistory();
+    const historyManager = useStateHistory();
 
     // for the displaying search querying
     const [queryingNode, setQueryingNode] = useState<QueryingNodeProps[]>([]);
@@ -274,28 +284,33 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     /**
      * return previous status of search input */
     const backspaceInputSearch: () => InputStatusHistory = useCallback(() => {
-        const history = popHistory();
+        const history = historyManager.pop();
         setCurrentInputStatus(history.status);
         setQueryingNode(history.display);
         return history;
-    }, [popHistory]);
+    }, [historyManager]);
 
     /**
-     * process the next status of input search */
-    const forwardInputSearch = useCallback((val: string, comboxOptionProps: ComboboxOptionWithDataProps | null) => {
+     * process the next status of input search
+     * @param inputVal original input value from search input
+     * @param optionVal value from option selected
+     * @param comboxOptionProps selected comboxx props */
+    const forwardInputSearch = useCallback((inputVal: string, optionVal: string, comboxOptionProps: ComboboxOptionWithDataProps | null) => {
         if (!comboxOptionProps && currentInputStatus.status !== SearchStatus.Attribute) {
-            return;
+            return false;
         }
-        pushHistory({
+        historyManager.push({
             status:  currentInputStatus,
             text:    rawText,
+            inputs:  (historyManager.isEmpty() ? [inputVal] : [...historyManager.peekCurrent()!.inputs, inputVal]),
             display: queryingNode,
         });
         // get next status by action
-        const nextStatus = STATUS_MAP.get(currentInputStatus.status)!.action(val, currentInputStatus);
-        newInput(val, comboxOptionProps);
+        const nextStatus = STATUS_MAP.get(currentInputStatus.status)!.action(optionVal, currentInputStatus);
+        newInput(optionVal, comboxOptionProps);
         setCurrentInputStatus(nextStatus);
-    }, [currentInputStatus, queryingNode, rawText, newInput, pushHistory]);
+        return true;
+    }, [currentInputStatus, queryingNode, rawText, newInput, historyManager]);
 
     /**
      * Clear the search */
@@ -304,8 +319,8 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             status: SearchStatus.Initial, inGroup: false, inAttribute: false,
         });
         setQueryingNode([]);
-        clearHistory();
-    }, [clearHistory]);
+        historyManager.clear();
+    }, [historyManager]);
 
     return {
         options:       selectableOptions,

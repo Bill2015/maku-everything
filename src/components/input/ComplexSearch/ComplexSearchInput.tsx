@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActionIcon, Combobox, ComboboxOptionProps, Flex, Group, Input, useCombobox } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import { FaSearch } from 'react-icons/fa';
@@ -26,11 +26,34 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
     const [searchText, setSearchText] = useState<string>('');
     const { options, displayNode, rawText, backspaceInputSearch, forwardInputSearch, clearSearch } = useComplexSearch(tags, searchText);
 
-    const handleOptionSubmit = useCallback((val: string, comboxOptionProps: ComboboxOptionProps) => {
-        forwardInputSearch(val, comboxOptionProps);
+    const handleOptionSubmit = useCallback((optionVal: string, comboxOptionProps: ComboboxOptionProps) => {
+        forwardInputSearch(searchText, optionVal, comboxOptionProps);
         combobox.resetSelectedOption();
         setSearchText('');
-    }, [combobox, forwardInputSearch]);
+    }, [combobox, searchText, forwardInputSearch]);
+
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Backspace' && searchText === '') {
+            const history = backspaceInputSearch();
+            setSearchText(history.inputs.at(-1)!);
+            e.preventDefault();
+            return;
+        }
+        if (e.key === 'Enter' && searchText === '' && combobox.getSelectedOptionIndex() < 0) {
+            onSubmitSearch(rawText);
+            combobox.resetSelectedOption();
+            combobox.closeDropdown();
+            return;
+        }
+        if (e.key === 'Enter') {
+            const val = e.currentTarget.value;
+            if (forwardInputSearch(val, val, null)) {
+                setSearchText('');
+                return;
+            }
+        }
+        combobox.openDropdown();
+    }, [backspaceInputSearch, forwardInputSearch, onSubmitSearch, combobox, rawText, searchText]);
 
     return (
         <Combobox
@@ -49,17 +72,9 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                             onChange={(e) => {
                                 setSearchText(e.currentTarget.value);
                             }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Backspace' && searchText === '') {
-                                    backspaceInputSearch();
-                                }
-                                if (e.key === 'Enter') {
-                                    forwardInputSearch(e.currentTarget.value, null);
-                                    setSearchText('');
-                                }
-                            }}
-                            onClick={() => {
-                                combobox.toggleDropdown();
+                            onKeyDown={handleKeyDown}
+                            onFocus={() => {
+                                combobox.openDropdown();
                                 combobox.resetSelectedOption();
                             }}
                         />
