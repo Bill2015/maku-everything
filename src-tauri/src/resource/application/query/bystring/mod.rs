@@ -53,23 +53,15 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         // get token
         let tokens = StringQLTokenizer::new(&query_string).parse();
 
-        dbg!(&tokens);
-
         // syntax check
         let _ = StringQLSyntaxChecker::new(&tokens).check()?;
-
+        
         // semantic check
         let new_token = StringQLSemantic::new(&tokens, self.tag_repo).parse().await?;
 
-        dbg!(&new_token);
-
         // generate QL string
         let sql_data = StringQLObjectGenerator::new(&new_token).gen()?;
-
-        dbg!(&sql_data);
         let ql = ResourceStringQL::from(sql_data);
-
-        dbg!(&ql);
 
         let result = self.resource_repo.string_ql(ql)
             .await;

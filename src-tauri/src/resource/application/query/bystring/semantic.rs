@@ -6,10 +6,10 @@ use super::token::QueryToken;
 use super::types::TokenSymbol;
 
 macro_rules! semantic_err {
-    ($msg: literal) => {
-        Err(ResourceError::QueryingByString(
+    ($msg: expr) => {
+        ResourceError::QueryingByString(
             ResourceGenericError::InvalidQueryingString { message: $msg.to_string() }
-        ))
+        )
     };
 }
 
@@ -62,22 +62,19 @@ impl<'a> StringQLSemantic<'a> {
                         // syntax check will make this to be true
                         if let Some(attr) = self.peek_attribute(current + 2) {
                             let new_attrval = AttributeValue::parse_from(attr, attr_type)
-                                .map_err(|err| ResourceError::QueryingByString(
-                                    ResourceGenericError::InvalidQueryingString { message: err.to_string() }
-                                ))?;
+                                .map_err(|err| semantic_err!(err.to_string()))?;
     
                             new_token.set_attribute(new_attrval);   
                         }
                         else if attr_type != AttributeValueType::OptionText {
-                            return semantic_err!("Attribute can't be empty");
+                            return Err(semantic_err!("Attribute can't be empty"));
                         }    
                     }
                     
                     new_tokens.push(new_token);
                 },
-                QueryToken::AttributeToken { .. } => {
-                    return semantic_err!("Unexpected error, it still have attribute token in semantic check");
-                },
+                // skip it, because `self.peek_attribute(current + 2)`
+                QueryToken::AttributeToken { .. } => { },
             }
 
             current += 1;
