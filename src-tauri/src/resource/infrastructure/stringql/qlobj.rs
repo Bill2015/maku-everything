@@ -2,6 +2,27 @@ use std::{fmt::Debug, num::{IntErrorKind, ParseIntError}};
 
 use chrono::NaiveDate;
 
+#[derive(thiserror::Error, Debug)]
+pub enum AttributeParseError {
+    #[error("Multiple range found")]
+    MultipleRangeFound,
+
+    #[error("Invalid range number format")]
+    InvalidRangeNumberFormat,
+
+    #[error("Range numeber start is larger than the end")]
+    NumberStartIsLargerThanEnd,
+
+    #[error("Invalid range date format")]
+    InvalidRangeDateFormat,
+    
+    #[error("Range date start is larger than the end")]
+    DateStartIsLargerThenEnd,
+
+    #[error("Range is empty")]
+    RangeEmpty,
+}
+
 // ---------------------------------------------------------
 /// Defined type of attribute
 /// ```
@@ -18,15 +39,7 @@ pub enum AttributeValueType {
     DateRange,
 }
 
-pub enum AttributeParseError {
-    MultipleRangeFound,
-    InvlidRangeNumberFormat,
-    NumberStartIsLargerThanEnd,
-    InvlidRangeDateFormat,
-    DateStartIsLargerThenEnd,
-    RangeEmpty,
-}
-
+// ---------------------------------------------------------
 #[derive(Debug, Clone, PartialEq)]
 pub enum AttributeValue {
     Text(String),
@@ -56,7 +69,7 @@ impl AttributeValue {
             .collect::<Vec<Result<Option<usize>, ParseIntError>>>();
 
         if !nums.iter().all(Result::is_ok) {
-            return Err(AttributeParseError::InvlidRangeNumberFormat);
+            return Err(AttributeParseError::InvalidRangeNumberFormat);
         }
 
         let nums: Vec<_> = nums.into_iter().map(|x| x.unwrap()).collect();
@@ -93,7 +106,7 @@ impl AttributeValue {
             .collect::<Vec<Result<Option<NaiveDate>, ()>>>();
     
         if !date.iter().all(Result::is_ok) {
-            return Err(AttributeParseError::InvlidRangeDateFormat);
+            return Err(AttributeParseError::InvalidRangeDateFormat);
         }
 
         let date: Vec<_> = date.into_iter().map(|x| x.unwrap()).collect();
