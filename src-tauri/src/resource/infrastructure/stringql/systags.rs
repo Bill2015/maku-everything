@@ -26,6 +26,25 @@ impl SystemTag {
     const TAG_CREATED: &str = "@maku:created";
     const TAG_UPDATED: &str = "@maku:updated";
 
+    const DATE_FORAMTER: &str = "%Y-%m-%d";
+
+    fn date_format(field_name: &str, value: (&Option<NaiveDate>, &Option<NaiveDate>)) -> String {
+        if let (Some(start), Some(end)) = value {
+            return sql_predefn::between(
+                field_name, 
+                format!("type::datetime('{}')", start.format(Self::DATE_FORAMTER)), 
+                format!("type::datetime('{}')", end.format(Self::DATE_FORAMTER)),
+            );
+        }
+        if let Some(start) = value.0 {
+            return format!("({} >= type::datetime('{}'))", field_name, start.format(Self::DATE_FORAMTER))
+        }
+        if let Some(end) = value.1 {
+            return format!("({} <= type::datetime('{}'))", field_name, end.format(Self::DATE_FORAMTER))
+        }
+        return "(true)".to_string();
+    }
+
     pub fn full_name(namespace: &str, val: &str) -> String {
         format!("{}:{}", namespace, val)
     }
@@ -133,8 +152,12 @@ impl SystemTag {
                 }
                 return "(true)".to_string();
             },
-            // TODO:
-            _ => { "".to_string() }
+            SystemTag::CreatedAt((date1, date2)) => {
+                Self::date_format("created_at", (date1, date2))
+            },
+            SystemTag::UpdatedAt((date1, date2)) => {
+                Self::date_format("updated_at", (date1, date2))
+            }
         };
 
         let not_symbol = if not_flag { "!" } else { "" };

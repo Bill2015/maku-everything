@@ -11,7 +11,6 @@ pub static PRE_DEFINED_REPOSITORY: PreDefinedRepository<'_> = PreDefinedReposito
 
 pub mod sql_predefn {
     use std::fmt::Display;
-    use num_traits::Num;
 
     pub const BETWEEN_FN: &str = "fn::between";
 
@@ -26,8 +25,8 @@ pub mod sql_predefn {
     /// ```
     pub fn between<T, F>(target: T, start: F, end: F) -> String 
         where
-            T: ToString + Display, 
-            F: Num + Display
+            T: ToString + Display,
+            F: ToString + Display,
     {
         format!("({}({}, {}, {}))", BETWEEN_FN, target, start, end)
     }
@@ -56,7 +55,7 @@ impl<'a> PreDefinedRepository<'a> {
     /// define between fn, for range used
     async fn define_between_fn(&self) -> surrealdb::Result<()> {
         let sql = format!(r#"
-            DEFINE FUNCTION {0}($target: number, $start: number, $end: number) {{
+            DEFINE FUNCTION {0}($target: any, $start: any, $end: any) {{
                 RETURN ($target >= $start AND $target <= $end);
             }};
         "#, sql_predefn::BETWEEN_FN);
