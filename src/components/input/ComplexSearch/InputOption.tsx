@@ -1,8 +1,10 @@
 import { Combobox, ComboboxOptionProps, Stack, Text } from '@mantine/core';
+import { System } from '@declares/variables';
+
 import { InputSymbol } from './enums';
 import classses from './InputOption.module.scss';
 
-export type AttributeType = 'none' | 'text' | 'number' | 'date';
+export type AttributeType = 'none' | 'text' | 'option-text' | 'range-number' | 'range-date';
 
 export type ComboboxOptionWithDataProps = ComboboxOptionProps & {
     'data-groupname'?: string;
@@ -84,19 +86,35 @@ InputOption.Operators = [
 
 /**
  * Functional tag */
-InputOption.FunctionalTags = [
+InputOption.FunctionalTags = ([
     {
-        name: 'url', description: 'Resource url path', attributeType: 'none',
+        name: 'url', description: 'Resource url path', attributeType: 'option-text',
     },
     {
-        name: 'tagnum', description: 'Resource tag num', attributeType: 'number',
+        name: 'file', description: 'Resource file name', attributeType: 'option-text',
     },
-].map<InputOptionType>((item) => ({
-    groupName:     '@maku',
-    key:           item.name,
-    itemID:        item.name,
-    name:          item.name,
-    value:         `@maku:${item.name}`,
-    description:   item.description,
-    attributeType: item.attributeType as AttributeType,
-}));
+    {
+        name: 'filext', description: 'Resource file extension', attributeType: 'text',
+    },
+    {
+        name: 'name', description: 'Resource name', attributeType: 'text',
+    },
+    {
+        name: 'tagnum', description: 'Resource tag num', attributeType: 'range-number',
+    },
+    {
+        name: 'created', description: 'Resource create date', attributeType: 'range-date',
+    },
+    {
+        name: 'updated', description: 'Resource update date', attributeType: 'range-date',
+    },
+] as { name: string, description: string, attributeType: AttributeType }[])
+    .map<InputOptionType>((item) => ({
+        groupName:     System.Namesapce,
+        key:           item.name,
+        itemID:        item.name,
+        name:          item.name,
+        value:         `${System.Namesapce}:${item.name}`,
+        description:   item.description,
+        attributeType: item.attributeType,
+    }));

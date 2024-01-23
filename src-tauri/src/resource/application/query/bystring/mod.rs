@@ -63,8 +63,6 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         let sql_data = StringQLObjectGenerator::new(&new_token).gen()?;
         let ql = ResourceStringQL::from(sql_data);
 
-        dbg!(&ql);
-
         let result = self.resource_repo.string_ql(ql)
             .await;
         
