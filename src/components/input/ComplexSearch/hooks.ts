@@ -32,7 +32,9 @@ import { ComboboxOptionWithDataProps, InputOption, InputOptionType } from './Inp
 type InputStatus = {
     status: SearchStatus;
 
-    inGroup: boolean;
+    groupStatus: 'none' | 'in-include' | 'in-exclude';
+
+    value: string;
 
     inAttribute: boolean;
 }
@@ -64,22 +66,33 @@ const STATUS_MAP: Map<SearchStatus, InputStatusMechine> = (() => {
         {
             name:    SearchStatus.Initial,
             options: () => [InputSymbol.Include, InputSymbol.Exclude],
-            action:  (_, prevStatus) => ({ ...prevStatus, status: SearchStatus.PrefixOperator }),
+            action:  (val, prevStatus) => ({
+                ...prevStatus,
+                value:  val,
+                status: SearchStatus.PrefixOperator,
+            }),
         },
         {
             name:    SearchStatus.PrefixOperator,
             options: () => [InputSymbol.Default, InputSymbol.LeftGroupBracket],
             action:  (val, prevStatus) => ({
                 ...prevStatus,
-                status:  ((val === InputSymbol.LeftGroupBracket) ? SearchStatus.Group : SearchStatus.TagName),
-                inGroup: (val === InputSymbol.LeftGroupBracket),
+                value:       val,
+                status:      ((val === InputSymbol.LeftGroupBracket) ? SearchStatus.Group : SearchStatus.TagName),
+                groupStatus: (() => {
+                    if (val === InputSymbol.LeftGroupBracket) {
+                        // determin group type
+                        return (prevStatus.value === InputSymbol.Include) ? 'in-include' : 'in-exclude';
+                    }
+                    return 'none';
+                })(),
             }),
         },
         {
             name:    SearchStatus.TagName,
             options: (prevStatus) => {
                 const option = [];
-                if (prevStatus.inGroup) {
+                if (prevStatus.groupStatus !== 'none') {
                     option.push(InputSymbol.Default);
                     option.push(InputSymbol.RightGroupBracket);
                 }
@@ -93,25 +106,26 @@ const STATUS_MAP: Map<SearchStatus, InputStatusMechine> = (() => {
                 return option;
             },
             action: (val, prevStatus) => {
+                const newStatus: InputStatus = { ...prevStatus, value: val };
                 if (InputSymbol.isPrefix(val)) {
                     return {
-                        ...prevStatus, status: SearchStatus.PrefixOperator, inGroup: false,
+                        ...newStatus, status: SearchStatus.PrefixOperator, groupStatus: 'none',
                     };
                 }
                 if (val === InputSymbol.RightGroupBracket) {
                     return {
-                        ...prevStatus, status: SearchStatus.Initial, inGroup: false,
+                        ...newStatus, status: SearchStatus.Initial, groupStatus: 'none',
                     };
                 }
                 if (val === InputSymbol.LeftAttrBracket) {
                     return {
-                        ...prevStatus, status: SearchStatus.Attribute, inAttribute: true,
+                        ...newStatus, status: SearchStatus.Attribute, inAttribute: true,
                     };
                 }
-                if (prevStatus.inGroup) {
-                    return { ...prevStatus, status: SearchStatus.TagName };
+                if (prevStatus.groupStatus !== 'none') {
+                    return { ...newStatus, status: SearchStatus.TagName };
                 }
-                return { ...prevStatus, status: SearchStatus.Initial };
+                return { ...newStatus, status: SearchStatus.Initial };
             },
         },
         {
@@ -119,6 +133,7 @@ const STATUS_MAP: Map<SearchStatus, InputStatusMechine> = (() => {
             options: () => [InputSymbol.Default],
             action:  (val, prevStatus) => ({
                 ...prevStatus,
+                value:  val,
                 status: SearchStatus.TagName,
             }),
         },
@@ -127,8 +142,9 @@ const STATUS_MAP: Map<SearchStatus, InputStatusMechine> = (() => {
             options: () => [],
             action:  (val, prevStatus) => ({
                 ...prevStatus,
+                value:       val,
                 inAttribute: false,
-                status:      (prevStatus.inGroup) ? SearchStatus.TagName : SearchStatus.Initial,
+                status:      (prevStatus.groupStatus !== 'none') ? SearchStatus.TagName : SearchStatus.Initial,
             }),
         },
     ];
@@ -156,11 +172,14 @@ export type InputStatusHistory = {
 export const useStateHistory = () => {
     const statusStackRef = useRef<InputStatusHistory[]>([]);
 
-    const pop = useCallback(() => {
+    const pop = useCallback<() => InputStatusHistory >(() => {
         if (statusStackRef.current.length <= 0) {
             return {
                 status: {
-                    status: SearchStatus.Initial, inGroup: false, inAttribute: false,
+                    status:      SearchStatus.Initial,
+                    groupStatus: 'none',
+                    inAttribute: false,
+                    value:       '',
                 },
                 inputs:  [],
                 display: [],
@@ -198,8 +217,9 @@ export const useStateHistory = () => {
 export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     const [currentInputStatus, setCurrentInputStatus] = useState<InputStatus>({
         status:      SearchStatus.Initial,
-        inGroup:     false,
+        groupStatus: 'none',
         inAttribute: false,
+        value:       '',
     });
     const historyManager = useStateHistory();
 
@@ -220,7 +240,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     ), [tags]);
 
     // concat the rawText & querying node from input value
-    const newInput = useCallback((value: string, comboxProps: ComboboxOptionWithDataProps | null) => {
+    const newInput = useCallback((value: string, comboxProps: ComboboxOptionWithDataProps | null, status: InputStatus) => {
         setQueryingNode((prev) => {
             let newNode: QueryingNodeProps = {
                 type:   'tag',
@@ -228,6 +248,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
                 suffix: '',
                 label:  '',
             };
+            let concatNode: QueryingNodeProps | null = null;
             if (!comboxProps) {
                 newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, { type: 'attribute', label: value });
             }
@@ -238,23 +259,33 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
                 newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, {
                     type: 'tag', label: comboxProps['data-name']!, groupName: comboxProps['data-groupname']!,
                 });
+                concatNode = { type: 'display-only', label: (status.groupStatus === 'in-include') ? 'or' : 'and' };
             }
 
             const lastElement = prev[prev.length - 1];
             if (!lastElement) {
                 return [newNode];
             }
+            const prevSlice = prev.slice(0, prev.length - 1);
             // Combine prefix operator with current node
             if (InputSymbol.isPrefix(lastElement.label)) {
-                return [...prev.slice(0, prev.length - 1), { ...newNode, prefix: lastElement.label }];
+                return [...prevSlice, { ...newNode, prefix: lastElement.label }];
             }
             // Combine suffix with attribute bracket
             if (lastElement.type === 'tag' && newNode.label === '{') {
-                return [...prev.slice(0, prev.length - 1), { ...lastElement, suffix: newNode.label }];
+                return [...prevSlice, { ...lastElement, suffix: newNode.label }];
             }
             // Combine suffix with attribute value
             if (lastElement.type === 'tag' && newNode.type === 'attribute') {
-                return [...prev.slice(0, prev.length - 1), { ...lastElement, suffix: `${lastElement.suffix}${newNode.label}}` }];
+                return [...prevSlice, { ...lastElement, suffix: `${lastElement.suffix}${newNode.label}}` }];
+            }
+            // if in the group tag name, add concat node
+            if (concatNode && lastElement.type !== 'operator') {
+                return [...prev, concatNode, newNode];
+            }
+            // padding a empty node after the ']'
+            if (newNode.label === ']') {
+                return [...prev, newNode, { label: '', type: 'display-only' }];
             }
             return [...prev, newNode];
         });
@@ -263,12 +294,14 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
     /**
      * This text is for pass to backend and search used  */
     const rawText = useMemo(() => (
-        queryingNode.map((item) => {
-            if (item.type === 'tag') {
-                return `${item.prefix}"${item.groupName}:${item.label}"${item.suffix}`;
-            }
-            return `${item.prefix}${item.label}${item.suffix}`;
-        }).join(' ')
+        queryingNode
+            .filter((item) => item.type !== 'display-only')
+            .map((item) => {
+                if (item.type === 'tag') {
+                    return `${item.prefix}"${item.groupName}:${item.label}"${item.suffix}`;
+                }
+                return `${item.prefix}${item.label}${item.suffix}`;
+            }).join(' ')
     ), [queryingNode]);
 
     // Memerized the selectable options
@@ -294,7 +327,8 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
      * process the next status of input search
      * @param inputVal original input value from search input
      * @param optionVal value from option selected
-     * @param comboxOptionProps selected comboxx props */
+     * @param comboxOptionProps selected comboxx props
+     * @returns `true` if forward successful, `false` then otherwise */
     const forwardInputSearch = useCallback((inputVal: string, optionVal: string, comboxOptionProps: ComboboxOptionWithDataProps | null) => {
         if (!comboxOptionProps && currentInputStatus.status !== SearchStatus.Attribute) {
             return false;
@@ -307,7 +341,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
         });
         // get next status by action
         const nextStatus = STATUS_MAP.get(currentInputStatus.status)!.action(optionVal, currentInputStatus);
-        newInput(optionVal, comboxOptionProps);
+        newInput(optionVal, comboxOptionProps, currentInputStatus);
         setCurrentInputStatus(nextStatus);
         return true;
     }, [currentInputStatus, queryingNode, rawText, newInput, historyManager]);
@@ -316,7 +350,7 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
      * Clear the search */
     const clearSearch = useCallback(() => {
         setCurrentInputStatus({
-            status: SearchStatus.Initial, inGroup: false, inAttribute: false,
+            status: SearchStatus.Initial, groupStatus: 'none', inAttribute: false, value: '',
         });
         setQueryingNode([]);
         historyManager.clear();

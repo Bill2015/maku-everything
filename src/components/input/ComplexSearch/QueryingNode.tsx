@@ -4,7 +4,7 @@ import classes from './QueryingNode.module.scss';
 export interface QueryingNodeProps {
     /** `Tag` or normal string \
      *  If it's a tag it will clickable link */
-    type: 'tag' | 'operator' | 'attribute';
+    type: 'tag' | 'operator' | 'attribute' | 'display-only';
 
     /**
      * Group name of options */
@@ -43,8 +43,16 @@ export function QueryingNode(props: QueryingNodeProps) {
         );
     }
 
+    if (type === 'display-only') {
+        return (
+            <Text component="span" h="1.1rem" fz="sm" c="indigo">
+                {label}
+            </Text>
+        );
+    }
+
     return (
-        <Text component="span" h="1.1em" fz="xl">
+        <Text component="span" h="1.1rem" fz="xl" c="indigo">
             {prefix}
             {label}
         </Text>

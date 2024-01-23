@@ -63,7 +63,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
         >
             <Combobox.Target>
                 <Flex classNames={{ root: classes.searchRoot }}>
-                    <Group gap="0.6rem" className={classes.displayQuery}>
+                    <Group gap="0.4rem" className={classes.displayQuery}>
                         {displayNode.map((val) => <QueryingNode key={randomId()} {...val} />) }
                         <Input
                             value={searchText}
