@@ -35,7 +35,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
     const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Backspace' && searchText === '') {
             const history = backspaceInputSearch();
-            setSearchText(history.inputs.at(-1)!);
+            setSearchText(history.inputs.at(-1) ? history.inputs.at(-1)! : '');
             e.preventDefault();
             return;
         }
