@@ -230,6 +230,8 @@ pub struct StringQLGroup {
 /// Using `StringQLObjectBuilder` to build object
 #[derive(Debug, Clone)]
 pub struct StringQLObject {
+    belong_category: Option<String>,
+
     item: Vec<StringQLItem>,
 
     groups: Vec<StringQLGroup>,
@@ -237,7 +239,7 @@ pub struct StringQLObject {
 
 impl StringQLObject {
     pub fn new() -> Self {
-        Self { item: Vec::new(), groups: Vec::new() }
+        Self { item: Vec::new(), groups: Vec::new(), belong_category: None }
     }
 
     pub fn get_items(&self) -> &Vec<StringQLItem> {
@@ -258,6 +260,10 @@ pub struct StringQLObjectBuilder {
 impl StringQLObjectBuilder {
     pub fn new() -> Self {
         Self { obj: StringQLObject::new() }
+    }
+
+    pub fn set_belong_category(&mut self, belong_category: String) {
+        self.obj.belong_category = Some(belong_category);
     }
 
     pub fn add_group(&mut self, prefix: StringQLPrefix, items: Vec<StringQLItem>) {

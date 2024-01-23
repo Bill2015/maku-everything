@@ -17,12 +17,15 @@ pub struct StringQLSemantic<'a>  {
     tokens: Vec<QueryToken>,
 
     repo: &'a TagQueryRepository<'a>,
+
+    belong_category: &'a Option<String>,
 }
 
 impl<'a> StringQLSemantic<'a> {
-    pub fn new(tokens: &Vec<QueryToken>, repo: &'a TagQueryRepository) -> Self {
+    pub fn new(tokens: &Vec<QueryToken>, belong_category: &'a Option<String>, repo: &'a TagQueryRepository) -> Self {
         Self {
             repo,
+            belong_category,
             tokens: tokens.iter().cloned().collect(),
         }
     }
@@ -92,6 +95,10 @@ impl<'a> StringQLSemantic<'a> {
 
                 if let Some(namepace) = namespace {
                     builder = builder.set_belong_subject_name(namepace.to_string());
+                }
+
+                if let Some(category) = self.belong_category {
+                    builder = builder.set_belong_category(category.to_string());
                 }
 
                 let result = &self.repo.query(builder)

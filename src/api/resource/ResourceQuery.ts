@@ -93,11 +93,11 @@ export namespace ResourceQuery {
         };
     }
 
-    export function useStringQuering(qString: string, onError: (error: Error) => void) {
+    export function useStringQuering(qString: string, belongCategory: string | null, onError: (error: Error) => void) {
         const queryfn = () => ResourceAPI.queryingByString(qString);
 
         const { error, ...other } = useQuery({
-            queryKey:        ['resource-string-querying', qString],
+            queryKey:        ['resource-string-querying', qString, belongCategory],
             queryFn:         queryfn,
             retry:           0,
             staleTime:       0,

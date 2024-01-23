@@ -7,20 +7,21 @@ use crate::resource::infrastructure::ResourceStringQL;
 use crate::resource::repository::ResourceQueryRepository;
 use crate::tag::repository::TagQueryRepository;
 
+use self::semantic::StringQLSemantic;
+use self::sqlgen::StringQLObjectGenerator;
+use self::syntax::StringQLSyntaxChecker;
+use self::tokenizer::StringQLTokenizer;
+
 mod types;
 mod syntax;
-use syntax::StringQLSyntaxChecker;
 mod tokenizer;
-use tokenizer::StringQLTokenizer;
 mod sqlgen;
-use sqlgen::StringQLObjectGenerator;
 mod token;
 mod semantic;
-use semantic::StringQLSemantic;
-
 
 pub struct StringResourceQuery {
     pub query_string: String,
+    pub belong_category: Option<String>,
 }
 
 
@@ -48,7 +49,7 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
     type Output = Result<Vec<ResourceResDto>, ResourceError>;
 
     async fn query(&self, query: StringResourceQuery) -> Self::Output {
-        let StringResourceQuery { query_string } = query;
+        let StringResourceQuery { query_string, belong_category } = query;
 
         // get token
         let tokens = StringQLTokenizer::new(&query_string).parse();
@@ -57,11 +58,14 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         let _ = StringQLSyntaxChecker::new(&tokens).check()?;
         
         // semantic check
-        let new_token = StringQLSemantic::new(&tokens, self.tag_repo).parse().await?;
+        let new_token = StringQLSemantic::new(&tokens, &belong_category, self.tag_repo).parse().await?;
 
         // generate QL string
-        let sql_data = StringQLObjectGenerator::new(&new_token).gen()?;
-        let ql = ResourceStringQL::from(sql_data);
+        let sqldata = StringQLObjectGenerator::new(&new_token)
+            .set_belong_category(belong_category)
+            .gen()?;
+
+        let ql = ResourceStringQL::from(sqldata);
 
         let result = self.resource_repo.string_ql(ql)
             .await;

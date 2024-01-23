@@ -16,8 +16,8 @@ export namespace ResourceAPI {
         return invoke<ResourceResDto[]>('list_resource', queryDto as unknown as InvokeArgs);
     }
 
-    export function queryingByString(q: string) {
-        return invoke<ResourceResDto[]>('querying_by_string', { q: q });
+    export function queryingByString(q: string, belongCategory?: string) {
+        return invoke<ResourceResDto[]>('querying_by_string', { q, belong_category: belongCategory });
     }
 
     export function getDetail(id: string) {

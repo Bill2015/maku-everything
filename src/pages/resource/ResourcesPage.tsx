@@ -21,7 +21,7 @@ export default function ResourcesPage() {
         refetch: resourceRefetch,
     } = ResourceQuery.useGetByCategory(activeCategory.id);
 
-    const { data: searchResult } = ResourceQuery.useStringQuering(search, (error) => {
+    const { data: searchResult } = ResourceQuery.useStringQuering(search, activeCategory.id, (error) => {
         showNotification('Search Failed', error.message, 'error');
     });
 

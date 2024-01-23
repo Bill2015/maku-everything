@@ -60,12 +60,9 @@ impl<'a> PreDefinedRepository<'a> {
             }};
         "#, sql_predefn::BETWEEN_FN);
 
-        dbg!(&sql);
-
-        let a = self.db
+        let _ = self.db
             .query(sql)
             .await?;
-        dbg!(&a);
 
         Ok(())
     }

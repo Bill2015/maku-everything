@@ -151,8 +151,10 @@ impl<'a> ResourceService<'a> {
         Ok(result)
     }
 
-    pub async fn querying_by_string(&self, query_string: String) -> Result<Vec<ResourceResDto>, ResourceError> {
-        let query = StringResourceQuery { query_string };
+    pub async fn querying_by_string(&self, query_string: String, belong_category: Option<String>) 
+        -> Result<Vec<ResourceResDto>, ResourceError> 
+    {
+        let query = StringResourceQuery { query_string, belong_category };
 
         let result = StringResourceHandler::register(
                 self.resource_query_repo,

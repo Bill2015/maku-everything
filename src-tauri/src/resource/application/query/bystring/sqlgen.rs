@@ -20,6 +20,13 @@ impl<'a> StringQLObjectGenerator<'a> {
         }
     }
 
+    pub fn set_belong_category(mut self, belong_category: Option<String>) -> Self {
+        if let Some(category) = belong_category {
+            self.builder.set_belong_category(category);
+        }
+        self
+    }
+
     pub fn gen(&mut self) -> Result<StringQLObject, ResourceError> {
 
         let mut ops_stack: Vec<Symbol> = Vec::new();

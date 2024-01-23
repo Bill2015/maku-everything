@@ -97,9 +97,9 @@ pub async fn list_resource(
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn querying_by_string(q: String) -> Result<Vec<ResourceResDto>, ResourceError> {
+pub async fn querying_by_string(q: String, belong_category: Option<String>) -> Result<Vec<ResourceResDto>, ResourceError> {
     let result = RESOURCE_SERVICE
-        .querying_by_string(q)
+        .querying_by_string(q, belong_category)
         .await?;
 
     Ok(result)
