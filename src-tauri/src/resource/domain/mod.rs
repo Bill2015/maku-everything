@@ -1,5 +1,5 @@
 use std::ffi::OsStr;
-use std::{path::Path};
+use std::path::Path;
 use chrono::{DateTime, Utc};
 use url::Url;
 use serde::Serialize;

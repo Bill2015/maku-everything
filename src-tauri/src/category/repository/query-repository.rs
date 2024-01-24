@@ -1,8 +1,7 @@
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
-use surrealdb::sql::{Thing, thing};
+use surrealdb::sql::thing;
 
 use crate::common::repository::{env, tablens};
 use crate::category::application::dto::CategoryResDto;

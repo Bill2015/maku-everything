@@ -7,10 +7,9 @@ use crate::command_from_dto;
 use crate::subject::domain::SubjectID;
 use crate::subject::repository::SubjectRepository;
 use crate::tag::application::dto::CreateTagDto;
-use crate::tag::domain::{TagAggregate, TagError, TagGenericError};
+use crate::tag::domain::{TagAggregate, TagError, TagGenericError, TagID};
 use crate::tag::repository::TagRepository;
 use crate::common::application::ICommandHandler;
-use crate::common::domain::ID;
 
 #[derive(Deserialize)]
 pub struct CreateTagCommand {
@@ -44,7 +43,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         String::from("Create Tag Command")
     }
 
-    type Output = Result<String, TagError>;
+    type Output = Result<TagID, TagError>;
 
     async fn execute(&self, command: CreateTagCommand) -> Self::Output {
         let CreateTagCommand { 
@@ -77,7 +76,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             .await;
         
         match result {
-            Ok(value) => Ok(value.id.to_string()),
+            Ok(value) => Ok(value.id),
             _ => Err(TagError::Create(TagGenericError::DBInternalError())),
         }
     }

@@ -1,10 +1,10 @@
-use crate::category::domain::CategoryError;
+use crate::category::domain::{CategoryError, CategoryID};
 
 use super::service::CATEGORY_SERVICE;
-use super::dto::{CategoryResDto, CreateCategoryDto, UpdateCategoryDto};
+use super::dto::*;
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_category(data: CreateCategoryDto) -> Result<String, CategoryError> {
+pub async fn create_category(data: CreateCategoryDto) -> Result<CategoryID, CategoryError> {
     let result = CATEGORY_SERVICE
         .create(data)
         .await?;
@@ -13,7 +13,7 @@ pub async fn create_category(data: CreateCategoryDto) -> Result<String, Category
 }
 
 #[tauri::command]
-pub async fn update_category(data: UpdateCategoryDto) -> Result<String, CategoryError> {
+pub async fn update_category(data: UpdateCategoryDto) -> Result<CategoryID, CategoryError> {
     let result = CATEGORY_SERVICE
         .update(data)
         .await?;

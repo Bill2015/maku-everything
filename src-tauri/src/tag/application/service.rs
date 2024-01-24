@@ -1,13 +1,13 @@
 
 use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
 use crate::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
-use crate::tag::domain::TagError;
+use crate::tag::domain::{TagError, TagID};
 use crate::tag::repository::{TAG_REPOSITORY, TAG_QUERY_REPOSITORY, TagRepository, TagQueryRepository};
 use crate::tag::application::command::{CreateTagCommand, CreateTagHandler};
 use crate::common::application::{ICommandHandler, IQueryHandler};
 
-use super::command::{UpdateTagCommand, UpdateTagHandler};
-use super::dto::{TagResDto, CreateTagDto, UpdateTagDto};
+use super::command::*;
+use super::dto::*;
 use super::query::*;
 
 pub static TAG_SERVICE: TagService = TagService::init(
@@ -38,7 +38,7 @@ impl<'a> TagService<'a> {
         }
     }
 
-    pub async fn create_tag(&self, data: CreateTagDto) -> Result<String, TagError> {
+    pub async fn create_tag(&self, data: CreateTagDto) -> Result<TagID, TagError> {
         let command = CreateTagCommand::from(data);
         let result = CreateTagHandler::register(
                 self.tag_repository,
@@ -51,7 +51,7 @@ impl<'a> TagService<'a> {
         Ok(result)
     }
 
-    pub async fn update_tag(&self, data: UpdateTagDto) -> Result<String, TagError> {
+    pub async fn update_tag(&self, data: UpdateTagDto) -> Result<TagID, TagError> {
         let command = UpdateTagCommand::from(data);
 
         let result = UpdateTagHandler::register(self.tag_repository)

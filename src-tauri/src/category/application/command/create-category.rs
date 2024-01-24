@@ -5,9 +5,9 @@ use crate::category::application::dto::CreateCategoryDto;
 use crate::category::domain::CategoryError;
 use crate::category::domain::CategoryAggregate;
 use crate::category::domain::CategoryGenericError;
+use crate::category::domain::CategoryID;
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
-use crate::common::domain::ID;
 use crate::command_from_dto;
 
 #[derive(Deserialize)]
@@ -38,7 +38,7 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
         String::from("Create Category Command")
     }
 
-    type Output = Result<String, CategoryError>;
+    type Output = Result<CategoryID, CategoryError>;
 
     async fn execute(&self, command: CreateCategoryCommand) -> Self::Output {
         let CreateCategoryCommand { 
@@ -56,7 +56,7 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
             .await;
 
         match result {
-            Ok(value) => Ok(value.id.to_string()),
+            Ok(value) => Ok(value.id),
             _ => Err(CategoryError::Create(CategoryGenericError::DBInternalError())),
         }
     }

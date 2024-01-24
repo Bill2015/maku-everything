@@ -1,9 +1,10 @@
-use crate::resource::domain::ResourceError;
+use crate::resource::domain::{ResourceError, ResourceID};
 
-use super::{service::RESOURCE_SERVICE, dto::{ResourceResDto, ResourceDetailDto, CreateResourceDto, UpdateResourceDto, ResourceAddTagDto, ResourceRemoveTagDto}};
+use super::service::RESOURCE_SERVICE;
+use super::dto::*;
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_resource(data: CreateResourceDto) -> Result<String, ResourceError> {
+pub async fn create_resource(data: CreateResourceDto) -> Result<ResourceID, ResourceError> {
     let result = RESOURCE_SERVICE
         .create_resource(data)
         .await?;
@@ -12,7 +13,7 @@ pub async fn create_resource(data: CreateResourceDto) -> Result<String, Resource
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn update_resource(data: UpdateResourceDto) -> Result<String, ResourceError> {
+pub async fn update_resource(data: UpdateResourceDto) -> Result<ResourceID, ResourceError> {
     let result = RESOURCE_SERVICE
         .update_resource(data)
         .await?;
@@ -22,7 +23,7 @@ pub async fn update_resource(data: UpdateResourceDto) -> Result<String, Resource
 
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn add_resource_tag(data: ResourceAddTagDto) -> Result<String, ResourceError> {
+pub async fn add_resource_tag(data: ResourceAddTagDto) -> Result<ResourceID, ResourceError> {
     let result = RESOURCE_SERVICE
         .add_resource_tag(data)
         .await?;
@@ -31,7 +32,7 @@ pub async fn add_resource_tag(data: ResourceAddTagDto) -> Result<String, Resourc
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn remove_resource_tag(data: ResourceRemoveTagDto) -> Result<String, ResourceError> {
+pub async fn remove_resource_tag(data: ResourceRemoveTagDto) -> Result<ResourceID, ResourceError> {
     let result = RESOURCE_SERVICE
         .remove_resource_tag(data)
         .await?;

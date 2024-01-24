@@ -1,14 +1,12 @@
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::category::domain::CategoryID;
 use crate::category::repository::CategoryRepository;
 use crate::command_from_dto;
 use crate::resource::application::dto::CreateResourceDto;
-use crate::resource::domain::{ResourceAggregate, ResourceError, ResourceGenericError};
+use crate::resource::domain::{ResourceAggregate, ResourceError, ResourceGenericError, ResourceID};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
-use crate::common::domain::ID;
 
 #[derive(Deserialize)]
 pub struct CreateResourceCommand {
@@ -43,7 +41,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         String::from("Create Resource Command")
     }
 
-    type Output = Result<String, ResourceError>;
+    type Output = Result<ResourceID, ResourceError>;
 
     async fn execute(&self, command: CreateResourceCommand) -> Self::Output {
         let CreateResourceCommand { 
@@ -77,7 +75,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
             .await;
         
         match result {
-            Ok(value) => Ok(value.id.to_string()),
+            Ok(value) => Ok(value.id),
             _ => Err(ResourceError::Create(ResourceGenericError::DBInternalError())),
         }
     }

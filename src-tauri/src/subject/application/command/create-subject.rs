@@ -5,10 +5,9 @@ use crate::category::domain::CategoryID;
 use crate::category::repository::CategoryRepository;
 use crate::command_from_dto;
 use crate::subject::application::dto::CreateSubjectDto;
-use crate::subject::domain::{SubjectAggregate, SubjectError, SubjectGenericError};
+use crate::subject::domain::{SubjectAggregate, SubjectError, SubjectGenericError, SubjectID};
 use crate::subject::repository::SubjectRepository;
 use crate::common::application::ICommandHandler;
-use crate::common::domain::ID;
 
 #[derive(Deserialize)]
 pub struct CreateSubjectCommand {
@@ -42,7 +41,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
         String::from("Create Subject Command")
     }
 
-    type Output = Result<String, SubjectError>;
+    type Output = Result<SubjectID, SubjectError>;
 
     async fn execute(&self, command: CreateSubjectCommand) -> Self::Output {
         let CreateSubjectCommand { 
@@ -67,7 +66,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
             .await;
         
         match result {
-            Ok(value) => Ok(value.id.to_string()),
+            Ok(value) => Ok(value.id),
             _ => Err(SubjectError::Create(SubjectGenericError::DBInternalError())),
         }
     }

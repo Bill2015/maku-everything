@@ -1,12 +1,12 @@
 
 use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
-use crate::subject::domain::{SubjectError, SubjectGenericError};
+use crate::subject::domain::{SubjectError, SubjectID};
 use crate::subject::repository::{SUBJECT_REPOSITORY, SUBJECT_QUERY_REPOSITORY, SubjectRepository, SubjectQueryRepository};
 use crate::subject::application::command::{CreateSubjectCommand, CreateSubjectHandler};
 use crate::common::application::{ICommandHandler, IQueryHandler};
 
-use super::command::{UpdateSubjectCommand, UpdateSubjectHandler};
-use super::dto::{SubjectResDto, CreateSubjectDto, UpdateSubjectDto};
+use super::command::*;
+use super::dto::*;
 use super::query::*;
 
 pub static SUBJECT_SERVICE: SubjectService = SubjectService::init(
@@ -33,7 +33,7 @@ impl<'a> SubjectService<'a> {
         }
     }
 
-    pub async fn create_subject(&self, data: CreateSubjectDto) -> Result<String, SubjectError> {
+    pub async fn create_subject(&self, data: CreateSubjectDto) -> Result<SubjectID, SubjectError> {
         let command = CreateSubjectCommand::from(data);
 
         let result = CreateSubjectHandler::register(self.subject_repository, self.category_repository)
@@ -43,7 +43,7 @@ impl<'a> SubjectService<'a> {
         Ok(result)
     }
 
-    pub async fn update_subject(&self, data: UpdateSubjectDto) -> Result<String, SubjectError> {
+    pub async fn update_subject(&self, data: UpdateSubjectDto) -> Result<SubjectID, SubjectError> {
         let command = UpdateSubjectCommand::from(data);
 
         let result = UpdateSubjectHandler::register(self.subject_repository)

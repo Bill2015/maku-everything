@@ -2,7 +2,7 @@
 use crate::category::repository::{CATEGORY_REPOSITORY, CATEGORY_QUERY_REPOSITORY, CategoryRepository, CategoryQueryRepository};
 use crate::category::application::command::{CreateCategoryCommand, CreateCategoryHandler};
 use crate::common::application::{ICommandHandler, IQueryHandler};
-use crate::category::domain::CategoryError;
+use crate::category::domain::{CategoryError, CategoryID};
 
 use super::command::{UpdateCategoryCommand, UpdateCategoryHandler};
 use super::dto::{CategoryResDto, CreateCategoryDto, UpdateCategoryDto};
@@ -25,7 +25,7 @@ impl<'a> CategoryService<'a> {
         }
     }
 
-    pub async fn create(&self, data: CreateCategoryDto) -> Result<String, CategoryError> {
+    pub async fn create(&self, data: CreateCategoryDto) -> Result<CategoryID, CategoryError> {
         let command = CreateCategoryCommand::from(data);
 
         let result = CreateCategoryHandler::register(self.category_repository)
@@ -35,7 +35,7 @@ impl<'a> CategoryService<'a> {
         Ok(result)
     }
 
-    pub async fn update(&self, data: UpdateCategoryDto) -> Result<String, CategoryError> {
+    pub async fn update(&self, data: UpdateCategoryDto) -> Result<CategoryID, CategoryError> {
         let command  = UpdateCategoryCommand::from(data);
 
         let result = UpdateCategoryHandler::register(self.category_repository)

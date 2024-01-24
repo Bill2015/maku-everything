@@ -114,7 +114,7 @@ impl<'a> ResourceRepository<'a> {
             .unwrap_or(None);
 
         match result {
-            Some(value) => true,
+            Some(_) => true,
             None => false,
         }
     }

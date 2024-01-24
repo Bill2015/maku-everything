@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::subject::application::dto::UpdateSubjectDto;
-use crate::subject::domain::{SubjectError, SubjectGenericError};
+use crate::subject::domain::{SubjectError, SubjectGenericError, SubjectID};
 use crate::subject::repository::SubjectRepository;
 use crate::common::application::ICommandHandler;
 
@@ -34,7 +34,7 @@ impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
         String::from("Update Subject Command")
     }
 
-    type Output = Result<String, SubjectError>;
+    type Output = Result<SubjectID, SubjectError>;
 
     async fn execute(&self, command: UpdateSubjectCommand) -> Self::Output {
         let UpdateSubjectCommand { 
@@ -62,10 +62,13 @@ impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
         }
 
         // save
-        let reuslt = self.subject_repo
+        let result = self.subject_repo
             .save(subject)
             .await;
 
-        Ok(String::from("OK"))
+        match result {
+            Ok(value) => Ok(value.id),
+            _ => Err(SubjectError::Update(SubjectGenericError::DBInternalError())),
+        }    
     }
 }

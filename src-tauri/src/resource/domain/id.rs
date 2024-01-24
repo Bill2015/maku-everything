@@ -1,10 +1,8 @@
 use serde::Serialize;
-use crate::impl_domain_id;
 use crate::common::domain::ID;
+use crate::impl_domain_id;
 
 #[derive(Debug, Serialize, Clone)]
-pub struct ResourceID {
-    id: String,
-}
+pub struct ResourceID(String);
 
 impl_domain_id!(ResourceID);

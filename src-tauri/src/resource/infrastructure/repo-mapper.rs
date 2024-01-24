@@ -20,7 +20,7 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
     fn do_to_aggregate(resource_do: ResourceDO) -> ResourceAggregate {
         let tags: Vec<TagID> = resource_do.tags
             .iter()
-            .map(|x|  TagID { id: x.to_string() })
+            .map(|x| TagID::from(x.to_string()))
             .collect();
 
         let file = match resource_do.file {

@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::category::application::dto::UpdateCategoryDto;
-use crate::category::domain::{CategoryError, CategoryGenericError};
+use crate::category::domain::{CategoryError, CategoryGenericError, CategoryID};
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 use crate::command_from_dto;
@@ -34,7 +34,7 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
         String::from("Change Category Command")
     }
 
-    type Output = Result<String, CategoryError>;
+    type Output = Result<CategoryID, CategoryError>;
 
     async fn execute(&self, command: UpdateCategoryCommand) -> Self::Output {
         let UpdateCategoryCommand { 
@@ -70,10 +70,13 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
         }
 
         // save
-        let reuslt = self.categroy_repo
+        let result = self.categroy_repo
             .save(category)
             .await;
 
-        Ok(String::from("OK"))
+        match result {
+            Ok(value) => Ok(value.id),
+            _ => Err(CategoryError::Update(CategoryGenericError::DBInternalError())),
+        }
     }
 }

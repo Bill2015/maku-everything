@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::resource::application::dto::UpdateResourceDto;
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 
@@ -37,7 +37,7 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
         String::from("Change Resource Command")
     }
 
-    type Output = Result<String, ResourceError>;
+    type Output = Result<ResourceID, ResourceError>;
 
     async fn execute(&self, command: UpdateResourceCommand) -> Self::Output {
         let UpdateResourceCommand { 
@@ -70,10 +70,13 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
         }
 
         // save
-        let reuslt = self.resource_repo
+        let result = self.resource_repo
             .save(resource)
             .await;
 
-        Ok(String::from("OK"))
+        match result {
+            Ok(value) => Ok(value.id),
+            _ => Err(ResourceError::Update(ResourceGenericError::DBInternalError())),
+        }
     }
 }

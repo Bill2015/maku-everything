@@ -1,4 +1,3 @@
-use std::fmt;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;

@@ -1,6 +1,3 @@
-use surrealdb::Surreal;
-use surrealdb::engine::remote::ws::Client;
-
 pub mod tablens {
     /** Resource Database Namespace (aka table name) */
     pub const RESOURCE: &str = "resource";

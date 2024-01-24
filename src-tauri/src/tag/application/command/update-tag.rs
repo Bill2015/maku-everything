@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::tag::application::dto::UpdateTagDto;
-use crate::tag::domain::{TagError, TagGenericError};
+use crate::tag::domain::{TagError, TagGenericError, TagID};
 use crate::tag::repository::TagRepository;
 use crate::common::application::ICommandHandler;
 
@@ -35,7 +35,7 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
         String::from("Change Tag Command")
     }
 
-    type Output = Result<String, TagError>;
+    type Output = Result<TagID, TagError>;
 
     async fn execute(&self, command: UpdateTagCommand) -> Self::Output {
         let UpdateTagCommand { 
@@ -63,10 +63,13 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
         }
 
         // save
-        let reuslt = self.tag_repo
+        let result = self.tag_repo
             .save(tag)
             .await;
 
-        Ok(String::from("OK"))
+        match result {
+            Ok(value) => Ok(value.id),
+            _ => Err(TagError::Create(TagGenericError::DBInternalError())),
+        }
     }
 }

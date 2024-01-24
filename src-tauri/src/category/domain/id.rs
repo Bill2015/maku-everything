@@ -1,10 +1,8 @@
 use serde::Serialize;
-use crate::impl_domain_id;
 use crate::common::domain::ID;
+use crate::impl_domain_id;
 
 #[derive(Debug, Serialize, Clone)]
-pub struct CategoryID {
-    id: String,
-}
+pub struct CategoryID(String);
 
 impl_domain_id!(CategoryID);

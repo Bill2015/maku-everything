@@ -2,7 +2,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use common::repository;
-use category::application::service::{CATEGORY_SERVICE};
 
 mod common;
 mod resource;

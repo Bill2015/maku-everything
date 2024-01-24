@@ -3,7 +3,7 @@ use std::process::Command;
 
 use crate::common::application::{ICommandHandler, IQueryHandler};
 use crate::category::repository::CategoryRepository;
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
 use crate::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, ResourceQueryRepository, RESOURCE_QUERY_REPOSITORY};
 use crate::category::repository::CATEGORY_REPOSITORY;
 use crate::tag::repository::{TagRepository, TAG_REPOSITORY, TagQueryRepository, TAG_QUERY_REPOSITORY};
@@ -44,7 +44,7 @@ impl<'a> ResourceService<'a> {
         }
     }
 
-    pub async fn create_resource(&self, data: CreateResourceDto) -> Result<String, ResourceError> {
+    pub async fn create_resource(&self, data: CreateResourceDto) -> Result<ResourceID, ResourceError> {
         let command = CreateResourceCommand::from(data);
 
         let result = CreateResourceHandler::register(self.resource_repository, self.category_repository)
@@ -54,7 +54,7 @@ impl<'a> ResourceService<'a> {
         Ok(result)
     }
 
-    pub async fn update_resource(&self, data: UpdateResourceDto) -> Result<String, ResourceError> {
+    pub async fn update_resource(&self, data: UpdateResourceDto) -> Result<ResourceID, ResourceError> {
         let command = UpdateResourceCommand::from(data);
 
         let result = UpdateResourceHandler::register(self.resource_repository)
@@ -64,7 +64,7 @@ impl<'a> ResourceService<'a> {
         Ok(result)
     }
 
-    pub async fn add_resource_tag(&self, data: ResourceAddTagDto) -> Result<String, ResourceError> {
+    pub async fn add_resource_tag(&self, data: ResourceAddTagDto) -> Result<ResourceID, ResourceError> {
         let command = ResourceAddTagCommand::from(data);
 
         let result = ResourceAddTagHandler::register(self.resource_repository, self.tag_respository)
@@ -74,7 +74,7 @@ impl<'a> ResourceService<'a> {
         Ok(result)
     }
 
-    pub async fn remove_resource_tag(&self, data: ResourceRemoveTagDto) -> Result<String, ResourceError> {
+    pub async fn remove_resource_tag(&self, data: ResourceRemoveTagDto) -> Result<ResourceID, ResourceError> {
         let command = ResourceRemoveTagCommand::from(data);
 
         let result = ResourceRemoveTagHandler::register(self.resource_repository, self.tag_respository)

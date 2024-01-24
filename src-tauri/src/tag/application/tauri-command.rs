@@ -1,10 +1,10 @@
-use crate::tag::domain::TagError;
+use crate::tag::domain::{TagError, TagID};
 
 use super::service::TAG_SERVICE;
-use super::dto::{TagResDto, CreateTagDto, UpdateTagDto};
+use super::dto::*;
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn create_tag(data: CreateTagDto) -> Result<String, TagError> {
+pub async fn create_tag(data: CreateTagDto) -> Result<TagID, TagError> {
     let result = TAG_SERVICE
         .create_tag(data)
         .await?;
@@ -13,7 +13,7 @@ pub async fn create_tag(data: CreateTagDto) -> Result<String, TagError> {
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn update_tag(data: UpdateTagDto) -> Result<String, TagError> {
+pub async fn update_tag(data: UpdateTagDto) -> Result<TagID, TagError> {
     let result = TAG_SERVICE
         .update_tag(data)
         .await?;

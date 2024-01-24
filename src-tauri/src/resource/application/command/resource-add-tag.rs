@@ -3,10 +3,9 @@ use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::resource::application::dto::ResourceAddTagDto;
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
-use crate::common::domain::ID;
 use crate::tag::domain::TagID;
 use crate::tag::repository::TagRepository;
 
@@ -36,7 +35,7 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
         String::from("Create Resource Command")
     }
 
-    type Output = Result<String, ResourceError>;
+    type Output = Result<ResourceID, ResourceError>;
 
     async fn execute(&self, command: ResourceAddTagCommand) -> Self::Output {
         let ResourceAddTagCommand { 
@@ -67,7 +66,7 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
             .await;
         
         match result {
-            Ok(value) => Ok(value.id.to_string()),
+            Ok(value) => Ok(value.id),
             _ => Err(ResourceError::AddTag(ResourceGenericError::DBInternalError())),
         }
     }

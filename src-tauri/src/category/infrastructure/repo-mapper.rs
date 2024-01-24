@@ -1,6 +1,5 @@
 use surrealdb::sql::{Thing, thing};
 use surrealdb::sql::Datetime;
-use chrono::{DateTime, Utc};
 
 use crate::common::domain::ID;
 use crate::common::infrastructure::IRepoMapper;
