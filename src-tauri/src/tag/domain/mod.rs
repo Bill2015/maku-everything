@@ -1,7 +1,9 @@
 
+use chrono::NaiveDateTime;
 use chrono::{DateTime, Utc};
 use crate::common::domain::ID;
 use crate::category::domain::CategoryID;
+use crate::common::infrastructure::date;
 use crate::subject::domain::SubjectID;
 
 mod id;
@@ -56,5 +58,17 @@ impl TagAggregate {
         }
 
         self.description = new_description;
+    }
+
+    pub fn set_updated_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.updated_at = date.and_utc();
+        }
+    }
+
+    pub fn set_created_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.created_at = date.and_utc();
+        }
     }
 }

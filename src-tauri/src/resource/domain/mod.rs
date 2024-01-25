@@ -1,9 +1,11 @@
 use std::ffi::OsStr;
 use std::path::Path;
+use chrono::NaiveDateTime;
 use chrono::{DateTime, Utc};
 use url::Url;
 use serde::Serialize;
 use crate::category::domain::CategoryID;
+use crate::common::infrastructure::date;
 use crate::tag::domain::TagID;
 use crate::common::domain::ID;
 
@@ -23,12 +25,7 @@ pub struct ResourceFileAggregate {
 }
 
 impl ResourceFileAggregate {
-    pub fn new(root_path: String, file_path: String) -> Result<Option<Self>, ResourceError> {
-        
-        if file_path.is_empty() {
-            return Ok(None);
-        }
-
+    pub fn new(root_path: String, file_path: String) -> Result<Self, ResourceError> {
         // If path already contain root path
         // trim it and re-concat it
         let main_path = file_path.trim_start_matches(&root_path);
@@ -51,14 +48,12 @@ impl ResourceFileAggregate {
         };
 
         Ok(
-            Some(
-                ResourceFileAggregate {
-                    uuid: String::from("id"),
-                    name: String::from(path.file_name().unwrap().to_str().unwrap()),
-                    ext: String::from(ext.to_str().unwrap()),
-                    path: String::from(main_path),
-                }
-            )
+            ResourceFileAggregate {
+                uuid: String::from("id"),
+                name: String::from(path.file_name().unwrap().to_str().unwrap()),
+                ext: String::from(ext.to_str().unwrap()),
+                path: String::from(main_path),
+            }
         )
     }
 
@@ -78,11 +73,7 @@ pub struct ResourceUrlAggregate {
     pub full: String,
 }
 impl ResourceUrlAggregate {
-    pub fn new(url: String) -> Result<Option<Self>, ResourceError> {
-        if url.is_empty() {
-            return Ok(None);
-        }
-
+    pub fn new(url: String) -> Result<Self, ResourceError> {
         let url_obj = Url::parse(url.as_str())
             .or(Err(ResourceError::Create(ResourceGenericError::UrlParseFailed())))?;
 
@@ -91,12 +82,10 @@ impl ResourceUrlAggregate {
         }
 
         Ok(
-            Some(
-                ResourceUrlAggregate {
-                    host: url_obj.host().unwrap().to_string(),
-                    full: url,
-                }
-            )
+            ResourceUrlAggregate {
+                host: url_obj.host().unwrap().to_string(),
+                full: url,
+            }
         )
     }
 
@@ -127,10 +116,23 @@ pub struct ResourceAggregate {
 
 impl ResourceAggregate {
 
-    pub fn new(name: String, description: String, belong_category: CategoryID, root_path: String, file_path: String, url: String) -> Result<Self, ResourceError> {
-        let file = ResourceFileAggregate::new(root_path, file_path)?;
+    pub fn new(
+        name: String,
+        description: String,
+        belong_category: CategoryID,
+        root_path: String,
+        file_path: Option<String>,
+        url: Option<String>
+    ) -> Result<Self, ResourceError> {
+        let file = match file_path {
+            Some(path) => Some(ResourceFileAggregate::new(root_path, path)?),
+            None => None,
+        };
 
-        let url = ResourceUrlAggregate::new(url)?;
+        let url = match url {
+            Some(url) => Some(ResourceUrlAggregate::new(url)?),
+            None => None,
+        };
         
         if name.is_empty() && file.is_none() {
             return Err(ResourceError::Create(ResourceGenericError::NameAndFilePathIsEmpty()));
@@ -176,8 +178,20 @@ impl ResourceAggregate {
     }
 
     pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), ResourceError> {
-        self.file = ResourceFileAggregate::new(root_path, file_path)?;
+        self.file = Some(ResourceFileAggregate::new(root_path, file_path)?);
         Ok(())
+    }
+
+    pub fn set_updated_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.updated_at = date.and_utc();
+        }
+    }
+
+    pub fn set_created_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.created_at = date.and_utc();
+        }
     }
 
     pub fn set_authorize(&mut self, flag: bool) {

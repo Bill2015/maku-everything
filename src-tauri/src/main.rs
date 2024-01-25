@@ -22,9 +22,6 @@ async fn connect_db() -> String {
             println!("Connection DB Failed");
             println!("{}", err);
         },
-        _ => {
-
-        }
     }
     String::from("Connect")
 }

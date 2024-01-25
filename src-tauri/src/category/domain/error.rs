@@ -17,6 +17,9 @@ pub enum CategoryError {
 
     #[error("Get specific Category by id failed")]
     GetById(#[source] CategoryGenericError),
+
+    #[error("Import category failed")]
+    Import(#[source] CategoryGenericError),
 }
 
 impl Serialize for CategoryError {
@@ -38,6 +41,10 @@ impl Serialize for CategoryError {
                 command: self.to_string(),
             },
             CategoryError::GetById(source) => ErrorBody {
+                message: source.to_string(),
+                command: self.to_string(),
+            },
+            CategoryError::Import(source) => ErrorBody {
                 message: source.to_string(),
                 command: self.to_string(),
             }
@@ -65,6 +72,15 @@ pub enum CategoryGenericError {
 
     #[error("Id is not exists")]
     IdNotFounded(),
+
+    #[error("Import category id not exists")]
+    ImportCategoryIdNotExists(),
+
+    #[error("Import subject id not exists")]
+    ImportSubjectIdNotExists(),
+
+    #[error("Import tag id not exists")]
+    ImportTagIdNotExists(),
 
     #[error("unknown Category error")]
     Unknown{ message: String },

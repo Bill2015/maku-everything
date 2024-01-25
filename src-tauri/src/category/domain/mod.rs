@@ -1,8 +1,10 @@
 use std::path::Path;
 
+use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
 
+use crate::common::infrastructure::date;
 use crate::common::domain::ID;
 
 mod error;
@@ -65,6 +67,18 @@ impl CategoryAggregate {
                 updated_at: Utc::now(),
             }
         )
+    }
+
+    pub fn set_updated_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.updated_at = date.and_utc();
+        }
+    }
+
+    pub fn set_created_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.created_at = date.and_utc();
+        }
     }
 
     pub fn change_name(&mut self, new_name: String) {
