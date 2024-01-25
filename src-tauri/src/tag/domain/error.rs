@@ -2,7 +2,7 @@ use serde::Serialize;
 use thiserror;
 use anyhow::Error;
 use crate::common::domain::ErrorBody;
-
+use crate::serialize_error;
 
 #[derive(thiserror::Error, Debug)]
 pub enum TagError {
@@ -28,26 +28,11 @@ impl Serialize for TagError {
         S: serde::ser::Serializer,
     {
         let error_message = match self {
-            TagError::Create(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            TagError::Update(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            TagError::GetAll(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            TagError::GetById(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            TagError::Query(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            }
+            TagError::Create(source) => serialize_error!(self, source),
+            TagError::Update(source) => serialize_error!(self, source),
+            TagError::GetAll(source) => serialize_error!(self, source),
+            TagError::GetById(source) => serialize_error!(self, source),
+            TagError::Query(source) => serialize_error!(self, source),
         };
         error_message.serialize(serializer)
     }

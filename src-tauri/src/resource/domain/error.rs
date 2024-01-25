@@ -2,7 +2,7 @@ use serde::Serialize;
 use thiserror;
 use anyhow::Error;
 use crate::common::domain::ErrorBody;
-
+use crate::serialize_error;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ResourceError {
@@ -42,47 +42,17 @@ impl Serialize for ResourceError {
     where
         S: serde::ser::Serializer,
     {
-        let error_message = match self {
-            ResourceError::Create(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::Update(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::GetAll(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::GetById(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::Detail(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::Query(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::QueryingByString(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::AddTag(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::RemoveTag(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            ResourceError::ExploreFile(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
+        let error_message: ErrorBody = match self {
+            ResourceError::Create(source) => serialize_error!(self, source),
+            ResourceError::Update(source) => serialize_error!(self, source),
+            ResourceError::GetAll(source) => serialize_error!(self, source),
+            ResourceError::GetById(source) => serialize_error!(self, source),
+            ResourceError::Detail(source) => serialize_error!(self, source),
+            ResourceError::Query(source) => serialize_error!(self, source),
+            ResourceError::QueryingByString(source) => serialize_error!(self, source),
+            ResourceError::AddTag(source) => serialize_error!(self, source),
+            ResourceError::RemoveTag(source) => serialize_error!(self, source),
+            ResourceError::ExploreFile(source) => serialize_error!(self, source),
         };
         error_message.serialize(serializer)
     }

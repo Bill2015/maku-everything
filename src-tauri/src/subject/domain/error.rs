@@ -3,7 +3,7 @@ use thiserror;
 use anyhow::Error;
 
 use crate::common::domain::ErrorBody;
-
+use crate::serialize_error;
 
 #[derive(thiserror::Error, Debug)]
 pub enum SubjectError {
@@ -30,26 +30,11 @@ impl Serialize for SubjectError {
         S: serde::ser::Serializer,
     {
         let error_message = match self {
-            SubjectError::Create(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            SubjectError::Update(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            SubjectError::GetAll(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            SubjectError::GetById(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            },
-            SubjectError::Query(source) => ErrorBody {
-                message: source.to_string(),
-                command: self.to_string(),
-            }
+            SubjectError::Create(source) => serialize_error!(self, source),
+            SubjectError::Update(source) => serialize_error!(self, source),
+            SubjectError::GetAll(source) => serialize_error!(self, source),
+            SubjectError::GetById(source) => serialize_error!(self, source),
+            SubjectError::Query(source) => serialize_error!(self, source),
         };
         error_message.serialize(serializer)
     }
