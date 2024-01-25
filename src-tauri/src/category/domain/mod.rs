@@ -69,16 +69,20 @@ impl CategoryAggregate {
         )
     }
 
-    pub fn set_updated_at(&mut self, new_date: &str) {
+    pub fn set_updated_at(&mut self, new_date: &str) -> Result<(), CategoryGenericError> {
         if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
             self.updated_at = date.and_utc();
+            return Ok(())
         }
+        Err(CategoryGenericError::InvalidDateFormat())
     }
 
-    pub fn set_created_at(&mut self, new_date: &str) {
+    pub fn set_created_at(&mut self, new_date: &str) -> Result<(), CategoryGenericError> {
         if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
             self.created_at = date.and_utc();
+            return Ok(())
         }
+        Err(CategoryGenericError::InvalidDateFormat())
     }
 
     pub fn change_name(&mut self, new_name: String) {

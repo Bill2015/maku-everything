@@ -58,6 +58,9 @@ pub enum TagGenericError {
     #[error("Id is not exists")]
     IdNotFounded(),
 
+    #[error("Invalid date format")]
+    InvalidDateFormat(),
+
     #[error("unknown Tag error")]
     Unknown{ message: String },
     

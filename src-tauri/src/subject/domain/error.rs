@@ -57,6 +57,9 @@ pub enum SubjectGenericError {
     #[error("Id is not exists")]
     IdNotFounded(),
 
+    #[error("Invalid date format")]
+    InvalidDateFormat(),
+
     #[error("unknown Subject error")]
     Unknown{ message: String },
 

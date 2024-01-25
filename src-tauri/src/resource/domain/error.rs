@@ -96,6 +96,9 @@ pub enum ResourceGenericError {
     #[error("Invalid querying string: {message}")]
     InvalidQueryingString{ message: String },
 
+    #[error("Invalid date format")]
+    InvalidDateFormat(),
+
     #[error("unknown Category error")]
     Unknown{ message: String },
 

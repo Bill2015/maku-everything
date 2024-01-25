@@ -67,6 +67,9 @@ pub enum CategoryGenericError {
 
     #[error("Import tag id not exists")]
     ImportTagIdNotExists(),
+    
+    #[error("Invalid date format")]
+    InvalidDateFormat(),
 
     #[error("unknown Category error")]
     Unknown{ message: String },
