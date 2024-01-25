@@ -85,20 +85,20 @@ impl CategoryAggregate {
         Err(CategoryGenericError::InvalidDateFormat())
     }
 
-    pub fn change_name(&mut self, new_name: String) {
-        if new_name.len() <= 0 {
-            print!("Name can't be empty");
+    pub fn change_name(&mut self, new_name: String) -> Result<(), CategoryGenericError> {
+        if new_name.is_empty() {
+            return Err(CategoryGenericError::NameIsEmpty());
         }
-    
         self.name = new_name;
+        Ok(())
     }
 
-    pub fn change_description(&mut self, new_description: String) {
-        if new_description.len() <= 0 {
-            print!("Description can't be empty")
+    pub fn change_description(&mut self, new_description: String) -> Result<(), CategoryGenericError> {
+        if new_description.is_empty() {
+            return Err(CategoryGenericError::DescriptionIsEmpty());
         }
-        
         self.description = new_description;
+        Ok(())
     }
 
     pub fn change_auth(&mut self, new_auth: bool) {

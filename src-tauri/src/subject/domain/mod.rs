@@ -42,20 +42,20 @@ impl SubjectAggregate {
     }
 
     pub fn change_name(&mut self, new_name: String) -> Result<(), SubjectGenericError> {
-        if new_name.len() <= 0 {
-            return  Err(SubjectGenericError::NameIsEmpty());
+        if new_name.is_empty() {
+            return Err(SubjectGenericError::NameIsEmpty());
         }
 
         self.name = new_name;
         Ok(())
     }
 
-    pub fn change_description(&mut self, new_description: String) {
-        if new_description.len() <= 0 {
-            println!("Description can't be empty")
+    pub fn change_description(&mut self, new_description: String) -> Result<(), SubjectGenericError> {
+        if new_description.is_empty() {
+            return Err(SubjectGenericError::DescriptionIsEmpty());
         }
-
         self.description = new_description;
+        Ok(())
     }
 
     pub fn set_updated_at(&mut self, new_date: &str) -> Result<(), SubjectGenericError> {

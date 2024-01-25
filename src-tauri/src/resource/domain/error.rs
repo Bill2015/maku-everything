@@ -75,6 +75,9 @@ pub enum ResourceGenericError {
     #[error("No File name")]
     FileNameIsEmpty(),
     
+    #[error("Name is empty")]
+    NameIsEmpty(),
+
     #[error("Description is empty")]
     DescriptionIsEmpty(),
 

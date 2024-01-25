@@ -161,20 +161,20 @@ impl ResourceAggregate {
         })
     }
 
-    pub fn change_name(&mut self, new_name: String) {
-        if new_name.len() <= 0 {
-            println!("Name can't be empty");
+    pub fn change_name(&mut self, new_name: String) -> Result<(), ResourceGenericError> {
+        if new_name.is_empty() {
+            return Err(ResourceGenericError::NameIsEmpty());
         }
-
         self.name = new_name;
+        Ok(())
     }
 
-    pub fn change_description(&mut self, new_description: String) {
-        if new_description.len() <= 0 {
-            print!("Description can't be empty");
+    pub fn change_description(&mut self, new_description: String) -> Result<(), ResourceGenericError> {
+        if new_description.is_empty() {
+            return Err(ResourceGenericError::DescriptionIsEmpty());
         }
-
         self.description = new_description;
+        Ok(())
     }
 
     pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), ResourceGenericError> {

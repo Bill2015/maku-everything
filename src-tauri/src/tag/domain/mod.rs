@@ -43,21 +43,20 @@ impl TagAggregate {
         )
     }
 
-    pub fn change_name(&mut self, new_name: String) -> Result<(), TagGenericError>{
-        if new_name.len() <= 0 {
+    pub fn change_name(&mut self, new_name: String) -> Result<(), TagGenericError> {
+        if new_name.is_empty() {
             return Err(TagGenericError::NameIsEmpty());
         }
-
         self.name = new_name;
         Ok(())
     }
 
-    pub fn change_description(&mut self, new_description: String) {
-        if new_description.len() <= 0 {
-            print!("Description can't be empty");
+    pub fn change_description(&mut self, new_description: String) -> Result<(), TagGenericError> {
+        if new_description.is_empty() {
+            return Err(TagGenericError::DescriptionIsEmpty());
         }
-
         self.description = new_description;
+        Ok(())
     }
 
     pub fn set_updated_at(&mut self, new_date: &str) -> Result<(), TagGenericError> {
