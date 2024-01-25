@@ -1,4 +1,4 @@
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::ResourceGenericError;
 
 use super::types::TokenSymbol;
 use super::token::QueryToken;
@@ -6,11 +6,9 @@ use super::token::QueryToken;
 macro_rules! syntax_err {
     ($msg: literal) => {
         Err(
-            ResourceError::QueryingByString(
-                ResourceGenericError::InvalidQueryingString { 
-                    message: $msg.to_string()
-                }
-            )
+            ResourceGenericError::InvalidQueryingString { 
+                message: $msg.to_string()
+            }
         )
     };
 }
@@ -46,7 +44,7 @@ impl<'a> StringQLSyntaxChecker<'a> {
         self.tokens.get(self.current)
     }
 
-    fn check_tagname(&self, value: &String) -> Result<bool, ResourceError> {
+    fn check_tagname(&self, value: &String) -> Result<bool, ResourceGenericError> {
         if value.is_empty() {
             return syntax_err!("The 'Tag Name' is empty");
         }
@@ -71,7 +69,7 @@ impl<'a> StringQLSyntaxChecker<'a> {
         self.match_token(TokenSymbol::EOF)
     }
 
-    fn express_attribute(&mut self) -> Result<(), ResourceError> {
+    fn express_attribute(&mut self) -> Result<(), ResourceGenericError> {
         if self.match_token(TokenSymbol::LeftAttrBracket) == false {
             return Ok(())
         }
@@ -93,7 +91,7 @@ impl<'a> StringQLSyntaxChecker<'a> {
         
     }
 
-    fn express_tags(&mut self) -> Result<(), ResourceError> {
+    fn express_tags(&mut self) -> Result<(), ResourceGenericError> {
         let mut tag_count = 0;
         loop {
             if let Some(QueryToken::TagToken{ value, .. }) = self.peek() {
@@ -122,7 +120,7 @@ impl<'a> StringQLSyntaxChecker<'a> {
         Ok(())
     }
 
-    fn express_body(&mut self) -> Result<(), ResourceError> {
+    fn express_body(&mut self) -> Result<(), ResourceGenericError> {
         if let Some(QueryToken::TagToken{ value, .. }) = self.peek() {
             self.check_tagname(value)?;
             self.comuse_token();
@@ -146,7 +144,7 @@ impl<'a> StringQLSyntaxChecker<'a> {
         }
     }
 
-    fn express(&mut self) -> Result<(), ResourceError> {
+    fn express(&mut self) -> Result<(), ResourceGenericError> {
         if self.match_token(TokenSymbol::Include) || self.match_token(TokenSymbol::Exclude) {
             self.comuse_token();
             self.express_body()?;
@@ -158,7 +156,7 @@ impl<'a> StringQLSyntaxChecker<'a> {
     }
     
 
-    pub fn check(&mut self) -> Result<String, ResourceError> {
+    pub fn check(&mut self) -> Result<String, ResourceGenericError> {
         while !self.eof() {
             self.express()?;
         }

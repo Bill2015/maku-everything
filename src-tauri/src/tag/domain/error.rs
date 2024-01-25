@@ -1,25 +1,25 @@
 use serde::Serialize;
 use thiserror;
-
+use anyhow::Error;
 use crate::common::domain::ErrorBody;
 
 
 #[derive(thiserror::Error, Debug)]
 pub enum TagError {
     #[error("Create Failed")]
-    Create(#[source] TagGenericError),
+    Create(Error),
 
     #[error("Updated Failed")]
-    Update(#[source] TagGenericError),
+    Update(Error),
 
     #[error("Retrieve all Tag failed")]
-    GetAll(#[source] TagGenericError),
+    GetAll(Error),
 
     #[error("Get specific Tag by id failed")]
-    GetById(#[source] TagGenericError),
+    GetById(Error),
 
     #[error("Query Failed")]
-    Query(#[source] TagGenericError),
+    Query(Error),
 }
 
 impl Serialize for TagError {

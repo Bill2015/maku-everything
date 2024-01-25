@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
+use crate::command_from_dto;
 use crate::category::application::dto::import::*;
 use crate::category::domain::CategoryAggregate;
 use crate::category::domain::CategoryError;
@@ -13,7 +15,6 @@ use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 use crate::resource::domain::ResourceAggregate;
 use crate::resource::repository::ResourceRepository;
-use crate::command_from_dto;
 use crate::subject::domain::SubjectAggregate;
 use crate::subject::domain::SubjectID;
 use crate::subject::repository::SubjectRepository;
@@ -80,17 +81,17 @@ impl<'a> ImportCategoryHandler<'a> {
         tags.iter().try_for_each(|val| {
             match subject_id_set.contains(&val.belong_subject) {
                 true => Ok(()),
-                false => Err(CategoryError::Import(CategoryGenericError::ImportSubjectIdNotExists()))
+                false => Err(CategoryGenericError::ImportSubjectIdNotExists())
             }
-        })?;
+        });
 
         // check resource's tags is exists
         resources.iter().flat_map(|val| &val.tags).try_for_each(|val| {
             match  tag_id_set.contains(&val) {
                 true => Ok(()),
-                false => Err(CategoryError::Import(CategoryGenericError::ImportSubjectIdNotExists()))
+                false => Err(CategoryGenericError::ImportSubjectIdNotExists())
             }
-        })?;
+        });
 
         Ok(())
     }
@@ -103,9 +104,9 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
         String::from("Create Category Command")
     }
 
-    type Output = Result<CategoryID, CategoryError>;
+    type Output = CategoryID;
 
-    async fn execute(&self, command: ImportCategoryCommand) -> Self::Output {
+    async fn execute(&self, command: ImportCategoryCommand) -> Result<Self::Output, Error> {
         let ImportCategoryCommand { 
             root_path,
             category,
@@ -116,10 +117,10 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
         } = command;
 
         // check relation is valid
-        self.check_relation(&subjects, &tags, &resources)?;
+        self.check_relation(&subjects, &tags, &resources);
 
         // create new category
-        let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone())?;
+        let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone()).unwrap();
 
         new_category.set_created_at(&category.created_at);
         new_category.set_updated_at(&category.updated_at);
@@ -128,7 +129,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
         let category_id = self.categroy_repo
             .save(new_category)
             .await
-            .or(Err(CategoryError::Import(CategoryGenericError::DBInternalError())))?
+            .or(Err(CategoryGenericError::DBInternalError()))?
             .id;
 
         // ------------------------------
@@ -137,7 +138,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
 
         for subject in subjects {
             // TODO: error handling
-            let mut new_subject = SubjectAggregate::new(subject.name, subject.description, category_id.clone()).unwrap();
+            let mut new_subject = SubjectAggregate::new(subject.name, subject.description, category_id.clone())?;
             
             new_subject.set_created_at(&subject.created_at);
             new_subject.set_updated_at(&subject.updated_at);
@@ -145,7 +146,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
             let subject_id = self.subject_repo
                 .save(new_subject)
                 .await
-                .or(Err(CategoryError::Import(CategoryGenericError::DBInternalError())))?
+                .or(Err(CategoryGenericError::DBInternalError()))?
                 .id;
     
             subject_id_hash.insert(subject.id, subject_id);
@@ -170,7 +171,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
             let tag_id = self.tag_repo
                 .save(new_tag)
                 .await
-                .or(Err(CategoryError::Import(CategoryGenericError::DBInternalError())))?
+                .or(Err(CategoryGenericError::DBInternalError()))?
                 .id;
 
             tag_id_hash.insert(tag.id, tag_id);

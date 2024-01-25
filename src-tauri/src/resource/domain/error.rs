@@ -1,40 +1,40 @@
 use serde::Serialize;
 use thiserror;
-
+use anyhow::Error;
 use crate::common::domain::ErrorBody;
 
 
 #[derive(thiserror::Error, Debug)]
 pub enum ResourceError {
     #[error("Create Failed")]
-    Create(#[source] ResourceGenericError),
+    Create(Error),
 
     #[error("Updated Failed")]
-    Update(#[source] ResourceGenericError),
+    Update(Error),
 
     #[error("Retrieve all Resource failed")]
-    GetAll(#[source] ResourceGenericError),
+    GetAll(Error),
 
     #[error("Get specific Resource by id failed")]
-    GetById(#[source] ResourceGenericError),
+    GetById(Error),
 
     #[error("Get Resource Detail by Id failed")]
-    Detail(#[source] ResourceGenericError),
+    Detail(Error),
 
     #[error("Query Resource failed")]
-    Query(#[source] ResourceGenericError),
+    Query(Error),
 
     #[error("Querying by string failed")]
-    QueryingByString(#[source] ResourceGenericError),
+    QueryingByString(Error),
 
     #[error("Add tag")]
-    AddTag(#[source] ResourceGenericError),
+    AddTag(Error),
     
     #[error("Remove tag")]
-    RemoveTag(#[source] ResourceGenericError),
+    RemoveTag(Error),
 
     #[error("Explore file failed")]
-    ExploreFile(#[source] ResourceGenericError),
+    ExploreFile(Error),
 }
 
 impl Serialize for ResourceError {

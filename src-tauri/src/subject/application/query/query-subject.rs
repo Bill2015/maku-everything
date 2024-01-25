@@ -1,7 +1,8 @@
+use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
-use crate::subject::domain::{SubjectError, SubjectGenericError};
+use crate::subject::domain::SubjectGenericError;
 use crate::subject::infrastructure::SubjectQueryBuilder;
 use crate::subject::repository::SubjectQueryRepository;
 use crate::subject::application::dto::SubjectResDto;
@@ -33,9 +34,9 @@ impl IQueryHandler<ListSubjectQuery> for ListSubjectHandler<'_>{
         String::from("Get All Subject")
     }
 
-    type Output = Result<Vec<SubjectResDto>, SubjectError>;
+    type Output = Vec<SubjectResDto>;
 
-    async fn query(&self, query: ListSubjectQuery) -> Self::Output {
+    async fn query(&self, query: ListSubjectQuery) -> Result<Self::Output, Error> {
         let query_builder = SubjectQueryBuilder::from(query);
 
         let result = self.subject_repo
@@ -44,7 +45,7 @@ impl IQueryHandler<ListSubjectQuery> for ListSubjectHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(SubjectError::Query(SubjectGenericError::DBInternalError())),
+            _ => Err(SubjectGenericError::DBInternalError().into()),
         }
     }
 }

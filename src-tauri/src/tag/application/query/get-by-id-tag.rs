@@ -1,7 +1,8 @@
+use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
-use crate::tag::domain::{TagError, TagGenericError};
+use crate::tag::domain::TagGenericError;
 use crate::tag::repository::TagQueryRepository;
 use crate::tag::application::dto::TagResDto;
 
@@ -26,9 +27,9 @@ impl IQueryHandler<GetByIdTagQuery> for GetByIdTagHandler<'_>{
         String::from("Get All Tag")
     }
 
-    type Output = Result<Option<TagResDto>, TagError>;
+    type Output = Option<TagResDto>;
 
-    async fn query(&self, query: GetByIdTagQuery) -> Self::Output {
+    async fn query(&self, query: GetByIdTagQuery) -> Result<Self::Output, Error> {
         let GetByIdTagQuery { id } = query;
 
         let result = self.tag_repo
@@ -37,7 +38,7 @@ impl IQueryHandler<GetByIdTagQuery> for GetByIdTagHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(TagError::GetById(TagGenericError::DBInternalError())),
+            _ => Err(TagGenericError::DBInternalError().into()),
         }
     }
 }

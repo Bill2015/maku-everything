@@ -1,15 +1,13 @@
 use crate::tag::repository::TagQueryRepository;
 use crate::tag::infrastructure::TagQueryBuilder;
 use crate::resource::infrastructure::{AttributeValue, AttributeValueType, SystemTag};
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::ResourceGenericError;
 use super::token::QueryToken;
 use super::types::TokenSymbol;
 
 macro_rules! semantic_err {
     ($msg: expr) => {
-        ResourceError::QueryingByString(
-            ResourceGenericError::InvalidQueryingString { message: $msg.to_string() }
-        )
+        ResourceGenericError::InvalidQueryingString { message: $msg.to_string() }
     };
 }
 
@@ -37,7 +35,7 @@ impl<'a> StringQLSemantic<'a> {
         }
     }
 
-    fn parse_value(&mut self) -> Result<(), ResourceError> {
+    fn parse_value(&mut self) -> Result<(), ResourceGenericError> {
         let mut new_tokens: Vec<QueryToken> = Vec::new();
         let mut current: usize = 0;
 
@@ -87,7 +85,7 @@ impl<'a> StringQLSemantic<'a> {
         Ok(())
     }
 
-    async fn generate_tag_id(&mut self) -> Result<(), ResourceError> {
+    async fn generate_tag_id(&mut self) -> Result<(), ResourceGenericError> {
         for token in self.tokens.iter_mut() {
             if let QueryToken::TagToken { namespace, value, .. } = token {
                 let mut builder = TagQueryBuilder::new()
@@ -103,7 +101,7 @@ impl<'a> StringQLSemantic<'a> {
 
                 let result = &self.repo.query(builder)
                     .await
-                    .or(Err(ResourceError::QueryingByString(ResourceGenericError::DBInternalError())))?;
+                    .or(Err(ResourceGenericError::DBInternalError()))?;
 
                 // find multiple same name tags
                 let _ = match result.len() {
@@ -112,8 +110,8 @@ impl<'a> StringQLSemantic<'a> {
                         token.set_tag_id(result.id.to_string());
                         Ok(())
                     },
-                    0 => Err(ResourceError::QueryingByString(ResourceGenericError::TagNotExists())),
-                    _ => Err(ResourceError::QueryingByString(ResourceGenericError::FindAmbiguousTags()))
+                    0 => Err(ResourceGenericError::TagNotExists()),
+                    _ => Err(ResourceGenericError::FindAmbiguousTags()),
                 }?;
             }
         }
@@ -121,7 +119,7 @@ impl<'a> StringQLSemantic<'a> {
         Ok(())
     }
 
-    pub async fn parse(&mut self) -> Result<Vec<QueryToken>, ResourceError> {
+    pub async fn parse(&mut self) -> Result<Vec<QueryToken>, ResourceGenericError> {
         self.generate_tag_id().await?;
         self.parse_value()?;
 

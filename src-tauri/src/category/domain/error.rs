@@ -1,25 +1,25 @@
 use serde::Serialize;
 use thiserror;
+use anyhow::Error;
 
 use crate::common::domain::ErrorBody;
-
 
 #[derive(thiserror::Error, Debug)]
 pub enum CategoryError {
     #[error("Create Failed")]
-    Create(#[source] CategoryGenericError),
+    Create(Error),
 
     #[error("Updated Failed")]
-    Update(#[source] CategoryGenericError),
+    Update(Error),
 
     #[error("Retrieve all Category failed")]
-    GetAll(#[source] CategoryGenericError),
+    GetAll(Error),
 
     #[error("Get specific Category by id failed")]
-    GetById(#[source] CategoryGenericError),
+    GetById(Error),
 
     #[error("Import category failed")]
-    Import(#[source] CategoryGenericError),
+    Import(Error),
 }
 
 impl Serialize for CategoryError {

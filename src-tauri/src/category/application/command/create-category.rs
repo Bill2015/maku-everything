@@ -1,14 +1,15 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::category::application::dto::CreateCategoryDto;
-use crate::category::domain::CategoryError;
 use crate::category::domain::CategoryAggregate;
 use crate::category::domain::CategoryGenericError;
 use crate::category::domain::CategoryID;
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 use crate::command_from_dto;
+
 
 #[derive(Deserialize)]
 pub struct CreateCategoryCommand {
@@ -38,9 +39,9 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
         String::from("Create Category Command")
     }
 
-    type Output = Result<CategoryID, CategoryError>;
+    type Output = CategoryID;
 
-    async fn execute(&self, command: CreateCategoryCommand) -> Self::Output {
+    async fn execute(&self, command: CreateCategoryCommand) -> Result<Self::Output, Error> {
         let CreateCategoryCommand { 
             name,
             description,
@@ -57,7 +58,7 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
 
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(CategoryError::Create(CategoryGenericError::DBInternalError())),
+            _ => Err(CategoryGenericError::DBInternalError().into()),
         }
     }
 }

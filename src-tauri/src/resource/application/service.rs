@@ -1,6 +1,8 @@
 use std::path::Path;
 use std::process::Command;
 
+use anyhow::anyhow;
+
 use crate::common::application::{ICommandHandler, IQueryHandler};
 use crate::category::repository::CategoryRepository;
 use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
@@ -49,7 +51,8 @@ impl<'a> ResourceService<'a> {
 
         let result = CreateResourceHandler::register(self.resource_repository, self.category_repository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| ResourceError::Create(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -59,7 +62,8 @@ impl<'a> ResourceService<'a> {
 
         let result = UpdateResourceHandler::register(self.resource_repository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| ResourceError::Update(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -69,7 +73,8 @@ impl<'a> ResourceService<'a> {
 
         let result = ResourceAddTagHandler::register(self.resource_repository, self.tag_respository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| ResourceError::AddTag(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -78,7 +83,9 @@ impl<'a> ResourceService<'a> {
         let command = ResourceRemoveTagCommand::from(data);
 
         let result = ResourceRemoveTagHandler::register(self.resource_repository, self.tag_respository)
-            .execute(command).await?;
+            .execute(command)
+            .await
+            .map_err(|err| ResourceError::RemoveTag(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -90,7 +97,8 @@ impl<'a> ResourceService<'a> {
 
         let result = GetByIdResourceHandler::register(self.resource_query_repo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| ResourceError::GetById(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -100,7 +108,8 @@ impl<'a> ResourceService<'a> {
 
         let result = GetAllResourceHandler::register(self.resource_query_repo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| ResourceError::GetAll(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -108,18 +117,19 @@ impl<'a> ResourceService<'a> {
     pub async fn resource_detail(&self, resource_id: String) -> Result<Option<ResourceDetailDto>, ResourceError> {
         let query = ResourceDetailQuery { id: resource_id };
 
-        let handler = ResourceDetailHandler::register(self.resource_query_repo);
+        let result = ResourceDetailHandler::register(self.resource_query_repo)
+            .query(query)
+            .await
+            .map_err(|err| ResourceError::Detail(anyhow!(err)))?;
 
-        let res = handler.query(query).await?;
-
-        Ok(res)
+        Ok(result)
     }
 
     pub async fn expore_the_file(&self, file_path: String) -> Result<(), ResourceError> {
         let path = Path::new(file_path.as_str());
 
         if path.exists() == false {
-            return Err(ResourceError::ExploreFile(ResourceGenericError::FilePathNotExist()));
+            return Err(ResourceError::ExploreFile(anyhow!(ResourceGenericError::FilePathNotExist())));
         }
         // TODO: For now, Windows Only 
         Command::new("explorer")
@@ -146,7 +156,8 @@ impl<'a> ResourceService<'a> {
         
         let result = ListResourceHandler::register(self.resource_query_repo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| ResourceError::Query(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -161,7 +172,8 @@ impl<'a> ResourceService<'a> {
                 self.tag_query_repository,
             )
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| ResourceError::QueryingByString(anyhow!(err)))?;
 
         Ok(result)
     }

@@ -1,9 +1,10 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::tag::application::dto::UpdateTagDto;
-use crate::tag::domain::{TagError, TagGenericError, TagID};
+use crate::tag::domain::{TagGenericError, TagID};
 use crate::tag::repository::TagRepository;
 use crate::common::application::ICommandHandler;
 
@@ -35,9 +36,9 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
         String::from("Change Tag Command")
     }
 
-    type Output = Result<TagID, TagError>;
+    type Output = TagID;
 
-    async fn execute(&self, command: UpdateTagCommand) -> Self::Output {
+    async fn execute(&self, command: UpdateTagCommand) -> Result<Self::Output, Error> {
         let UpdateTagCommand { 
             id,
             name,
@@ -49,8 +50,8 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
         let mut tag = self.tag_repo
             .find_by_id(&id)
             .await
-            .or(Err(TagError::Update(TagGenericError::DBInternalError())))?
-            .ok_or(TagError::Update(TagGenericError::IdNotFounded()))?;
+            .or(Err(TagGenericError::DBInternalError()))?
+            .ok_or(TagGenericError::IdNotFounded())?;
 
         // change name
         if name.is_some() {
@@ -69,7 +70,7 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
 
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(TagError::Create(TagGenericError::DBInternalError())),
+            _ => Err(TagGenericError::DBInternalError().into()),
         }
     }
 }

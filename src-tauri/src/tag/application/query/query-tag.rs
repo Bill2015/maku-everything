@@ -1,7 +1,8 @@
+use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
-use crate::tag::domain::{TagError, TagGenericError};
+use crate::tag::domain::TagGenericError;
 use crate::tag::infrastructure::TagQueryBuilder;
 use crate::tag::repository::TagQueryRepository;
 use crate::tag::application::dto::TagResDto;
@@ -39,9 +40,9 @@ impl IQueryHandler<ListTagQuery> for ListTagHandler<'_>{
         String::from("Get All Tag")
     }
 
-    type Output = Result<Vec<TagResDto>, TagError>;
+    type Output = Vec<TagResDto>;
 
-    async fn query(&self, query: ListTagQuery) -> Self::Output {
+    async fn query(&self, query: ListTagQuery) -> Result<Self::Output, Error> {
         let query_builder = TagQueryBuilder::from(query);
 
         let result = self.tag_repo
@@ -50,7 +51,7 @@ impl IQueryHandler<ListTagQuery> for ListTagHandler<'_>{
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(TagError::Query(TagGenericError::DBInternalError())),
+            _ => Err(TagGenericError::DBInternalError().into()),
         }
     }
 }

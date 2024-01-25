@@ -1,9 +1,10 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::resource::application::dto::ResourceRemoveTagDto;
-use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
+use crate::resource::domain::{ResourceGenericError, ResourceID};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 use crate::tag::domain::TagID;
@@ -36,9 +37,9 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
         String::from("Create Resource Command")
     }
 
-    type Output = Result<ResourceID, ResourceError>;
+    type Output = ResourceID;
 
-    async fn execute(&self, command: ResourceRemoveTagCommand) -> Self::Output {
+    async fn execute(&self, command: ResourceRemoveTagCommand) -> Result<Self::Output, Error> {
         let ResourceRemoveTagCommand { 
             id,
             tag_id,
@@ -50,14 +51,14 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
             .is_exist(&tag_id)
             .await
             .then(|| TagID::from(tag_id))
-            .ok_or(ResourceError::AddTag(ResourceGenericError::TagNotExists()))?;   
+            .ok_or(ResourceGenericError::TagNotExists())?;   
 
         // find by id
         let mut resource = self.resource_repo
             .find_by_id(id)
             .await
-            .or(Err(ResourceError::AddTag(ResourceGenericError::DBInternalError())))?
-            .ok_or(ResourceError::AddTag(ResourceGenericError::IdNotFound()))?;
+            .or(Err(ResourceGenericError::DBInternalError()))?
+            .ok_or(ResourceGenericError::IdNotFound())?;
                 
         // remove tag
         resource.del_tag(tag_id)?;
@@ -69,7 +70,7 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
         
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(ResourceError::RemoveTag(ResourceGenericError::DBInternalError())),
+            _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }
 }

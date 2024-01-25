@@ -1,7 +1,8 @@
+use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::ResourceGenericError;
 use crate::resource::repository::ResourceQueryRepository;
 use crate::resource::application::dto::ResourceDetailDto;
 
@@ -26,9 +27,9 @@ impl IQueryHandler<ResourceDetailQuery> for ResourceDetailHandler<'_>{
         String::from("Get All Resource")
     }
 
-    type Output = Result<Option<ResourceDetailDto>, ResourceError>;
+    type Output = Option<ResourceDetailDto>;
 
-    async fn query(&self, query: ResourceDetailQuery) -> Self::Output {
+    async fn query(&self, query: ResourceDetailQuery) -> Result<Self::Output, Error> {
         let ResourceDetailQuery { id } = query;
 
         let result = self.resource_repo
@@ -37,7 +38,7 @@ impl IQueryHandler<ResourceDetailQuery> for ResourceDetailHandler<'_>{
 
         match result {
             Ok(value) => Ok(value),
-            _ => Err(ResourceError::Detail(ResourceGenericError::DBInternalError())),
+            _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }
 }

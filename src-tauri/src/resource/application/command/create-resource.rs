@@ -1,10 +1,11 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::category::repository::CategoryRepository;
 use crate::command_from_dto;
 use crate::resource::application::dto::CreateResourceDto;
-use crate::resource::domain::{ResourceAggregate, ResourceError, ResourceGenericError, ResourceID};
+use crate::resource::domain::{ResourceAggregate, ResourceGenericError, ResourceID};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 
@@ -41,9 +42,9 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         String::from("Create Resource Command")
     }
 
-    type Output = Result<ResourceID, ResourceError>;
+    type Output = ResourceID;
 
-    async fn execute(&self, command: CreateResourceCommand) -> Self::Output {
+    async fn execute(&self, command: CreateResourceCommand) -> Result<Self::Output, Error> {
         let CreateResourceCommand { 
             name,
             description,
@@ -55,8 +56,8 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         let category = self.category_repo
             .find_by_id(&belong_category)
             .await
-            .or(Err(ResourceError::Create(ResourceGenericError::DBInternalError())))?
-            .ok_or(ResourceError::Create(ResourceGenericError::BelongCategoryNotExists()))?;
+            .or(Err(ResourceGenericError::DBInternalError()))?
+            .ok_or(ResourceGenericError::BelongCategoryNotExists())?;
 
 
         // create new resource
@@ -76,7 +77,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(ResourceError::Create(ResourceGenericError::DBInternalError())),
+            _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }
 }

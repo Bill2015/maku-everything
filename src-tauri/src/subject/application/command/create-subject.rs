@@ -1,3 +1,4 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
@@ -5,7 +6,7 @@ use crate::category::domain::CategoryID;
 use crate::category::repository::CategoryRepository;
 use crate::command_from_dto;
 use crate::subject::application::dto::CreateSubjectDto;
-use crate::subject::domain::{SubjectAggregate, SubjectError, SubjectGenericError, SubjectID};
+use crate::subject::domain::{SubjectAggregate, SubjectGenericError, SubjectID};
 use crate::subject::repository::SubjectRepository;
 use crate::common::application::ICommandHandler;
 
@@ -41,9 +42,9 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
         String::from("Create Subject Command")
     }
 
-    type Output = Result<SubjectID, SubjectError>;
+    type Output = SubjectID;
 
-    async fn execute(&self, command: CreateSubjectCommand) -> Self::Output {
+    async fn execute(&self, command: CreateSubjectCommand) -> Result<Self::Output, Error> {
         let CreateSubjectCommand { 
             name,
             description,
@@ -55,7 +56,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
             .is_exist(&belong_category)
             .await
             .then(|| CategoryID::from(belong_category))
-            .ok_or(SubjectError::Create(SubjectGenericError::BelongCategoryNotExists()))?;
+            .ok_or(SubjectGenericError::BelongCategoryNotExists())?;
 
         // create new subject
         let new_subject = SubjectAggregate::new(name, description, category_id)?;
@@ -67,7 +68,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(SubjectError::Create(SubjectGenericError::DBInternalError())),
+            _ => Err(SubjectGenericError::DBInternalError().into()),
         }
     }
 }

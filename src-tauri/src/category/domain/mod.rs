@@ -27,10 +27,10 @@ pub struct CategoryAggregate {
 }
 
 impl CategoryAggregate {
-    pub fn new(name: String, description: String, root_path: String) -> Result<Self, CategoryError> {
+    pub fn new(name: String, description: String, root_path: String) -> Result<Self, CategoryGenericError> {
         // path can't be empty
         if root_path.is_empty() {
-            return Err(CategoryError::Create(CategoryGenericError::RootPathIsEmpty()));
+            return Err(CategoryGenericError::RootPathIsEmpty());
         }
 
         // the path must be end with '\'
@@ -43,17 +43,17 @@ impl CategoryAggregate {
         // create path object
         let path = Path::new(new_path.as_str());
         if path.exists() == false {
-            return Err(CategoryError::Create(CategoryGenericError::RootPathNotExists()));
+            return Err(CategoryGenericError::RootPathNotExists());
         }
 
         // name can't be empty
         if name.len() <= 0 {
-            return Err(CategoryError::Create(CategoryGenericError::NameIsEmpty()));
+            return Err(CategoryGenericError::NameIsEmpty());
         }
 
         // description can't be empty
         if description.len() <= 0 {
-            return  Err(CategoryError::Create(CategoryGenericError::DescriptionIsEmpty()));
+            return  Err(CategoryGenericError::DescriptionIsEmpty());
         }
         
         Ok(

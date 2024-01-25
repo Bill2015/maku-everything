@@ -1,4 +1,4 @@
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::ResourceGenericError;
 use crate::resource::infrastructure::{StringQLObject, StringQLObjectBuilder, StringQLPrefix, StringQLItem, SystemTag};
 
 use super::types::TokenSymbol;
@@ -27,7 +27,7 @@ impl<'a> StringQLObjectGenerator<'a> {
         self
     }
 
-    pub fn gen(&mut self) -> Result<StringQLObject, ResourceError> {
+    pub fn gen(&mut self) -> Result<StringQLObject, ResourceGenericError> {
 
         let mut ops_stack: Vec<Symbol> = Vec::new();
 
@@ -91,11 +91,9 @@ impl<'a> StringQLObjectGenerator<'a> {
                 },
                 // semantic will merge all the attribute tokens in tag token
                 QueryToken::AttributeToken { .. } => {
-                    return Err(ResourceError::QueryingByString(
-                        ResourceGenericError::InvalidQueryingString{ 
-                            message: "Unexpected error, it still have attribute token in string ql generator".to_string()
-                        }
-                    ))
+                    return Err(ResourceGenericError::InvalidQueryingString{ 
+                        message: "Unexpected error, it still have attribute token in string ql generator".to_string()
+                    })
                 },
             }
         };

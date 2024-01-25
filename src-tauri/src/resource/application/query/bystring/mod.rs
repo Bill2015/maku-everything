@@ -1,8 +1,9 @@
+use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
 use crate::resource::application::dto::ResourceResDto;
-use crate::resource::domain::{ResourceError, ResourceGenericError};
+use crate::resource::domain::ResourceGenericError;
 use crate::resource::infrastructure::ResourceStringQL;
 use crate::resource::repository::ResourceQueryRepository;
 use crate::tag::repository::TagQueryRepository;
@@ -46,9 +47,9 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         String::from("String Querying Resource")
     }
 
-    type Output = Result<Vec<ResourceResDto>, ResourceError>;
+    type Output = Vec<ResourceResDto>;
 
-    async fn query(&self, query: StringResourceQuery) -> Self::Output {
+    async fn query(&self, query: StringResourceQuery) -> Result<Self::Output, Error> {
         let StringResourceQuery { query_string, belong_category } = query;
 
         // get token
@@ -72,7 +73,7 @@ impl IQueryHandler<StringResourceQuery> for StringResourceHandler<'_>{
         
         match result {
             Ok(value) => Ok(value),
-            _ => Err(ResourceError::Query(ResourceGenericError::DBInternalError())),
+            _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }
 }

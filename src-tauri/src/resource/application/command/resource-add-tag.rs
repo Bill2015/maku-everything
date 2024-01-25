@@ -1,9 +1,10 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::resource::application::dto::ResourceAddTagDto;
-use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
+use crate::resource::domain::{ResourceGenericError, ResourceID};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 use crate::tag::domain::TagID;
@@ -35,9 +36,9 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
         String::from("Create Resource Command")
     }
 
-    type Output = Result<ResourceID, ResourceError>;
+    type Output = ResourceID;
 
-    async fn execute(&self, command: ResourceAddTagCommand) -> Self::Output {
+    async fn execute(&self, command: ResourceAddTagCommand) -> Result<Self::Output, Error> {
         let ResourceAddTagCommand { 
             id,
             tag_id,
@@ -48,14 +49,14 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
             .is_exist(&tag_id)
             .await
             .then(|| TagID::from(tag_id))
-            .ok_or(ResourceError::AddTag(ResourceGenericError::TagNotExists()))?;   
+            .ok_or(ResourceGenericError::TagNotExists())?;   
 
         // find by id
         let mut resource = self.resource_repo
             .find_by_id(id)
             .await
-            .or(Err(ResourceError::AddTag(ResourceGenericError::DBInternalError())))?
-            .ok_or(ResourceError::AddTag(ResourceGenericError::IdNotFound()))?;
+            .or(Err(ResourceGenericError::DBInternalError()))?
+            .ok_or(ResourceGenericError::IdNotFound())?;
 
         // add tag  
         resource.add_tag(tag_id)?;
@@ -67,7 +68,7 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(ResourceError::AddTag(ResourceGenericError::DBInternalError())),
+            _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }
 }

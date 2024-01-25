@@ -1,4 +1,6 @@
 
+use anyhow::anyhow;
+
 use crate::category::repository::{CATEGORY_REPOSITORY, CATEGORY_QUERY_REPOSITORY, CategoryRepository, CategoryQueryRepository};
 use crate::category::application::command::{CreateCategoryCommand, CreateCategoryHandler};
 use crate::common::application::{ICommandHandler, IQueryHandler};
@@ -30,7 +32,8 @@ impl<'a> CategoryService<'a> {
 
         let result = CreateCategoryHandler::register(self.category_repository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| CategoryError::Create(anyhow!(err)))?;
         
         Ok(result)
     }
@@ -40,7 +43,8 @@ impl<'a> CategoryService<'a> {
 
         let result = UpdateCategoryHandler::register(self.category_repository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| CategoryError::Update(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -50,7 +54,8 @@ impl<'a> CategoryService<'a> {
 
         let result = GetAllCategoryHandler::register(self.category_queryrepo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| CategoryError::GetAll(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -60,7 +65,8 @@ impl<'a> CategoryService<'a> {
         
         let result = GetByIdCategoryHandler::register(self.category_queryrepo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| CategoryError::GetById(anyhow!(err)))?;
 
         Ok(result)
     }

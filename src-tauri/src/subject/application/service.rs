@@ -1,4 +1,6 @@
 
+use anyhow::anyhow;
+
 use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
 use crate::subject::domain::{SubjectError, SubjectID};
 use crate::subject::repository::{SUBJECT_REPOSITORY, SUBJECT_QUERY_REPOSITORY, SubjectRepository, SubjectQueryRepository};
@@ -38,7 +40,8 @@ impl<'a> SubjectService<'a> {
 
         let result = CreateSubjectHandler::register(self.subject_repository, self.category_repository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| SubjectError::Create(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -48,7 +51,8 @@ impl<'a> SubjectService<'a> {
 
         let result = UpdateSubjectHandler::register(self.subject_repository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| SubjectError::Update(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -58,7 +62,8 @@ impl<'a> SubjectService<'a> {
 
         let result = GetAllSubjectHandler::register(self.subject_queryrepo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| SubjectError::GetAll(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -68,7 +73,8 @@ impl<'a> SubjectService<'a> {
         
         let result = GetByIdSubjectHandler::register(self.subject_queryrepo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| SubjectError::GetById(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -89,7 +95,8 @@ impl<'a> SubjectService<'a> {
         
         let result = ListSubjectHandler::register(self.subject_queryrepo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| SubjectError::Query(anyhow!(err)))?;
 
         Ok(result)
     }

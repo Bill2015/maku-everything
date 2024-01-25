@@ -1,3 +1,4 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
@@ -7,7 +8,7 @@ use crate::command_from_dto;
 use crate::subject::domain::SubjectID;
 use crate::subject::repository::SubjectRepository;
 use crate::tag::application::dto::CreateTagDto;
-use crate::tag::domain::{TagAggregate, TagError, TagGenericError, TagID};
+use crate::tag::domain::{TagAggregate, TagGenericError, TagID};
 use crate::tag::repository::TagRepository;
 use crate::common::application::ICommandHandler;
 
@@ -43,9 +44,9 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         String::from("Create Tag Command")
     }
 
-    type Output = Result<TagID, TagError>;
+    type Output = TagID;
 
-    async fn execute(&self, command: CreateTagCommand) -> Self::Output {
+    async fn execute(&self, command: CreateTagCommand) -> Result<Self::Output, Error> {
         let CreateTagCommand { 
             name,
             description,
@@ -58,14 +59,14 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             .is_exist(&belong_category)
             .await
             .then(|| CategoryID::from(belong_category))
-            .ok_or(TagError::Create(TagGenericError::BelongCategoryNotExists()))?;
+            .ok_or(TagGenericError::BelongCategoryNotExists())?;
 
         // get SubjectID
         let subject_id = self.subject_repo
             .is_exist(&belong_subject)
             .await
             .then(|| SubjectID::from(belong_subject))
-            .ok_or(TagError::Create(TagGenericError::BelongSubjectNotExists()))?;
+            .ok_or(TagGenericError::BelongSubjectNotExists())?;
 
         // create new tag
         let new_tag = TagAggregate::new(name, description, category_id, subject_id)?;
@@ -77,7 +78,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(TagError::Create(TagGenericError::DBInternalError())),
+            _ => Err(TagGenericError::DBInternalError().into()),
         }
     }
 }

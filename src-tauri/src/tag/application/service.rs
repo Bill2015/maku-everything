@@ -1,4 +1,6 @@
 
+use anyhow::anyhow;
+
 use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
 use crate::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
 use crate::tag::domain::{TagError, TagID};
@@ -46,7 +48,8 @@ impl<'a> TagService<'a> {
                 self.subject_repository,
             )
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| TagError::Create(anyhow!(err)))?;
         
         Ok(result)
     }
@@ -56,7 +59,8 @@ impl<'a> TagService<'a> {
 
         let result = UpdateTagHandler::register(self.tag_repository)
             .execute(command)
-            .await?;
+            .await
+            .map_err(|err| TagError::Update(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -66,7 +70,8 @@ impl<'a> TagService<'a> {
 
         let result = GetAllTagHandler::register(self.tag_queryrepo)
             .query(query).
-            await?;
+            await
+            .map_err(|err| TagError::GetAll(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -76,7 +81,8 @@ impl<'a> TagService<'a> {
         
         let result = GetByIdTagHandler::register(self.tag_queryrepo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| TagError::GetById(anyhow!(err)))?;
 
         Ok(result)
     }
@@ -103,7 +109,8 @@ impl<'a> TagService<'a> {
         
         let result = ListTagHandler::register(self.tag_queryrepo)
             .query(query)
-            .await?;
+            .await
+            .map_err(|err| TagError::Query(anyhow!(err)))?;
 
         Ok(result)
     }

@@ -1,7 +1,9 @@
+use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
 use crate::common::domain::ID;
 use crate::category::domain::CategoryID;
+use crate::common::infrastructure::date;
 
 mod id;
 pub use id::SubjectID;
@@ -21,9 +23,9 @@ pub struct SubjectAggregate {
 }
 
 impl SubjectAggregate {
-    pub fn new(name: String, description: String, belong_category: CategoryID) -> Result<Self, SubjectError> {
+    pub fn new(name: String, description: String, belong_category: CategoryID) -> Result<Self, SubjectGenericError> {
         if name.len() <= 0 {
-            return  Err(SubjectError::Create(SubjectGenericError::NameIsEmpty()));
+            return  Err(SubjectGenericError::NameIsEmpty());
         }
 
         Ok(
@@ -39,9 +41,9 @@ impl SubjectAggregate {
         )
     }
 
-    pub fn change_name(&mut self, new_name: String) -> Result<(), SubjectError> {
+    pub fn change_name(&mut self, new_name: String) -> Result<(), SubjectGenericError> {
         if new_name.len() <= 0 {
-            return  Err(SubjectError::Create(SubjectGenericError::NameIsEmpty()));
+            return  Err(SubjectGenericError::NameIsEmpty());
         }
 
         self.name = new_name;
@@ -54,5 +56,17 @@ impl SubjectAggregate {
         }
 
         self.description = new_description;
+    }
+
+    pub fn set_updated_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.updated_at = date.and_utc();
+        }
+    }
+
+    pub fn set_created_at(&mut self, new_date: &str) {
+        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+            self.created_at = date.and_utc();
+        }
     }
 }

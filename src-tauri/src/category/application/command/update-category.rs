@@ -1,8 +1,9 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::category::application::dto::UpdateCategoryDto;
-use crate::category::domain::{CategoryError, CategoryGenericError, CategoryID};
+use crate::category::domain::{CategoryGenericError, CategoryID};
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
 use crate::command_from_dto;
@@ -34,9 +35,9 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
         String::from("Change Category Command")
     }
 
-    type Output = Result<CategoryID, CategoryError>;
+    type Output = CategoryID;
 
-    async fn execute(&self, command: UpdateCategoryCommand) -> Self::Output {
+    async fn execute(&self, command: UpdateCategoryCommand) -> Result<Self::Output, Error> {
         let UpdateCategoryCommand { 
             id,
             name,
@@ -52,7 +53,7 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
         let mut category = category_result
             .ok()
             .flatten()
-            .ok_or_else(|| CategoryError::Update(CategoryGenericError::IdNotFounded()))?;
+            .ok_or_else(|| CategoryGenericError::IdNotFounded())?;
  
         // change name
         if name.is_some() {
@@ -76,7 +77,7 @@ impl ICommandHandler<UpdateCategoryCommand> for UpdateCategoryHandler<'_> {
 
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(CategoryError::Update(CategoryGenericError::DBInternalError())),
+            _ => Err(CategoryGenericError::DBInternalError().into()),
         }
     }
 }

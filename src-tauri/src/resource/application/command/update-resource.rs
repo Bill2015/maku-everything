@@ -1,9 +1,10 @@
+use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::resource::application::dto::UpdateResourceDto;
-use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
+use crate::resource::domain::{ResourceGenericError, ResourceID};
 use crate::resource::repository::ResourceRepository;
 use crate::common::application::ICommandHandler;
 
@@ -37,9 +38,9 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
         String::from("Change Resource Command")
     }
 
-    type Output = Result<ResourceID, ResourceError>;
+    type Output = ResourceID;
 
-    async fn execute(&self, command: UpdateResourceCommand) -> Self::Output {
+    async fn execute(&self, command: UpdateResourceCommand) -> Result<Self::Output, Error> {
         let UpdateResourceCommand { 
             id,
             name,
@@ -51,8 +52,8 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
         let  mut resource = self.resource_repo
             .find_by_id(id)
             .await
-            .or(Err(ResourceError::Update(ResourceGenericError::DBInternalError())))?
-            .ok_or(ResourceError::Update(ResourceGenericError::IdNotFound()))?;
+            .or(Err(ResourceGenericError::DBInternalError()))?
+            .ok_or(ResourceGenericError::IdNotFound())?;
 
         // change name
         if name.is_some() {
@@ -76,7 +77,7 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
 
         match result {
             Ok(value) => Ok(value.id),
-            _ => Err(ResourceError::Update(ResourceGenericError::DBInternalError())),
+            _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }
 }

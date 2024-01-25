@@ -1,5 +1,6 @@
 use serde::Serialize;
 use thiserror;
+use anyhow::Error;
 
 use crate::common::domain::ErrorBody;
 
@@ -7,19 +8,19 @@ use crate::common::domain::ErrorBody;
 #[derive(thiserror::Error, Debug)]
 pub enum SubjectError {
     #[error("Create Failed")]
-    Create(#[source] SubjectGenericError),
+    Create(Error),
 
     #[error("Updated Failed")]
-    Update(#[source] SubjectGenericError),
+    Update(Error),
 
     #[error("Retrieve all Subject failed")]
-    GetAll(#[source] SubjectGenericError),
+    GetAll(Error),
 
     #[error("Get specific Subject by id failed")]
-    GetById(#[source] SubjectGenericError),
+    GetById(Error),
 
     #[error("Query Failed")]
-    Query(#[source] SubjectGenericError),
+    Query(Error),
 }
 
 

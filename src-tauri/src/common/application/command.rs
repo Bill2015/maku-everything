@@ -1,3 +1,4 @@
+use anyhow::Error;
 use async_trait::async_trait;
 
 #[async_trait]
@@ -5,7 +6,8 @@ pub trait ICommandHandler<C> {
     fn get_name() -> String;
 
     type Output;
-    async fn execute(&self, command: C) -> Self::Output;
+
+    async fn execute(&self, command: C) -> Result<Self::Output, Error>;
 }
 
 #[macro_export]

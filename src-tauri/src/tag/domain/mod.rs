@@ -24,9 +24,9 @@ pub struct TagAggregate {
 }
 
 impl TagAggregate {
-    pub fn new(name: String, description: String, belong_category: CategoryID, belong_subject: SubjectID) -> Result<Self, TagError> {
+    pub fn new(name: String, description: String, belong_category: CategoryID, belong_subject: SubjectID) -> Result<Self, TagGenericError> {
         if name.len() <= 0 {
-            return Err(TagError::Create(TagGenericError::NameIsEmpty()));
+            return Err(TagGenericError::NameIsEmpty());
         }
 
         Ok(
@@ -43,9 +43,9 @@ impl TagAggregate {
         )
     }
 
-    pub fn change_name(&mut self, new_name: String) -> Result<(), TagError>{
+    pub fn change_name(&mut self, new_name: String) -> Result<(), TagGenericError>{
         if new_name.len() <= 0 {
-            return Err(TagError::Update(TagGenericError::NameIsEmpty()));
+            return Err(TagGenericError::NameIsEmpty());
         }
 
         self.name = new_name;

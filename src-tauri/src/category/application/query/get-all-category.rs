@@ -1,9 +1,10 @@
+use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::common::application::IQueryHandler;
 use crate::category::repository::CategoryQueryRepository;
 use crate::category::application::dto::CategoryResDto;
-use crate::category::domain::{CategoryError, CategoryGenericError};
+use crate::category::domain::CategoryGenericError;
 
 pub struct GetAllCategoryQuery { }
 
@@ -24,16 +25,16 @@ impl IQueryHandler<GetAllCategoryQuery> for GetAllCategoryHandler<'_>{
         String::from("Get All Category")
     }
 
-    type Output = Result<Vec<CategoryResDto>, CategoryError>;
+    type Output = Vec<CategoryResDto>;
 
-    async fn query(&self, query: GetAllCategoryQuery) -> Self::Output {
+    async fn query(&self, query: GetAllCategoryQuery) -> Result<Self::Output, Error> {
         let result = self.category_repo
             .get_all()
             .await;
     
         match result {
             Ok(value) => Ok(value),
-            _ => Err(CategoryError::GetAll(CategoryGenericError::DBInternalError())),
+            _ => Err(CategoryGenericError::DBInternalError().into()),
         }
     }
 }

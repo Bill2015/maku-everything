@@ -25,7 +25,7 @@ pub struct ResourceFileAggregate {
 }
 
 impl ResourceFileAggregate {
-    pub fn new(root_path: String, file_path: String) -> Result<Self, ResourceError> {
+    pub fn new(root_path: String, file_path: String) -> Result<Self, ResourceGenericError> {
         // If path already contain root path
         // trim it and re-concat it
         let main_path = file_path.trim_start_matches(&root_path);
@@ -35,11 +35,11 @@ impl ResourceFileAggregate {
         let path = Path::new(full_path.as_str());
 
         if path.exists() == false {
-            return Err(ResourceError::Create(ResourceGenericError::FilePathNotExist()));
+            return Err(ResourceGenericError::FilePathNotExist());
         }
         
         if path.file_name().is_none() {
-            return Err(ResourceError::Create(ResourceGenericError::FileNameIsEmpty()));
+            return Err(ResourceGenericError::FileNameIsEmpty());
         }
 
         let ext = match path.is_file() {
@@ -73,12 +73,12 @@ pub struct ResourceUrlAggregate {
     pub full: String,
 }
 impl ResourceUrlAggregate {
-    pub fn new(url: String) -> Result<Self, ResourceError> {
+    pub fn new(url: String) -> Result<Self, ResourceGenericError> {
         let url_obj = Url::parse(url.as_str())
-            .or(Err(ResourceError::Create(ResourceGenericError::UrlParseFailed())))?;
+            .or(Err(ResourceGenericError::UrlParseFailed()))?;
 
         if url_obj.host().is_none() {
-            return Err(ResourceError::Create(ResourceGenericError::UrlEmptyHost()));
+            return Err(ResourceGenericError::UrlEmptyHost());
         }
 
         Ok(
@@ -123,7 +123,7 @@ impl ResourceAggregate {
         root_path: String,
         file_path: Option<String>,
         url: Option<String>
-    ) -> Result<Self, ResourceError> {
+    ) -> Result<Self, ResourceGenericError> {
         let file = match file_path {
             Some(path) => Some(ResourceFileAggregate::new(root_path, path)?),
             None => None,
@@ -135,7 +135,7 @@ impl ResourceAggregate {
         };
         
         if name.is_empty() && file.is_none() {
-            return Err(ResourceError::Create(ResourceGenericError::NameAndFilePathIsEmpty()));
+            return Err(ResourceGenericError::NameAndFilePathIsEmpty());
         }
         
         // if no provide resource name, use file name as default
@@ -177,7 +177,7 @@ impl ResourceAggregate {
         self.description = new_description;
     }
 
-    pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), ResourceError> {
+    pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), ResourceGenericError> {
         self.file = Some(ResourceFileAggregate::new(root_path, file_path)?);
         Ok(())
     }
@@ -198,9 +198,9 @@ impl ResourceAggregate {
         self.auth = flag;
     }
 
-    pub fn add_tag(&mut self, tag_id: TagID) -> Result<(), ResourceError> {
+    pub fn add_tag(&mut self, tag_id: TagID) -> Result<(), ResourceGenericError> {
         if self.tags.contains(&tag_id) {
-            return Err(ResourceError::AddTag(ResourceGenericError::AddSameTag()));
+            return Err(ResourceGenericError::AddSameTag());
         }
 
         self.new_tags.push(tag_id);
@@ -208,9 +208,9 @@ impl ResourceAggregate {
         Ok(())
     }
 
-    pub fn del_tag(&mut self, tag_id: TagID) -> Result<(), ResourceError> {
+    pub fn del_tag(&mut self, tag_id: TagID) -> Result<(), ResourceGenericError> {
         if self.tags.contains(&tag_id) == false {
-            return Err(ResourceError::RemoveTag(ResourceGenericError::TagNotExists()));
+            return Err(ResourceGenericError::TagNotExists());
         }
     
         self.del_tags.push(tag_id);
