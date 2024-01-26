@@ -4,12 +4,20 @@ import { CategoryAPI, CategoryMutation } from '@api/category';
 import { SubjectAPI, SubjectMutation } from '@api/subject';
 import { TagMutation } from '@api/tag';
 
+import { showNotification } from '@components/notification';
 import { initialData } from './data';
+import { importDefaultData } from './data2';
 
 export function Initializer() {
     const createCategory = CategoryMutation.useCreate();
     const createSubject = SubjectMutation.useCreate();
     const tagMutation = TagMutation.useCreate();
+
+    const importCategory = CategoryMutation.useImport();
+
+    async function importData() {
+        await importCategory.mutateAsync(importDefaultData);
+    }
 
     async function run() {
         for (const category of initialData.categories) {
@@ -44,7 +52,7 @@ export function Initializer() {
 
     return (
         <Affix position={{ bottom: rem(20), left: rem(20) }}>
-            <Button onClick={() => run()}>Gen</Button>
+            <Button onClick={() => importData()}>Gen</Button>
         </Affix>
     );
 }

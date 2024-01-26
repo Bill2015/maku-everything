@@ -34,6 +34,7 @@ fn main() {
             connect_db, 
             category::application::create_category,
             category::application::update_category,
+            category::application::import_category,
             category::application::get_all_category,
             category::application::get_category_by_id,
             subject::application::create_subject,

@@ -1,5 +1,6 @@
 import { invoke } from '@tauri-apps/api/tauri';
 import { CategoryResDto, CategoryCreateDto } from './Dto';
+import { CategoryImportDto } from './dto/ImportDto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace CategoryAPI {
@@ -13,5 +14,9 @@ export namespace CategoryAPI {
 
     export function create(data: CategoryCreateDto) {
         return invoke<string>('create_category', { data });
+    }
+
+    export function importData(data: CategoryImportDto) {
+        return invoke<string>('import_category', { data });
     }
 }

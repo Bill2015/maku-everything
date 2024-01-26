@@ -8,7 +8,6 @@ use serde::Deserialize;
 use crate::command_from_dto;
 use crate::category::application::dto::import::*;
 use crate::category::domain::CategoryAggregate;
-use crate::category::domain::CategoryError;
 use crate::category::domain::CategoryGenericError;
 use crate::category::domain::CategoryID;
 use crate::category::repository::CategoryRepository;
@@ -33,8 +32,6 @@ pub struct ImportCategoryCommand {
     tags: Vec<ImportCategoryOfTagObjDto>,
 
     resources: Vec<ImportCategoryOfResourceObjDto>,
-
-    skip_when_resource_not_found: bool,
 }
 command_from_dto!(ImportCategoryCommand, ImportCategoryDto);
 
@@ -66,7 +63,7 @@ impl<'a> ImportCategoryHandler<'a> {
         subjects: &Vec<ImportCategoryOfSubjectObjDto>,
         tags: &Vec<ImportCategoryOfTagObjDto>,
         resources: &Vec<ImportCategoryOfResourceObjDto>,
-    ) -> Result<(), CategoryError> {
+    ) -> Result<(), CategoryGenericError> {
         let subject_id_set: HashSet<&String> = subjects
             .iter()
             .map(|val| &val.id)
@@ -83,7 +80,7 @@ impl<'a> ImportCategoryHandler<'a> {
                 true => Ok(()),
                 false => Err(CategoryGenericError::ImportSubjectIdNotExists())
             }
-        });
+        })?;
 
         // check resource's tags is exists
         resources.iter().flat_map(|val| &val.tags).try_for_each(|val| {
@@ -91,7 +88,7 @@ impl<'a> ImportCategoryHandler<'a> {
                 true => Ok(()),
                 false => Err(CategoryGenericError::ImportSubjectIdNotExists())
             }
-        });
+        })?;
 
         Ok(())
     }
@@ -113,17 +110,16 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
             subjects,
             tags,
             resources,
-            skip_when_resource_not_found,
         } = command;
 
         // check relation is valid
-        self.check_relation(&subjects, &tags, &resources);
+        self.check_relation(&subjects, &tags, &resources)?;
 
         // create new category
-        let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone()).unwrap();
+        let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone())?;
 
-        new_category.set_created_at(&category.created_at);
-        new_category.set_updated_at(&category.updated_at);
+        new_category.set_created_at(&category.created_at)?;
+        new_category.set_updated_at(&category.updated_at)?;
 
         // save category
         let category_id = self.categroy_repo
@@ -140,8 +136,8 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
             // TODO: error handling
             let mut new_subject = SubjectAggregate::new(subject.name, subject.description, category_id.clone())?;
             
-            new_subject.set_created_at(&subject.created_at);
-            new_subject.set_updated_at(&subject.updated_at);
+            new_subject.set_created_at(&subject.created_at)?;
+            new_subject.set_updated_at(&subject.updated_at)?;
 
             let subject_id = self.subject_repo
                 .save(new_subject)
@@ -163,10 +159,10 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
                 tag.description,
                 category_id.clone(),
                 subject_id_hash.get(&tag.belong_subject).unwrap().clone()
-            ).unwrap();
+            )?;
 
-            new_tag.set_created_at(&tag.created_at);
-            new_tag.set_updated_at(&tag.updated_at);
+            new_tag.set_created_at(&tag.created_at)?;
+            new_tag.set_updated_at(&tag.updated_at)?;
 
             let tag_id = self.tag_repo
                 .save(new_tag)
@@ -187,19 +183,24 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
                 category_id.clone(),
                 root_path.clone(),
                 None,
-                resource.file.clone(),
-            ).unwrap();
+                resource.url.clone(),
+            )?;
 
             if let Some(f) = resource.file {
-                let _ = new_resource.change_file(root_path.clone(), f);
+                new_resource.change_file(root_path.clone(), f)?;
             }
 
-            new_resource.set_created_at(&resource.created_at);
-            new_resource.set_updated_at(&resource.updated_at);
+            new_resource.set_created_at(&resource.created_at)?;
+            new_resource.set_updated_at(&resource.updated_at)?;
             
             for tag in resource.tags {
-                new_resource.add_tag(tag_id_hash.get(&tag).unwrap().clone());
+                new_resource.add_tag(tag_id_hash.get(&tag).unwrap().clone())?;
             }
+
+            let _ = self.resource_repo
+                .save(new_resource)
+                .await
+                .or(Err(CategoryGenericError::DBInternalError()))?;
         }
 
         Ok(category_id)

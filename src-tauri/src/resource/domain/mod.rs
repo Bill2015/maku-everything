@@ -125,13 +125,13 @@ impl ResourceAggregate {
         url: Option<String>
     ) -> Result<Self, ResourceGenericError> {
         let file = match file_path {
-            Some(path) => Some(ResourceFileAggregate::new(root_path, path)?),
-            None => None,
+            Some(path) if !path.is_empty() => Some(ResourceFileAggregate::new(root_path, path)?),
+            _ => None,
         };
 
         let url = match url {
-            Some(url) => Some(ResourceUrlAggregate::new(url)?),
-            None => None,
+            Some(url) if !url.is_empty() => Some(ResourceUrlAggregate::new(url)?),
+            _ => None,
         };
         
         if name.is_empty() && file.is_none() {

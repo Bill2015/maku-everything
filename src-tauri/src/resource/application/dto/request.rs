@@ -8,9 +8,9 @@ pub struct CreateResourceDto {
 
     pub belong_category: String,
 
-    pub file_path: String,
+    pub file_path: Option<String>,
 
-    pub url_path: String,
+    pub url_path: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]

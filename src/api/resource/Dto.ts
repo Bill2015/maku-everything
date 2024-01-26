@@ -39,9 +39,9 @@ export interface ResourceCreateDto {
 
     belong_category: string,
 
-    file_path: string,
+    file_path?: string | null,
 
-    url_path: string,
+    url_path?: string | null,
 }
 
 export interface ResourceTagOperateDto {

@@ -43,7 +43,6 @@ export default function ResourcesPage() {
                 description:     '',
                 belong_category: activeCategory.id,
                 file_path:       filePaths[0],
-                url_path:        '',
             });
             resourceRefetch();
         }
