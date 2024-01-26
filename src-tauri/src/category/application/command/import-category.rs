@@ -118,6 +118,8 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
         // create new category
         let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone())?;
 
+        dbg!(&new_category);
+
         new_category.set_created_at(&category.created_at)?;
         new_category.set_updated_at(&category.updated_at)?;
 

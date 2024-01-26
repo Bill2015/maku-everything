@@ -9,7 +9,7 @@ pub trait ID : PartialEq {
 
 #[macro_export]
 macro_rules! impl_domain_id {
-    ($id_type:ty) => {
+    ($id_type:ty, $namespace: expr) => {
         impl ID for $id_type {
             fn to_string(&self) -> String {
                 self.0.clone()
@@ -20,7 +20,7 @@ macro_rules! impl_domain_id {
             }
 
             fn new() -> Self {
-                Self(String::from(""))
+                Self(format!("{}:{}", $namespace, Id::rand().to_string()))
             }
         }
 

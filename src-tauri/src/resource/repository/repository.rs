@@ -36,7 +36,6 @@ pub struct ResourceUrlDo {
  * Resource Data Object */
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ResourceDO {
-    #[serde(skip_serializing)]
     pub id: Thing,
     pub name: String,
     pub description: String,
@@ -134,7 +133,7 @@ impl<'a> ResourceRepository<'a> {
         let resource_do = ResourceRepoMapper::aggregate_to_do(data);
         let id: Thing = resource_do.id.clone();
         
-        let is_new: bool = id.id.to_raw().is_empty();
+        let is_new: bool = !self.is_exist(&id.to_string()).await;
 
         // save data
         let result: Option<ResourceDO> = match is_new {
@@ -145,7 +144,6 @@ impl<'a> ResourceRepository<'a> {
                     .content(resource_do)
                     .await?
                     .pop()
-
             }
             false => {
                 self.db

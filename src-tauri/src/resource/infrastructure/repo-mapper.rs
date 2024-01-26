@@ -10,7 +10,6 @@ use crate::resource::repository::ResourceFileDo;
 use crate::resource::repository::ResourceUrlDo;
 use crate::tag::domain::TagID;
 use crate::common::domain::ID;
-use crate::common::repository::tablens;
 use crate::common::infrastructure::IRepoMapper;
 use crate::resource::repository::ResourceDO;
 
@@ -63,12 +62,6 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             .map(|x| thing(x.to_str()).unwrap())
             .collect();
 
-        let id = thing(aggregate.id.to_str())
-            .unwrap_or(Thing::from((tablens::RESOURCE, "")));
-
-        let belong_category = thing(aggregate.belong_category.to_str())
-            .unwrap_or(Thing::from((tablens::CATEGORY, "")));
-
         let file = match aggregate.file {
             Some(value) => Some(ResourceFileDo {
                 uuid: value.uuid,
@@ -88,10 +81,10 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
         };
 
         ResourceDO {
-            id: id,
+            id: thing(aggregate.id.to_str()).unwrap(),
             name: aggregate.name,
             description: aggregate.description,
-            belong_category: belong_category,
+            belong_category: thing(aggregate.belong_category.to_str()).unwrap(),
             file: file,
             url: url,
             auth: aggregate.auth,

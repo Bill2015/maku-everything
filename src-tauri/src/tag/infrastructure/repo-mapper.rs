@@ -1,8 +1,7 @@
-use surrealdb::sql::{Thing, thing};
+use surrealdb::sql::thing;
 use surrealdb::sql::Datetime;
 
 use crate::category::domain::CategoryID;
-use crate::common::repository::tablens;
 use crate::subject::domain::SubjectID;
 use crate::tag::domain::{TagAggregate, TagID};
 use crate::common::infrastructure::IRepoMapper;
@@ -26,21 +25,12 @@ impl IRepoMapper<TagAggregate, TagDO> for TagRepoMapper {
     }
     
     fn aggregate_to_do(aggregate: TagAggregate) -> TagDO {
-        let id = thing(aggregate.id.to_str())
-            .unwrap_or(Thing::from((tablens::TAG, "")));
-
-        let belong_category = thing(aggregate.belong_category.to_str())
-            .unwrap_or(Thing::from((tablens::CATEGORY, "")));
-        
-        let belong_subject = thing(aggregate.belong_subject.to_str())
-            .unwrap_or(Thing::from((tablens::CATEGORY, "")));
-
         TagDO {
-            id: id,
+            id: thing(aggregate.id.to_str()).unwrap(),
             name: aggregate.name,
             description: aggregate.description,
-            belong_category: belong_category,
-            belong_subject: belong_subject,
+            belong_category: thing(aggregate.belong_category.to_str()).unwrap(),
+            belong_subject: thing(aggregate.belong_subject.to_str()).unwrap(),
             auth: aggregate.auth,
             created_at: Datetime(aggregate.created_at),
             updated_at: Datetime(aggregate.updated_at),

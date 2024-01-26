@@ -51,11 +51,6 @@ impl CategoryAggregate {
             return Err(CategoryGenericError::NameIsEmpty());
         }
 
-        // description can't be empty
-        if description.len() <= 0 {
-            return  Err(CategoryGenericError::DescriptionIsEmpty());
-        }
-        
         Ok(
             CategoryAggregate {
                 id: CategoryID::new(),

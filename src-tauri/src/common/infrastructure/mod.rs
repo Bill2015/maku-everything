@@ -1,5 +1,5 @@
 mod repomapper;
-pub use repomapper::IRepoMapper;
+pub use repomapper::*;
 
 mod def;
 pub use def::*;

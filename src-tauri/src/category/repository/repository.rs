@@ -15,7 +15,6 @@ pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::ini
  * Category Data Object */
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CategoryDO {
-    #[serde(skip_serializing)]
     pub id: Thing,
     pub name: String,
     pub description: String,
@@ -65,7 +64,7 @@ impl<'a> CategoryRepository<'a> {
         let category_do = CategoryRepoMapper::aggregate_to_do(data);
         let id = category_do.id.clone();
 
-        let is_new: bool = id.id.to_raw().is_empty();
+        let is_new: bool = self.is_exist(&id.to_string()).await;
 
         // save data
         let result: Option<CategoryDO> = match is_new {

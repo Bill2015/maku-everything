@@ -15,7 +15,6 @@ pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&
  * Subject Data Object */
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SubjectDO {
-    #[serde(skip_serializing)]
     pub id: Thing,
     pub name: String,
     pub description: String,
@@ -91,8 +90,7 @@ impl<'a> SubjectRepository<'a> {
         let subject_do = SubjectRepoMapper::aggregate_to_do(data);
         let id: Thing = subject_do.id.clone();
 
-
-        let is_new: bool = id.id.to_raw().is_empty();
+        let is_new: bool = !self.is_exist(&id.to_string()).await;
 
         // save data
         let result: Option<SubjectDO> = match is_new {
@@ -103,7 +101,6 @@ impl<'a> SubjectRepository<'a> {
                     .content(subject_do)
                     .await?
                     .pop()
-
             }
             false => {
                 self.db

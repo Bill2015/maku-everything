@@ -1,7 +1,6 @@
-use surrealdb::sql::{Thing, thing};
+use surrealdb::sql::thing;
 use surrealdb::sql::Datetime;
 
-use crate::common::repository::tablens;
 use crate::subject::domain::{SubjectAggregate, SubjectID};
 use crate::category::domain::CategoryID;
 use crate::common::infrastructure::IRepoMapper;
@@ -24,17 +23,11 @@ impl IRepoMapper<SubjectAggregate, SubjectDO> for SubjectRepoMapper {
     }
     
     fn aggregate_to_do(aggregate: SubjectAggregate) -> SubjectDO {
-        let id = thing(aggregate.id.to_str())
-            .unwrap_or(Thing::from((tablens::SUBJECT, "")));
-
-        let belong_category = thing(aggregate.belong_category.to_str())
-            .unwrap_or(Thing::from((tablens::CATEGORY, "")));
-
         SubjectDO {
-            id: id,
+            id: thing(aggregate.id.to_str()).unwrap(),
             name: aggregate.name,
             description: aggregate.description,
-            belong_category: belong_category,
+            belong_category: thing(aggregate.belong_category.to_str()).unwrap(),
             auth: aggregate.auth,
             created_at: Datetime(aggregate.created_at),
             updated_at: Datetime(aggregate.updated_at),

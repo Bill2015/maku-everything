@@ -15,7 +15,6 @@ pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB, &CO
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TagDO {
-    #[serde(skip_serializing)]
    pub id: Thing,
 
    pub name: String,
@@ -94,7 +93,7 @@ impl<'a> TagRepository<'a> {
         let tag_do = TagRepoMapper::aggregate_to_do(data);
         let id: Thing = tag_do.id.clone();
 
-        let is_new: bool = id.id.to_raw().is_empty();
+        let is_new: bool = !self.is_exist(&id.to_string()).await;
 
         // save data
         let result: Option<TagDO> = match is_new {
@@ -105,7 +104,6 @@ impl<'a> TagRepository<'a> {
                     .content(tag_do)
                     .await?
                     .pop()
-
             }
             false => {
                 self.db
