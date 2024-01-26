@@ -59,7 +59,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
             .ok_or(SubjectGenericError::BelongCategoryNotExists())?;
 
         // create new subject
-        let new_subject = SubjectAggregate::new(name, description, category_id)?;
+        let new_subject = SubjectAggregate::new(name, description, &category_id)?;
 
         // save
         let result = self.subject_repo

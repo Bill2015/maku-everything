@@ -23,7 +23,7 @@ pub struct SubjectAggregate {
 }
 
 impl SubjectAggregate {
-    pub fn new(name: String, description: String, belong_category: CategoryID) -> Result<Self, SubjectGenericError> {
+    pub fn new(name: String, description: String, belong_category: &CategoryID) -> Result<Self, SubjectGenericError> {
         if name.len() <= 0 {
             return  Err(SubjectGenericError::NameIsEmpty());
         }
@@ -33,7 +33,7 @@ impl SubjectAggregate {
                 id: SubjectID::new(),
                 name: name,
                 description: description,
-                belong_category: belong_category,
+                belong_category: belong_category.clone(),
                 auth: false,
                 created_at: Utc::now(),
                 updated_at: Utc::now(),

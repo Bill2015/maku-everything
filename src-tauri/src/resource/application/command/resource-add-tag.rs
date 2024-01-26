@@ -59,7 +59,7 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
             .ok_or(ResourceGenericError::IdNotFound())?;
 
         // add tag  
-        resource.add_tag(tag_id)?;
+        resource.add_tag(&tag_id)?;
         
         // save
         let result = self.resource_repo

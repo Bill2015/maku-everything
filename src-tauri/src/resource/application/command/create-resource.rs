@@ -64,7 +64,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         let new_resource = ResourceAggregate::new(
             name,
             description,
-            category.id,
+            &category.id,
             category.root_path,
             file_path,
             url_path

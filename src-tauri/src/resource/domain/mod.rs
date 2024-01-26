@@ -119,7 +119,7 @@ impl ResourceAggregate {
     pub fn new(
         name: String,
         description: String,
-        belong_category: CategoryID,
+        belong_category: &CategoryID,
         root_path: String,
         file_path: Option<String>,
         url: Option<String>
@@ -149,7 +149,7 @@ impl ResourceAggregate {
             id: ResourceID::new(),
             name: new_name,
             description: description,
-            belong_category: belong_category,
+            belong_category: belong_category.clone(),
             file: file,
             url: url,
             auth: false,
@@ -202,22 +202,22 @@ impl ResourceAggregate {
         self.auth = flag;
     }
 
-    pub fn add_tag(&mut self, tag_id: TagID) -> Result<(), ResourceGenericError> {
-        if self.tags.contains(&tag_id) {
+    pub fn add_tag(&mut self, tag_id: &TagID) -> Result<(), ResourceGenericError> {
+        if self.tags.contains(tag_id) {
             return Err(ResourceGenericError::AddSameTag());
         }
 
-        self.new_tags.push(tag_id);
+        self.new_tags.push(tag_id.clone());
 
         Ok(())
     }
 
-    pub fn del_tag(&mut self, tag_id: TagID) -> Result<(), ResourceGenericError> {
-        if self.tags.contains(&tag_id) == false {
+    pub fn del_tag(&mut self, tag_id: &TagID) -> Result<(), ResourceGenericError> {
+        if self.tags.contains(tag_id) == false {
             return Err(ResourceGenericError::TagNotExists());
         }
     
-        self.del_tags.push(tag_id);
+        self.del_tags.push(tag_id.clone());
         
         Ok(())
     }

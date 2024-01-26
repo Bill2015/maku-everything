@@ -61,7 +61,7 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
             .ok_or(ResourceGenericError::IdNotFound())?;
                 
         // remove tag
-        resource.del_tag(tag_id)?;
+        resource.del_tag(&tag_id)?;
         
         // save
         let result = self.resource_repo

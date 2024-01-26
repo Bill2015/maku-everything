@@ -69,7 +69,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             .ok_or(TagGenericError::BelongSubjectNotExists())?;
 
         // create new tag
-        let new_tag = TagAggregate::new(name, description, category_id, subject_id)?;
+        let new_tag = TagAggregate::new(name, description, &category_id, &subject_id)?;
 
         // save
         let result = self.tag_repo

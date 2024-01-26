@@ -24,7 +24,7 @@ pub struct TagAggregate {
 }
 
 impl TagAggregate {
-    pub fn new(name: String, description: String, belong_category: CategoryID, belong_subject: SubjectID) -> Result<Self, TagGenericError> {
+    pub fn new(name: String, description: String, belong_category: &CategoryID, belong_subject: &SubjectID) -> Result<Self, TagGenericError> {
         if name.len() <= 0 {
             return Err(TagGenericError::NameIsEmpty());
         }
@@ -33,8 +33,8 @@ impl TagAggregate {
             TagAggregate {
                 id: TagID::new(),
                 name: name,
-                belong_category: belong_category,
-                belong_subject: belong_subject,
+                belong_category: belong_category.clone(),
+                belong_subject: belong_subject.clone(),
                 description: description,
                 auth: false,
                 created_at: Utc::now(),

@@ -92,6 +92,77 @@ impl<'a> ImportCategoryHandler<'a> {
 
         Ok(())
     }
+
+    fn create(
+        root_path: String,
+        category: ImportCategoryObjDto,
+        subjects: Vec<ImportCategoryOfSubjectObjDto>,
+        tags: Vec<ImportCategoryOfTagObjDto>,
+        resources: Vec<ImportCategoryOfResourceObjDto>,
+    ) -> Result<(CategoryAggregate, Vec<SubjectAggregate>, Vec<TagAggregate>, Vec<ResourceAggregate>), Error> {
+        let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone())?;
+        new_category.set_created_at(&category.created_at)?;
+        new_category.set_updated_at(&category.updated_at)?;
+
+
+        let category_id = &new_category.id;
+        // ------------------------------
+        // subject part
+        let mut subids: HashMap<String, SubjectID> = HashMap::new();
+        let mut new_subjects: Vec<SubjectAggregate> = Vec::new();
+
+        for val in subjects {
+            let mut new_sub = SubjectAggregate::new(val.name, val.description, category_id)?;
+            new_sub.set_created_at(&val.created_at)?;
+            new_sub.set_updated_at(&val.updated_at)?;
+    
+            subids.insert(val.id, new_sub.id.clone());
+
+            new_subjects.push(new_sub);
+        }
+
+        // ------------------------------
+        // tag part
+        let mut tagids: HashMap<String, TagID> = HashMap::new();
+        let mut new_tags: Vec<TagAggregate> = Vec::new();
+
+        for val in tags {
+            let belong_subject = subids.get(&val.belong_subject).unwrap();
+            let mut new_tag = TagAggregate::new(val.name, val.description, category_id, belong_subject)?;
+            new_tag.set_created_at(&val.created_at)?;
+            new_tag.set_updated_at(&val.updated_at)?;
+    
+            tagids.insert(val.id, new_tag.id.clone());
+
+            new_tags.push(new_tag);
+        }
+        
+        // ------------------------------
+        // resource part
+        let mut new_resources: Vec<ResourceAggregate> = Vec::new();
+
+        for val in resources {
+            let mut new_res = ResourceAggregate::new(
+                val.name,
+                val.description,
+                category_id,
+                root_path.clone(),
+                None,
+                val.url,
+            )?;
+            new_res.set_created_at(&val.created_at)?;
+            new_res.set_updated_at(&val.updated_at)?;
+    
+            for tag in val.tags {
+                new_res.add_tag(tagids.get(&tag).unwrap())?;
+            }
+
+            new_resources.push(new_res);
+        }
+        
+
+        Ok((new_category, new_subjects, new_tags, new_resources))
+    }
 }
 
 #[async_trait]
@@ -115,13 +186,8 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
         // check relation is valid
         self.check_relation(&subjects, &tags, &resources)?;
 
-        // create new category
-        let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone())?;
-
-        dbg!(&new_category);
-
-        new_category.set_created_at(&category.created_at)?;
-        new_category.set_updated_at(&category.updated_at)?;
+        // create entity
+        let (new_category, new_subjects, new_tags, new_resources) = Self::create(root_path, category, subjects, tags, resources)?;
 
         // save category
         let category_id = self.categroy_repo
@@ -132,75 +198,27 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
 
         // ------------------------------
         // subject part
-        let mut subject_id_hash: HashMap<String, SubjectID> = HashMap::new();
-
-        for subject in subjects {
-            // TODO: error handling
-            let mut new_subject = SubjectAggregate::new(subject.name, subject.description, category_id.clone())?;
-            
-            new_subject.set_created_at(&subject.created_at)?;
-            new_subject.set_updated_at(&subject.updated_at)?;
-
-            let subject_id = self.subject_repo
-                .save(new_subject)
+        for subject in new_subjects {
+            self.subject_repo
+                .save(subject)
                 .await
-                .or(Err(CategoryGenericError::DBInternalError()))?
-                .id;
-    
-            subject_id_hash.insert(subject.id, subject_id);
+                .or(Err(CategoryGenericError::DBInternalError()))?;
         }
 
         // ------------------------------
         // tag part
-        let mut tag_id_hash: HashMap<String, TagID> = HashMap::new();
-
-        for tag in tags {
-            // TODO: error handling
-            let mut new_tag = TagAggregate::new(
-                tag.name,
-                tag.description,
-                category_id.clone(),
-                subject_id_hash.get(&tag.belong_subject).unwrap().clone()
-            )?;
-
-            new_tag.set_created_at(&tag.created_at)?;
-            new_tag.set_updated_at(&tag.updated_at)?;
-
-            let tag_id = self.tag_repo
-                .save(new_tag)
+        for tag in new_tags {
+            self.tag_repo
+                .save(tag)
                 .await
-                .or(Err(CategoryGenericError::DBInternalError()))?
-                .id;
-
-            tag_id_hash.insert(tag.id, tag_id);
+                .or(Err(CategoryGenericError::DBInternalError()))?;
         }
 
         // ------------------------------
         // resource part
-        for resource in resources {
-            // TODO: error handling
-            let mut new_resource = ResourceAggregate::new(
-                resource.name,
-                resource.description,
-                category_id.clone(),
-                root_path.clone(),
-                None,
-                resource.url.clone(),
-            )?;
-
-            if let Some(f) = resource.file {
-                new_resource.change_file(root_path.clone(), f)?;
-            }
-
-            new_resource.set_created_at(&resource.created_at)?;
-            new_resource.set_updated_at(&resource.updated_at)?;
-            
-            for tag in resource.tags {
-                new_resource.add_tag(tag_id_hash.get(&tag).unwrap().clone())?;
-            }
-
-            let _ = self.resource_repo
-                .save(new_resource)
+        for resource in new_resources {
+            self.resource_repo
+                .save(resource)
                 .await
                 .or(Err(CategoryGenericError::DBInternalError()))?;
         }
