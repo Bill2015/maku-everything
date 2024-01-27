@@ -30,24 +30,31 @@ pub struct CategoryAggregate {
 }
 
 impl CategoryAggregate {
-    pub fn new(name: String, description: String, root_path: String) -> Result<Self, CategoryGenericError> {
+    fn relove_path(path: String) -> Result<String, CategoryGenericError> {
         // path can't be empty
-        if root_path.is_empty() {
+        if path.is_empty() {
             return Err(CategoryGenericError::RootPathIsEmpty());
         }
 
         // the path must be end with '\'
         // TODO: linux path need to impl?
-        let new_path = match  root_path.ends_with("\\") {
-            true => root_path,
-            false => root_path + "\\",
+        let new_path = match path.ends_with("\\") {
+            true => path,
+            false => path + "\\",
         };
 
         // create path object
-        let path = Path::new(new_path.as_str());
+        let path = Path::new(&new_path);
         if path.exists() == false {
             return Err(CategoryGenericError::RootPathNotExists());
         }
+
+        Ok(new_path)
+    }
+
+    pub fn new(name: String, description: String, root_path: String) -> Result<Self, CategoryGenericError> {
+
+        let new_path = Self::relove_path(root_path)?;
 
         // name can't be empty
         if name.len() <= 0 {
@@ -107,7 +114,8 @@ impl CategoryAggregate {
 impl Porting<PortingCategoryObject> for CategoryAggregate {
     type Err = CategoryGenericError;
     fn import_from(data: PortingCategoryObject) -> Result<Self, Self::Err> {
-        let mut category = Self::new(data.name, data.description, data.root_path)?;
+        let new_path = Self::relove_path(data.root_path)?;
+        let mut category = Self::new(data.name, data.description, new_path)?;
         category.set_created_at(&data.created_at)?;
         category.set_updated_at(&data.updated_at)?;
         Ok(category)

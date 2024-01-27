@@ -1,53 +1,26 @@
 use serde::{Deserialize, Serialize};
 
+use crate::category::domain::PortingCategoryObject;
+use crate::resource::domain::PortingResourceObject;
+use crate::subject::domain::PortingSubjectObject;
+use crate::tag::domain::PortingTagObject;
+
 
 #[derive(Serialize, Deserialize)]
-pub struct ImportCategoryObjDto {
-    pub id: String,
-    pub description: String,
-    pub name: String,
-    pub updated_at: String,
-    pub created_at: String,
-    pub auth: bool
-}
+pub struct ImportCategoryObjDto(pub PortingCategoryObject);
 
 #[derive(Serialize, Deserialize)]
-pub struct ImportCategoryOfSubjectObjDto {
-    pub id: String,
-    pub name: String,
-    pub description: String,
-    pub created_at: String,
-    pub updated_at: String,
-    pub auth: bool,
-}
+pub struct ImportCategoryOfSubjectObjDto(pub PortingSubjectObject);
 
 #[derive(Serialize, Deserialize)]
-pub struct ImportCategoryOfTagObjDto {
-    pub id: String,
-    pub name: String,
-    pub description: String,
-    pub belong_subject: String,
-    pub created_at: String,
-    pub updated_at: String,
-    pub auth: bool,
-}
+pub struct ImportCategoryOfTagObjDto(pub PortingTagObject);
 
 #[derive(Serialize, Deserialize)]
-pub struct ImportCategoryOfResourceObjDto {
-    pub id: String,
-    pub name: String,
-    pub description: String,
-    pub file: Option<String>,
-    pub url: Option<String>,
-    pub created_at: String,
-    pub updated_at: String,
-    pub tags: Vec<String>,
-    pub auth: bool,
-}
+pub struct ImportCategoryOfResourceObjDto(pub PortingResourceObject);
 
 #[derive(Serialize, Deserialize)]
 pub struct ImportCategoryDto {
-    pub root_path: String,
+    pub new_root_path: String,
 
     pub category: ImportCategoryObjDto,
     
@@ -56,6 +29,4 @@ pub struct ImportCategoryDto {
     pub tags: Vec<ImportCategoryOfTagObjDto>,
 
     pub resources: Vec<ImportCategoryOfResourceObjDto>,
-    
-    pub skip_when_resource_not_found: bool,
 }

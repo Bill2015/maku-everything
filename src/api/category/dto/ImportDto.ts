@@ -1,10 +1,11 @@
 export interface CategoryImportDto {
-    root_path: string,
+    new_root_path: string,
 
     category: {
         id: string,
         description: string,
         name: string,
+        root_path: string,
         updated_at: string,
         created_at: string,
         auth: boolean,
@@ -14,6 +15,7 @@ export interface CategoryImportDto {
         id: string,
         name: string,
         description: string,
+        belong_category: string,
         created_at: string,
         updated_at: string,
         auth: boolean,
@@ -23,6 +25,7 @@ export interface CategoryImportDto {
         id: string,
         name: string,
         description: string,
+        belong_category: string,
         belong_subject: string,
         created_at: string,
         updated_at: string,
@@ -33,6 +36,8 @@ export interface CategoryImportDto {
         id: string,
         name: string,
         description: string,
+        belong_category: string,
+        root_path: string,
         file?: string | null,
         url?: string | null,
         created_at: string,

@@ -7,23 +7,20 @@ use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::category::application::dto::import::*;
-use crate::category::domain::CategoryAggregate;
-use crate::category::domain::CategoryGenericError;
-use crate::category::domain::CategoryID;
+use crate::category::domain::{CategoryAggregate, CategoryGenericError, CategoryID, PortingCategoryObject};
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
-use crate::resource::domain::ResourceAggregate;
+use crate::common::domain::{ID, Porting};
+use crate::resource::domain::{ResourceAggregate, PortingResourceObject};
 use crate::resource::repository::ResourceRepository;
-use crate::subject::domain::SubjectAggregate;
-use crate::subject::domain::SubjectID;
+use crate::subject::domain::{SubjectID, SubjectAggregate, PortingSubjectObject};
 use crate::subject::repository::SubjectRepository;
-use crate::tag::domain::TagAggregate;
-use crate::tag::domain::TagID;
+use crate::tag::domain::{TagID, TagAggregate, PortingTagObject};
 use crate::tag::repository::TagRepository;
 
 #[derive(Deserialize)]
 pub struct ImportCategoryCommand {
-    root_path: String,
+    new_root_path: String,
 
     category: ImportCategoryObjDto,
     
@@ -64,27 +61,27 @@ impl<'a> ImportCategoryHandler<'a> {
         tags: &Vec<ImportCategoryOfTagObjDto>,
         resources: &Vec<ImportCategoryOfResourceObjDto>,
     ) -> Result<(), CategoryGenericError> {
-        let subject_id_set: HashSet<&String> = subjects
+        let subject_id_set: HashSet<String> = subjects
             .iter()
-            .map(|val| &val.id)
+            .map(|val| val.0.id.to_string())
             .collect();
 
-        let tag_id_set: HashSet<&String> = tags
+        let tag_id_set: HashSet<String> = tags
             .iter()
-            .map(|val| &val.id)
+            .map(|val| val.0.id.to_string())
             .collect();
 
         // check tag's belong subject is exists
         tags.iter().try_for_each(|val| {
-            match subject_id_set.contains(&val.belong_subject) {
+            match subject_id_set.contains(&val.0.belong_subject.to_string()) {
                 true => Ok(()),
                 false => Err(CategoryGenericError::ImportSubjectIdNotExists())
             }
         })?;
 
         // check resource's tags is exists
-        resources.iter().flat_map(|val| &val.tags).try_for_each(|val| {
-            match  tag_id_set.contains(&val) {
+        resources.iter().flat_map(|val| &val.0.tags).try_for_each(|val| {
+            match  tag_id_set.contains(&val.to_string()) {
                 true => Ok(()),
                 false => Err(CategoryGenericError::ImportSubjectIdNotExists())
             }
@@ -100,23 +97,25 @@ impl<'a> ImportCategoryHandler<'a> {
         tags: Vec<ImportCategoryOfTagObjDto>,
         resources: Vec<ImportCategoryOfResourceObjDto>,
     ) -> Result<(CategoryAggregate, Vec<SubjectAggregate>, Vec<TagAggregate>, Vec<ResourceAggregate>), Error> {
-        let mut new_category = CategoryAggregate::new(category.name, category.description, root_path.clone())?;
-        new_category.set_created_at(&category.created_at)?;
-        new_category.set_updated_at(&category.updated_at)?;
-
-
+        let new_category = CategoryAggregate::import_from(PortingCategoryObject {
+            root_path: root_path.clone(),
+            ..category.0
+        })?;
         let category_id = &new_category.id;
+        let new_root = &new_category.root_path;
+
         // ------------------------------
         // subject part
         let mut subids: HashMap<String, SubjectID> = HashMap::new();
         let mut new_subjects: Vec<SubjectAggregate> = Vec::new();
 
-        for val in subjects {
-            let mut new_sub = SubjectAggregate::new(val.name, val.description, category_id)?;
-            new_sub.set_created_at(&val.created_at)?;
-            new_sub.set_updated_at(&val.updated_at)?;
+        for ImportCategoryOfSubjectObjDto(subject) in subjects {
+            let old_id = subject.id.to_string().clone();
+            let new_sub = SubjectAggregate::import_from(PortingSubjectObject { 
+                belong_category: category_id.clone(), ..subject
+            })?;
     
-            subids.insert(val.id, new_sub.id.clone());
+            subids.insert(old_id, new_sub.id.clone());
 
             new_subjects.push(new_sub);
         }
@@ -126,13 +125,15 @@ impl<'a> ImportCategoryHandler<'a> {
         let mut tagids: HashMap<String, TagID> = HashMap::new();
         let mut new_tags: Vec<TagAggregate> = Vec::new();
 
-        for val in tags {
-            let belong_subject = subids.get(&val.belong_subject).unwrap();
-            let mut new_tag = TagAggregate::new(val.name, val.description, category_id, belong_subject)?;
-            new_tag.set_created_at(&val.created_at)?;
-            new_tag.set_updated_at(&val.updated_at)?;
+        for ImportCategoryOfTagObjDto(tag) in tags {
+            let old_id = tag.id.to_string().clone();
+            let new_tag = TagAggregate::import_from(PortingTagObject {
+                belong_category: category_id.clone(),
+                belong_subject: subids.get(&tag.belong_subject.to_string()).unwrap().clone(),
+                ..tag
+            })?;
     
-            tagids.insert(val.id, new_tag.id.clone());
+            tagids.insert(old_id, new_tag.id.clone());
 
             new_tags.push(new_tag);
         }
@@ -141,21 +142,12 @@ impl<'a> ImportCategoryHandler<'a> {
         // resource part
         let mut new_resources: Vec<ResourceAggregate> = Vec::new();
 
-        for val in resources {
-            let mut new_res = ResourceAggregate::new(
-                val.name,
-                val.description,
-                category_id,
-                root_path.clone(),
-                None,
-                val.url,
-            )?;
-            new_res.set_created_at(&val.created_at)?;
-            new_res.set_updated_at(&val.updated_at)?;
-    
-            for tag in val.tags {
-                new_res.add_tag(tagids.get(&tag).unwrap())?;
-            }
+        for ImportCategoryOfResourceObjDto(res) in resources {
+            let new_res = ResourceAggregate::import_from(PortingResourceObject {
+                belong_category: category_id.clone(),
+                root_path: new_root.to_string(),
+                ..res
+            })?;
 
             new_resources.push(new_res);
         }
@@ -176,7 +168,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
 
     async fn execute(&self, command: ImportCategoryCommand) -> Result<Self::Output, Error> {
         let ImportCategoryCommand { 
-            root_path,
+            new_root_path,
             category,
             subjects,
             tags,
@@ -187,7 +179,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
         self.check_relation(&subjects, &tags, &resources)?;
 
         // create entity
-        let (new_category, new_subjects, new_tags, new_resources) = Self::create(root_path, category, subjects, tags, resources)?;
+        let (new_category, new_subjects, new_tags, new_resources) = Self::create(new_root_path, category, subjects, tags, resources)?;
 
         // save category
         let category_id = self.categroy_repo
