@@ -1,7 +1,5 @@
 use crate::category::domain::{CategoryError, CategoryID};
 
-use self::import::ImportCategoryDto;
-
 use super::service::CATEGORY_SERVICE;
 use super::dto::*;
 
@@ -30,6 +28,11 @@ pub async fn import_category(data: ImportCategoryDto) -> Result<CategoryID, Cate
         .await?;
 
     Ok(result)
+}
+
+#[tauri::command(rename_all = "snake_case")]
+pub async fn export_category() {
+
 }
 
 #[tauri::command]
