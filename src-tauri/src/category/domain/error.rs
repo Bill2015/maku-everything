@@ -21,6 +21,9 @@ pub enum CategoryError {
 
     #[error("Import category failed")]
     Import(Error),
+
+    #[error("Export category failed")]
+    Export(Error),
 }
 
 impl Serialize for CategoryError {
@@ -34,6 +37,7 @@ impl Serialize for CategoryError {
             CategoryError::GetAll(source) => serialize_error!(self, source),
             CategoryError::GetById(source) => serialize_error!(self, source),
             CategoryError::Import(source) => serialize_error!(self, source),
+            CategoryError::Export(source) => serialize_error!(self, source),
         };
         error_message.serialize(serializer)
     }

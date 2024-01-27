@@ -36,3 +36,8 @@ pub struct ImportCategoryDto {
 
     pub resources: Vec<PortingResourceObject>,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct ExportCategoryDto {
+    pub id: String,
+}

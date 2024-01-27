@@ -7,7 +7,7 @@ use surrealdb::engine::remote::ws::Client;
 use crate::common::infrastructure::IRepoMapper;
 use crate::common::repository::{env, tablens, CommonRepository, COMMON_REPOSITORY};
 use crate::subject::domain::{SubjectAggregate, SubjectID};
-use crate::subject::infrastructure::SubjectRepoMapper;
+use crate::subject::infrastructure::{SubjectQueryBuilder, SubjectRepoMapper};
 
 pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -38,6 +38,25 @@ impl<'a> SubjectRepository<'a> {
             db: db,
             common_repo: common_repo,
         }
+    }
+
+    pub async fn get_by(&self, builder: SubjectQueryBuilder) -> surrealdb::Result<Vec<SubjectAggregate>> {
+        let sql = format!(r#"
+            SELECT 
+                *
+            FROM type::table($table) WHERE {}"#, 
+            builder.build());
+
+        let result: Vec<SubjectAggregate> = self.db
+            .query(sql)
+            .bind(("table", tablens::SUBJECT))
+            .await?
+            .take::<Vec<SubjectDO>>(0)?
+            .into_iter()
+            .map(|val| { SubjectRepoMapper::do_to_aggregate(val) })
+            .collect();
+
+        Ok(result) 
     }
 
     async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<SubjectAggregate>> {

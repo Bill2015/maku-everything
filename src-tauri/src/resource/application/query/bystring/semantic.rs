@@ -89,14 +89,14 @@ impl<'a> StringQLSemantic<'a> {
         for token in self.tokens.iter_mut() {
             if let QueryToken::TagToken { namespace, value, .. } = token {
                 let mut builder = TagQueryBuilder::new()
-                    .set_name(value.to_string());
+                    .set_name(&value);
 
                 if let Some(namepace) = namespace {
-                    builder = builder.set_belong_subject_name(namepace.to_string());
+                    builder = builder.set_belong_subject_name(&namepace);
                 }
 
                 if let Some(category) = self.belong_category {
-                    builder = builder.set_belong_category(category.to_string());
+                    builder = builder.set_belong_category(category);
                 }
 
                 let result = &self.repo.query(builder)

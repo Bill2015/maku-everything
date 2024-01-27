@@ -9,7 +9,7 @@ use crate::common::repository::env;
 use crate::common::repository::tablens;
 use crate::common::repository::{CommonRepository, COMMON_REPOSITORY};
 use crate::tag::domain::{TagAggregate, TagID};
-use crate::tag::infrastructure::TagRepoMapper;
+use crate::tag::infrastructure::{TagQueryBuilder, TagRepoMapper};
 
 pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -41,6 +41,25 @@ impl<'a> TagRepository<'a> {
             db: db,
             common_repo: common_repo,
         }
+    }
+
+    pub async fn get_by(&self, builder: TagQueryBuilder) -> surrealdb::Result<Vec<TagAggregate>> {
+        let sql = format!(r#"
+            SELECT 
+                *
+            FROM type::table($table) WHERE {}"#, 
+            builder.build());
+
+        let result: Vec<TagAggregate> = self.db
+            .query(sql)
+            .bind(("table", tablens::TAG))
+            .await?
+            .take::<Vec<TagDO>>(0)?
+            .into_iter()
+            .map(|val| { TagRepoMapper::do_to_aggregate(val) })
+            .collect();
+
+        Ok(result) 
     }
 
     async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<TagAggregate>> {

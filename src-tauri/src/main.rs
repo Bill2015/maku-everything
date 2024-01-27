@@ -1,6 +1,5 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
 use common::repository;
 
 mod common;
@@ -35,6 +34,7 @@ fn main() {
             category::application::create_category,
             category::application::update_category,
             category::application::import_category,
+            category::application::export_category,
             category::application::get_all_category,
             category::application::get_category_by_id,
             subject::application::create_subject,

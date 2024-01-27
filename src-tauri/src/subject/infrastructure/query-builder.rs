@@ -23,28 +23,30 @@ impl SubjectQueryBuilder {
         }
     }
 
-    pub fn set_id(mut self, id: String) -> SubjectQueryBuilder {
+    pub fn set_id<S: Into<String>>(mut self, id: S) -> SubjectQueryBuilder {
+        let id: String = id.into();
         if !id.is_empty() {
             self.id = Some(format!("id == {}", id));
         }
         self
     }
 
-    pub fn set_name(mut self, name: String) -> SubjectQueryBuilder {
+    pub fn set_name(mut self, name: &String) -> SubjectQueryBuilder {
         if !name.is_empty() {
             self.name = Some(format!("string::lowercase(name) == string::lowercase(\'{}\')", name));
         }
         self
     }
 
-    pub fn set_belong_category(mut self, category_id: String) -> SubjectQueryBuilder {
+    pub fn set_belong_category<S: Into<String>>(mut self, category_id: S) -> SubjectQueryBuilder {
+        let category_id: String = category_id.into();
         if !category_id.is_empty() {
             self.belong_category = Some(format!("belong_category == '{}'", category_id));
         }
         self
     }
 
-    pub fn set_order_by(mut self, field_name: String) -> SubjectQueryBuilder {
+    pub fn set_order_by(mut self, field_name: &String) -> SubjectQueryBuilder {
         if !field_name.is_empty() {
             self.order_by = Some(format!("ORDER BY {}", field_name));
         }
@@ -80,19 +82,19 @@ impl From<ListSubjectQuery> for SubjectQueryBuilder {
         let mut builder = SubjectQueryBuilder::new();
 
         if let Some(id) = value.id {
-            builder = builder.set_id(id);
+            builder = builder.set_id(&id);
         }
 
         if let Some(name) = value.name {
-            builder = builder.set_name(name);
+            builder = builder.set_name(&name);
         }
 
         if let Some(category_id) = value.belong_category {
-            builder = builder.set_belong_category(category_id);
+            builder = builder.set_belong_category(&category_id);
         }
 
         if let Some(field_name) = value.order_by {
-            builder = builder.set_order_by(field_name);
+            builder = builder.set_order_by(&field_name);
         }
 
         builder

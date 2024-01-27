@@ -9,3 +9,7 @@ pub use update::*;
 #[path="./import-category.rs"]
 mod import;
 pub use import::*;
+
+#[path="./export-category.rs"]
+mod export;
+pub use export::*;

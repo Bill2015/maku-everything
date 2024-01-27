@@ -32,35 +32,38 @@ impl TagQueryBuilder {
         }
     }
 
-    pub fn set_id(mut self, id: String) -> TagQueryBuilder {
+    pub fn set_id<S: Into<String>>(mut self, id: S) -> TagQueryBuilder {
+        let id: String = id.into();
         if !id.is_empty() {
             self.id = Some(format!("id == {}", id));
         }
         self
     }
 
-    pub fn set_name(mut self, name: String) -> TagQueryBuilder {
+    pub fn set_name(mut self, name: &String) -> TagQueryBuilder {
         if !name.is_empty() {
             self.name = Some(format!("string::lowercase(name) == string::lowercase(\'{}\')", name));
         }
         self
     }
 
-    pub fn set_belong_category(mut self, category_id: String) -> TagQueryBuilder {
+    pub fn set_belong_category<S: Into<String>>(mut self, category_id: S) -> TagQueryBuilder {
+        let category_id: String = category_id.into();
         if !category_id.is_empty() {
             self.belong_category = Some(format!("belong_category == '{}'", category_id));
         }
         self
     }
 
-    pub fn set_belong_subject(mut self, subject_id: String) -> TagQueryBuilder {
+    pub fn set_belong_subject<S: Into<String>>(mut self, subject_id: S) -> TagQueryBuilder {
+        let subject_id: String = subject_id.into();
         if !subject_id.is_empty() {
             self.belong_subject = Some(format!("belong_subject == {}", subject_id));
         } 
         self
     }
 
-    pub fn set_belong_subject_name(mut self, subject_name: String) -> TagQueryBuilder {
+    pub fn set_belong_subject_name(mut self, subject_name: &String) -> TagQueryBuilder {
         if !subject_name.is_empty() {
             self.belong_subject_name = Some(
                 format!("string::lowercase(belong_subject.name) == string::lowercase(\'{}\')", subject_name)
@@ -69,14 +72,14 @@ impl TagQueryBuilder {
         self
     }
 
-    pub fn set_tagging_resource(mut self, resource_id: String) -> TagQueryBuilder {
+    pub fn set_tagging_resource(mut self, resource_id: &String) -> TagQueryBuilder {
         if !resource_id.is_empty() {
             self.tagging_resource = Some(format!("->tagging.out CONTAINS {}", resource_id));
         }
         self
     }
 
-    pub fn set_order_by(mut self, field_name: String) -> TagQueryBuilder {
+    pub fn set_order_by(mut self, field_name: &String) -> TagQueryBuilder {
         if !field_name.is_empty() {
             self.order_by = Some(format!("ORDER BY {}", field_name));
         }
@@ -119,27 +122,27 @@ impl From<ListTagQuery> for TagQueryBuilder {
         }
 
         if let Some(name) = value.name {
-            builder = builder.set_name(name);
+            builder = builder.set_name(&name);
         }
 
         if let Some(category_id) = value.belong_category {
-            builder = builder.set_belong_category(category_id);
+            builder = builder.set_belong_category(&category_id);
         }
 
         if let Some(subject_id) = value.belong_subject {
-            builder = builder.set_belong_subject(subject_id);
+            builder = builder.set_belong_subject(&subject_id);
         }
 
         if let Some(subject_name) = value.belong_subject_name {
-            builder = builder.set_belong_subject_name(subject_name);
+            builder = builder.set_belong_subject_name(&subject_name);
         }
 
         if let Some(resource_id) = value.tagging_resource {
-            builder = builder.set_tagging_resource(resource_id);
+            builder = builder.set_tagging_resource(&resource_id);
         }
 
         if let Some(field_name) = value.order_by {
-            builder = builder.set_order_by(field_name);
+            builder = builder.set_order_by(&field_name);
         }
 
         builder

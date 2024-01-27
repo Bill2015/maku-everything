@@ -8,7 +8,7 @@ use crate::common::infrastructure::IRepoMapper;
 use crate::common::repository::{env, CommonRepository, COMMON_REPOSITORY};
 use crate::common::repository::tablens;
 use crate::resource::domain::{ResourceAggregate, ResourceID};
-use crate::resource::infrastructure::ResourceRepoMapper;
+use crate::resource::infrastructure::{ResourceQueryBuilder, ResourceRepoMapper};
 
 use super::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationRepository};
 
@@ -75,6 +75,27 @@ impl<'a> ResourceRepository<'a> {
             common_repo: common_repo,
             tag_relation_repo: tag_relation_repo,
         }
+    }
+
+    pub async fn get_by(&self, builder: ResourceQueryBuilder) -> surrealdb::Result<Vec<ResourceAggregate>> {
+        let sql = format!(r#"
+            SELECT 
+                *,
+                belong_category.root_path as root_path,
+                <-tagging.in as tags
+            FROM type::table($table) WHERE {}"#, 
+            builder.build());
+
+        let result: Vec<ResourceAggregate> = self.db
+            .query(sql)
+            .bind(("table", tablens::RESOURCE))
+            .await?
+            .take::<Vec<ResourceDO>>(0)?
+            .into_iter()
+            .map(|val| { ResourceRepoMapper::do_to_aggregate(val) })
+            .collect();
+
+        Ok(result) 
     }
 
     async fn return_aggregate_by_id(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {

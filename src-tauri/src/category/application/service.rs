@@ -9,7 +9,7 @@ use crate::resource::repository::{ResourceRepository, RESOURCE_REPOSITORY};
 use crate::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
 use crate::tag::repository::{TagRepository, TAG_REPOSITORY};
 
-use super::command::{ImportCategoryCommand, ImportCategoryHandler, UpdateCategoryCommand, UpdateCategoryHandler};
+use super::command::{ExportCategoryCommand, ExportCategoryHandler, ImportCategoryCommand, ImportCategoryHandler, UpdateCategoryCommand, UpdateCategoryHandler};
 use super::dto::*;
 use super::query::*;
 
@@ -79,6 +79,22 @@ impl<'a> CategoryService<'a> {
             .execute(command)
             .await
             .map_err(|err| CategoryError::Import(anyhow!(err)))?;
+
+        Ok(result)
+    }
+
+    pub async fn export(&self, data: ExportCategoryDto) -> Result<ExportCategoryResDto, CategoryError> {
+        let command = ExportCategoryCommand::from(data);
+
+        let result = ExportCategoryHandler::register(
+                self.category_repository,
+                self.subject_repository,
+                self.tag_repository,
+                self.resource_repository,
+            )
+            .execute(command)
+            .await
+            .map_err(|err| CategoryError::Export(anyhow!(err)))?;
 
         Ok(result)
     }

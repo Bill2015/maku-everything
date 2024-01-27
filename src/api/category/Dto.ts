@@ -27,3 +27,7 @@ export interface CategoryCreateDto {
 export interface CategoryUpdateDto extends Partial<CategoryCreateDto> {
     id: string;
 }
+
+export interface ExportCategoryDto {
+    id: string;
+}
