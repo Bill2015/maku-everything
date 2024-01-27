@@ -1,7 +1,7 @@
 
 use chrono::NaiveDateTime;
 use chrono::{DateTime, Utc};
-use crate::common::domain::ID;
+use crate::common::domain::{Porting, ID};
 use crate::category::domain::CategoryID;
 use crate::common::infrastructure::date;
 use crate::subject::domain::SubjectID;
@@ -11,6 +11,8 @@ pub use id::TagID;
 mod error;
 pub use error::TagError;
 pub use error::TagGenericError;
+mod porting;
+pub use porting::PortingTagObject;
 
 pub struct TagAggregate {
     pub id: TagID,
@@ -73,5 +75,29 @@ impl TagAggregate {
             return Ok(())
         }
         Err(TagGenericError::InvalidDateFormat())
+    }
+}
+
+impl Porting<PortingTagObject> for TagAggregate {
+    type Err = TagGenericError;
+
+    fn import_from(data: PortingTagObject) -> Result<Self, Self::Err> {
+        let mut new_tag = Self::new(data.name, data.description, &data.belong_category, &data.belong_subject)?;
+        new_tag.set_created_at(&data.created_at)?;
+        new_tag.set_updated_at(&data.updated_at)?;
+        Ok(new_tag)
+    }
+
+    fn export_to(self) -> Result<PortingTagObject, Self::Err> {
+        Ok(PortingTagObject {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            belong_category: self.belong_category,
+            belong_subject: self.belong_subject,
+            created_at: self.created_at.to_string(),
+            updated_at: self.updated_at.to_string(),
+            auth: self.auth,
+        })
     }
 }

@@ -4,6 +4,7 @@ use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
 
+use crate::common::domain::Porting;
 use crate::common::infrastructure::date;
 use crate::common::domain::ID;
 
@@ -14,6 +15,8 @@ pub use error::CategoryError;
 mod id;
 pub use id::CategoryID;
 
+mod porting;
+pub use porting::PortingCategoryObject;
 
 #[derive(Debug, Serialize)]
 pub struct CategoryAggregate {
@@ -100,3 +103,26 @@ impl CategoryAggregate {
         self.auth = new_auth;
     }
 }
+
+impl Porting<PortingCategoryObject> for CategoryAggregate {
+    type Err = CategoryGenericError;
+    fn import_from(data: PortingCategoryObject) -> Result<Self, Self::Err> {
+        let mut category = Self::new(data.name, data.description, data.root_path)?;
+        category.set_created_at(&data.created_at)?;
+        category.set_updated_at(&data.updated_at)?;
+        Ok(category)
+    }
+
+    fn export_to(self) -> Result<PortingCategoryObject, Self::Err> {
+        Ok(PortingCategoryObject {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            root_path: self.root_path,
+            created_at: self.created_at.to_string(),
+            updated_at: self.updated_at.to_string(),
+            auth: self.auth,
+        })
+    }
+}
+

@@ -1,6 +1,7 @@
 use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
+use crate::common::domain::Porting;
 use crate::common::domain::ID;
 use crate::category::domain::CategoryID;
 use crate::common::infrastructure::date;
@@ -10,6 +11,8 @@ pub use id::SubjectID;
 mod error;
 pub use error::SubjectError;
 pub use error::SubjectGenericError;
+mod porting;
+pub use porting::PortingSubjectObject;
 
 #[derive(Debug, Serialize)]
 pub struct SubjectAggregate {
@@ -72,5 +75,28 @@ impl SubjectAggregate {
             return Ok(())
         }
         Err(SubjectGenericError::InvalidDateFormat())
+    }
+}
+
+impl Porting<PortingSubjectObject> for SubjectAggregate {
+    type Err = SubjectGenericError;
+
+    fn import_from(data: PortingSubjectObject) -> Result<Self, Self::Err> {
+        let mut new_subject = Self::new(data.name, data.description, &data.belong_category)?;
+        new_subject.set_created_at(&data.created_at)?;
+        new_subject.set_updated_at(&data.updated_at)?;
+        Ok(new_subject)
+    }
+
+    fn export_to(self) -> Result<PortingSubjectObject, Self::Err> {
+        Ok(PortingSubjectObject {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            belong_category: self.belong_category,
+            created_at: self.created_at.to_string(),
+            updated_at: self.updated_at.to_string(),
+            auth: self.auth,
+        })
     }
 }

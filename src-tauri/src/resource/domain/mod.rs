@@ -7,7 +7,7 @@ use serde::Serialize;
 use crate::category::domain::CategoryID;
 use crate::common::infrastructure::date;
 use crate::tag::domain::TagID;
-use crate::common::domain::ID;
+use crate::common::domain::{Porting, ID};
 
 
 mod id;
@@ -15,6 +15,8 @@ pub use id::ResourceID;
 mod error;
 pub use error::ResourceError;
 pub use error::ResourceGenericError;
+mod porting;
+pub use porting::PortingResourceObject;
 
 #[derive(Debug, Serialize)]
 pub struct ResourceFileAggregate {
@@ -25,11 +27,11 @@ pub struct ResourceFileAggregate {
 }
 
 impl ResourceFileAggregate {
-    pub fn new(root_path: String, file_path: String) -> Result<Self, ResourceGenericError> {
+    pub fn new(root_path: &String, file_path: String) -> Result<Self, ResourceGenericError> {
         // If path already contain root path
         // trim it and re-concat it
-        let main_path = file_path.trim_start_matches(&root_path);
-        let full_path = root_path + main_path;
+        let main_path = file_path.trim_start_matches(root_path);
+        let full_path = format!("{}{}", root_path, main_path);
 
         // concat with root path
         let path = Path::new(full_path.as_str());
@@ -104,6 +106,7 @@ pub struct ResourceAggregate {
     pub name: String,
     pub description: String,
     pub belong_category: CategoryID,
+    pub root_path: String,
     pub file: Option<ResourceFileAggregate>,
     pub url: Option<ResourceUrlAggregate>,
     pub auth: bool,
@@ -125,7 +128,7 @@ impl ResourceAggregate {
         url: Option<String>
     ) -> Result<Self, ResourceGenericError> {
         let file = match file_path {
-            Some(path) if !path.is_empty() => Some(ResourceFileAggregate::new(root_path, path)?),
+            Some(path) if !path.is_empty() => Some(ResourceFileAggregate::new(&root_path, path)?),
             _ => None,
         };
 
@@ -150,6 +153,7 @@ impl ResourceAggregate {
             name: new_name,
             description: description,
             belong_category: belong_category.clone(),
+            root_path: root_path,
             file: file,
             url: url,
             auth: false,
@@ -177,8 +181,8 @@ impl ResourceAggregate {
         Ok(())
     }
 
-    pub fn change_file(&mut self, root_path: String, file_path: String) -> Result<(), ResourceGenericError> {
-        self.file = Some(ResourceFileAggregate::new(root_path, file_path)?);
+    pub fn change_file(&mut self, file_path: String) -> Result<(), ResourceGenericError> {
+        self.file = Some(ResourceFileAggregate::new(&self.root_path, file_path)?);
         Ok(())
     }
 
@@ -222,4 +226,49 @@ impl ResourceAggregate {
         Ok(())
     }
 
+}
+
+impl Porting<PortingResourceObject> for ResourceAggregate {
+    type Err = ResourceGenericError;
+
+    fn import_from(data: PortingResourceObject) -> Result<Self, Self::Err> {
+        let mut new_res = ResourceAggregate::new(
+            data.name,
+            data.description,
+            &data.belong_category,
+            data.root_path,
+            None,
+            data.url,
+        )?;
+        new_res.set_created_at(&data.created_at)?;
+        new_res.set_updated_at(&data.updated_at)?;
+
+        if let Some(file) = data.file {
+            new_res.change_file(file)?;
+        }
+
+        for tag in data.tags {
+            new_res.add_tag(&tag)?;
+        }
+
+        Ok(new_res)
+    }
+
+    fn export_to(self) -> Result<PortingResourceObject, Self::Err> {
+        Ok(PortingResourceObject {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            belong_category: self.belong_category,
+            file: self.file.map(|x| x.path),
+            root_path: self.root_path,
+            url: self.url.map(|x| x.full),
+            created_at: self.created_at.to_string(),
+            updated_at: self.updated_at.to_string(),
+            tags: self.tags,
+            auth: self.auth,            
+        })
+    }
+
+    
 }

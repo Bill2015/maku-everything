@@ -39,6 +39,7 @@ pub struct ResourceDO {
     pub id: Thing,
     pub name: String,
     pub description: String,
+    pub root_path: String,
     pub file: Option<ResourceFileDo>,
     pub url: Option<ResourceUrlDo>,
     pub auth: bool,
@@ -79,7 +80,8 @@ impl<'a> ResourceRepository<'a> {
     async fn return_aggregate_by_id(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {
         let sql = r#"
             SELECT 
-                *, 
+                *,
+                belong_category.root_path as root_path,
                 <-tagging.in as tags
             FROM type::table($table) 
             WHERE id == $id"#;
