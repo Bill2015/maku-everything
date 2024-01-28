@@ -127,8 +127,8 @@ impl Porting<PortingCategoryObject> for CategoryAggregate {
             name: self.name,
             description: self.description,
             root_path: self.root_path,
-            created_at: self.created_at.to_string(),
-            updated_at: self.updated_at.to_string(),
+            created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
+            updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
             auth: self.auth,
         })
     }

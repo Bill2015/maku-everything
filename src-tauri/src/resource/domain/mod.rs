@@ -263,8 +263,8 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
             file: self.file.map(|x| x.path),
             root_path: self.root_path,
             url: self.url.map(|x| x.full),
-            created_at: self.created_at.to_string(),
-            updated_at: self.updated_at.to_string(),
+            created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
+            updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
             tags: self.tags,
             auth: self.auth,            
         })
