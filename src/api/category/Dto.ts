@@ -31,3 +31,9 @@ export interface CategoryUpdateDto extends Partial<CategoryCreateDto> {
 export interface ExportCategoryDto {
     id: string;
 }
+
+export interface CategoryImportDto {
+    new_root_path: string,
+
+    data: string,
+}

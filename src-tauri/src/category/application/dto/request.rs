@@ -28,13 +28,7 @@ pub struct UpdateCategoryDto {
 pub struct ImportCategoryDto {
     pub new_root_path: String,
 
-    pub category: PortingCategoryObject,
-    
-    pub subjects: Vec<PortingSubjectObject>,
-
-    pub tags: Vec<PortingTagObject>,
-
-    pub resources: Vec<PortingResourceObject>,
+    pub data: String,
 }
 
 #[derive(Serialize, Deserialize)]

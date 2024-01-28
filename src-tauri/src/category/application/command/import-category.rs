@@ -4,13 +4,16 @@ use std::collections::HashSet;
 use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 
+use crate::category::application::dto::ExportCategoryResDto;
 use crate::command_from_dto;
 use crate::category::application::dto::ImportCategoryDto;
 use crate::category::domain::{CategoryAggregate, CategoryGenericError, CategoryID, PortingCategoryObject};
 use crate::category::repository::CategoryRepository;
 use crate::common::application::ICommandHandler;
-use crate::common::domain::{ID, Porting};
+use crate::common::domain::Porting;
 use crate::resource::domain::{ResourceAggregate, PortingResourceObject};
 use crate::resource::repository::ResourceRepository;
 use crate::subject::domain::{SubjectID, SubjectAggregate, PortingSubjectObject};
@@ -22,13 +25,7 @@ use crate::tag::repository::TagRepository;
 pub struct ImportCategoryCommand {
     new_root_path: String,
 
-    category: PortingCategoryObject,
-    
-    subjects: Vec<PortingSubjectObject>,
-
-    tags: Vec<PortingTagObject>,
-
-    resources: Vec<PortingResourceObject>,
+    data: String,
 }
 command_from_dto!(ImportCategoryCommand, ImportCategoryDto);
 
@@ -83,7 +80,7 @@ impl<'a> ImportCategoryHandler<'a> {
         resources.iter().flat_map(|val| &val.tags).try_for_each(|val| {
             match  tag_id_set.contains(&val.to_string()) {
                 true => Ok(()),
-                false => Err(CategoryGenericError::ImportSubjectIdNotExists())
+                false => Err(CategoryGenericError::ImportTagIdNotExists())
             }
         })?;
 
@@ -169,11 +166,17 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
     async fn execute(&self, command: ImportCategoryCommand) -> Result<Self::Output, Error> {
         let ImportCategoryCommand { 
             new_root_path,
+            data,
+        } = command;
+
+        let strbyte = BASE64_STANDARD.decode(data)?;
+        let str = String::from_utf8(strbyte)?;
+        let ExportCategoryResDto {
             category,
             subjects,
             tags,
             resources,
-        } = command;
+        } = serde_json::from_str(&str)?;
 
         // check relation is valid
         self.check_relation(&subjects, &tags, &resources)?;
