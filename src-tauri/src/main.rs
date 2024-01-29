@@ -1,5 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use tauri::api::process::Command;
 use common::repository;
 
 mod common;
@@ -27,6 +28,12 @@ async fn connect_db() -> String {
 
 
 fn main() {
+
+    let (mut rx, mut child) = Command::new_sidecar("surreal")
+        .expect("failed to create `surread db` binary command")
+        .args(["start", "-A", "--user", "root", "--pass", "root"])
+        .spawn()
+        .expect("Failed to spawn server");
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
