@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Stack, UnstyledButton, Tooltip, Image } from '@mantine/core';
+import { Stack, UnstyledButton, Tooltip } from '@mantine/core';
 import { IconBaseProps } from 'react-icons/lib';
 import { BsGear, BsMailbox } from 'react-icons/bs';
-import Logo from '@assets/logo.png';
-import { useHomeNavigate } from '@router/navigateHook';
 
-import navbarClasses from './Navbar.module.scss';
+import navbarClasses from './MainNavbar.module.scss';
 
 interface NavbarLinkProps {
     icon: React.FC<IconBaseProps>;
@@ -33,7 +31,6 @@ const mockdata = [
 
 export function MainNavbar() {
     const [active, setActive] = useState(2);
-    const navigateToHome = useHomeNavigate();
 
     const navbarItem = mockdata.map((val, index) => (
         <NavbarLink
@@ -48,16 +45,8 @@ export function MainNavbar() {
     ));
 
     return (
-        <>
-            <Tooltip label="Maku" position="right" transitionProps={{ duration: 0 }}>
-                <UnstyledButton onClick={navigateToHome} pb={5}>
-                    <Image p={1} width="45px" h="45px" src={Logo} />
-                </UnstyledButton>
-            </Tooltip>
-
-            <Stack style={{ alignItems: 'center' }} gap={5}>
-                {navbarItem}
-            </Stack>
-        </>
+        <Stack style={{ alignItems: 'center' }} gap={5}>
+            {/* {navbarItem} */}
+        </Stack>
     );
 }

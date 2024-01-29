@@ -5,12 +5,14 @@ interface ModelReduxProps {
 }
 
 export interface ModalState {
+    importCategory: ModelReduxProps;
     createSubject: ModelReduxProps;
     createTag: ModelReduxProps;
     createResource: ModelReduxProps;
 }
 
 const initialState: ModalState = {
+    importCategory: { opened: false },
     createSubject:  { opened: false },
     createTag:      { opened: false },
     createResource: { opened: false },
@@ -20,6 +22,9 @@ const modalSlice = createSlice({
     name:     'modal',
     initialState,
     reducers: {
+        setImportCategoryModelOpen: (state, action: PayloadAction<boolean>) => {
+            state.importCategory.opened = action.payload;
+        },
         setCreateSubjectModelOpen: (state, action: PayloadAction<boolean>) => {
             state.createSubject.opened = action.payload;
         },
@@ -33,6 +38,7 @@ const modalSlice = createSlice({
 });
 
 export const {
+    setImportCategoryModelOpen,
     setCreateSubjectModelOpen,
     setCreateTagModelOpen,
     setCreateResourceModelOpen,

@@ -1,7 +1,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { Notifications } from '@mantine/notifications';
-import { Box, MantineProvider, AppShell, Group } from '@mantine/core';
+import { Box, MantineProvider, AppShell } from '@mantine/core';
 
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -9,9 +9,10 @@ import { MainNavbar } from '@components/navbar';
 import { CreateSubjectModal } from '@modals/subject';
 import { CreateTagModal } from '@modals/tag';
 import { CreateResourceModal } from '@modals/resource';
+import { ImportCategoryModal } from '@modals/category';
+import { MainHeader } from '@components/header';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
-import { Initializer } from './__test__/components/Initializer';
 
 // https://mantine.dev/styles/mantine-styles/#css-layers
 import '@mantine/core/styles.layer.css';
@@ -41,7 +42,7 @@ function App() {
         <MantineProvider defaultColorScheme="dark">
             <AppShell
                 classNames={{ main: classes.main }}
-                header={{ height: 60 }}
+                header={{ height: 40 }}
                 navbar={{
                     width:      70,
                     breakpoint: 'sm',
@@ -49,10 +50,8 @@ function App() {
                 }}
                 padding="md"
             >
-                <AppShell.Header>
-                    <Group px="md">
-                        Header
-                    </Group>
+                <AppShell.Header display="flex" style={{ alignItems: 'center' }}>
+                    <MainHeader />
                 </AppShell.Header>
 
                 <AppShell.Navbar p="sm">
@@ -73,7 +72,7 @@ function App() {
             <CreateSubjectModal />
             <CreateTagModal />
             <CreateResourceModal />
-            <Initializer />
+            <ImportCategoryModal />
         </MantineProvider>
     );
 }

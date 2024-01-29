@@ -1,0 +1,14 @@
+.btn {
+    background-color: transparent;
+    padding: 0.25rem;
+    height: 30px;
+    cursor: default;
+
+    @include hover {
+        background-color: rgba(74, 127, 181, 0.564);
+    }
+
+    &[data-expanded="true"] {
+        background-color: rgba(72, 143, 213, 0.373)
+    }
+}

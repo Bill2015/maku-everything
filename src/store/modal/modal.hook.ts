@@ -1,6 +1,28 @@
 import { useCallback } from 'react';
 import { useModelSelector, useModelDispatch } from '../hook';
-import { setCreateResourceModelOpen, setCreateSubjectModelOpen, setCreateTagModelOpen } from './modal.slice';
+import {
+    setCreateResourceModelOpen,
+    setCreateSubjectModelOpen,
+    setCreateTagModelOpen,
+    setImportCategoryModelOpen,
+} from './modal.slice';
+
+export function useImportCategoryModel() {
+    const { opened } = useModelSelector().importCategory;
+    const dispatch = useModelDispatch();
+
+    const open = useCallback(() => {
+        dispatch(setImportCategoryModelOpen(true));
+    }, [dispatch]);
+
+    const close = useCallback(() => {
+        dispatch(setImportCategoryModelOpen(false));
+    }, [dispatch]);
+
+    return {
+        opened, open, close,
+    };
+}
 
 export function useCreateSubjectModel() {
     const { opened } = useModelSelector().createSubject;
