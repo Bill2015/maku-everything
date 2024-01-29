@@ -1,9 +1,13 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use tauri::api::process::Command;
+use core::dbmanager::DatabaseManagerStatus;
+
+use pretty_env_logger;
 use modules::common::repository;
 use modules::{category, tag, subject, resource};
+use tauri::{Manager, State, WindowEvent};
 
+mod core;
 mod modules;
 mod utils;
 
@@ -25,14 +29,40 @@ async fn connect_db() -> String {
 
 
 fn main() {
+    pretty_env_logger::init();
 
-    let (mut rx, mut child) = Command::new_sidecar("surreal")
-        .expect("failed to create `surread db` binary command")
-        .args(["start", "-A", "--user", "root", "--pass", "root"])
-        .spawn()
-        .expect("Failed to spawn server");
+    // db manager instance
+    let dbms = DatabaseManagerStatus::new();
 
+    // tauri main builder
     tauri::Builder::default()
+        .manage(dbms)
+        .setup(move |app| {
+            let dbm: State<DatabaseManagerStatus> = app.state();
+            let result = dbm.db_manager
+                .lock()
+                .unwrap()
+                .start_db();
+            match result {
+                Ok(_) => { Ok(()) },
+                Err(err) => panic!("{}", err.to_string()),
+            }
+        })
+        .on_window_event(move |event| match event.event() {
+            WindowEvent::Destroyed => {
+                let dbm: State<DatabaseManagerStatus> = event.window().state();
+                println!("Ternimated app!");
+                let result = dbm.db_manager
+                    .lock()
+                    .unwrap()
+                    .terminate_db();
+                match result {
+                    Ok(_) => {},
+                    Err(err) => panic!("{}", err.to_string()),
+                }
+            },
+            _ => {}
+        })
         .invoke_handler(tauri::generate_handler![
             connect_db, 
             category::application::create_category,
