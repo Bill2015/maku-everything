@@ -55,7 +55,7 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
         String::from("Create Category Command")
     }
 
-    type Output = ExportCategoryResDto;
+    type Output = String;
 
     async fn execute(&self, command: ExportCategoryCommand) -> Result<Self::Output, Error> {
         let ExportCategoryCommand { id: category_id } = command;
@@ -107,11 +107,13 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .map(|val| { val.export_to() })
             .collect::<Result<Vec<PortingResourceObject>, ResourceGenericError>>()?;
 
-        Ok(ExportCategoryResDto { 
+        let data = serde_json::to_string::<ExportCategoryResDto>(&ExportCategoryResDto { 
             category,
             subjects, 
             tags, 
             resources 
-        })
+        })?;
+
+        Ok(data)
     }
 }

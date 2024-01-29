@@ -51,12 +51,8 @@ pub async fn export_category(data: ExportCategoryDto) -> Result<String, Category
         .save_file()
         .ok_or(CategoryError::Export(anyhow!("Save file failed")))?;
 
-    let data = serde_json::to_string::<ExportCategoryResDto>(&result)
-        .map_err(|err| CategoryError::Export(anyhow!(err)))
-        .unwrap();
-
     let mut file = File::create(save).expect("Unable to create file");
-    file.write_all(BASE64_STANDARD.encode(data.as_bytes()).as_bytes()).expect("Unable to write to file");
+    file.write_all(BASE64_STANDARD.encode(result.as_bytes()).as_bytes()).expect("Unable to write to file");
 
     Ok(id)
 }

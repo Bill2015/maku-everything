@@ -83,7 +83,7 @@ impl<'a> CategoryService<'a> {
         Ok(result)
     }
 
-    pub async fn export(&self, data: ExportCategoryDto) -> Result<ExportCategoryResDto, CategoryError> {
+    pub async fn export(&self, data: ExportCategoryDto) -> Result<String, CategoryError> {
         let command = ExportCategoryCommand::from(data);
 
         let result = ExportCategoryHandler::register(
