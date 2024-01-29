@@ -2,3 +2,6 @@
 # will have compiled files and executables
 /target/
 
+/binaries/**
+!/binaries/converter.ts
+!/binaries/READMD.md
