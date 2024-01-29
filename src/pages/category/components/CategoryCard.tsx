@@ -1,17 +1,40 @@
 import {
-    Card, Group, Text, Badge, Button, rem, Spoiler, Box, Title, Divider,
+    Card, Group, Text, Badge, Button, rem, Spoiler, Box, Title, Divider, ActionIcon, Menu,
 } from '@mantine/core';
-import { CategoryResDto } from '@api/category';
+import { CgExport } from 'react-icons/cg';
+import { MdOutlineMoreVert } from 'react-icons/md';
+import { IoSettingsOutline } from 'react-icons/io5';
+import { LuPin } from 'react-icons/lu';
 
+import { CategoryMutation, CategoryResDto } from '@api/category';
+
+import { showNotification } from '@components/notification';
+import { useActiveCategoryRedux } from '@store/global';
+import { useCategoryNavigate } from '@router/navigateHook';
+import { useCallback } from 'react';
 import classes from './CategoryCard.module.scss';
 
 export interface CategoryCardProps {
     data: CategoryResDto;
-    onLoadClick: (data: CategoryResDto) => void;
 }
 
 export function CategoryCard(props: CategoryCardProps) {
-    const { data, onLoadClick } = props;
+    const { data } = props;
+    const { setActiveCategory } = useActiveCategoryRedux();
+    const navigateCategoryTo = useCategoryNavigate();
+    const exportCategory = CategoryMutation.useExport();
+
+    // on load category
+    const handleLoadClick = useCallback(async () => {
+        showNotification('Loaded Category', data.name);
+        setActiveCategory({ id: data.id, name: data.name });
+        navigateCategoryTo(data.name);
+    }, [data, setActiveCategory, navigateCategoryTo]);
+
+    // on export click
+    const handleExportClick = useCallback(async () => {
+        await exportCategory.mutateAsync({ id: data.id });
+    }, [exportCategory, data]);
 
     return (
         <Card shadow="sm" padding="md" pt="xs" radius="md" withBorder classNames={{ root: classes.card }}>
@@ -39,8 +62,39 @@ export function CategoryCard(props: CategoryCardProps) {
             </Group>
 
             <Group>
-                <Button onClick={() => onLoadClick(data)}>Load</Button>
+                <Button onClick={handleLoadClick}>Load</Button>
             </Group>
+
+            <Menu
+                shadow="md"
+                withArrow
+                loop
+                width={200}
+                position="bottom-start"
+                arrowSize={14}
+                offset={0}
+            >
+                <Menu.Target>
+                    <ActionIcon pos="absolute" right="10px" variant="outline" classNames={{ root: classes.menuBtn }}>
+                        <MdOutlineMoreVert />
+                    </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                    <Menu.Label>
+                        {`${data.name}`}
+                    </Menu.Label>
+                    <Menu.Item leftSection={<IoSettingsOutline />}>
+                        Settings
+                    </Menu.Item>
+                    <Menu.Item leftSection={<LuPin />}>
+                        Pin
+                    </Menu.Item>
+                    <Menu.Item leftSection={<CgExport />} onClick={handleExportClick}>
+                        Export
+                    </Menu.Item>
+                </Menu.Dropdown>
+            </Menu>
+
         </Card>
     );
 }
