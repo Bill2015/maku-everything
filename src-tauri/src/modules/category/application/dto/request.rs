@@ -1,8 +1,8 @@
 use serde::{Serialize, Deserialize};
-use crate::category::domain::PortingCategoryObject;
-use crate::resource::domain::PortingResourceObject;
-use crate::subject::domain::PortingSubjectObject;
-use crate::tag::domain::PortingTagObject;
+use crate::modules::category::domain::PortingCategoryObject;
+use crate::modules::resource::domain::PortingResourceObject;
+use crate::modules::subject::domain::PortingSubjectObject;
+use crate::modules::tag::domain::PortingTagObject;
 
 #[derive(Deserialize, Serialize)]
 pub struct CreateCategoryDto {

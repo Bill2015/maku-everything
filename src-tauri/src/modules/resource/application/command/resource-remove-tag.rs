@@ -3,12 +3,12 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
-use crate::resource::application::dto::ResourceRemoveTagDto;
-use crate::resource::domain::{ResourceGenericError, ResourceID};
-use crate::resource::repository::ResourceRepository;
-use crate::common::application::ICommandHandler;
-use crate::tag::domain::TagID;
-use crate::tag::repository::TagRepository;
+use crate::modules::resource::application::dto::ResourceRemoveTagDto;
+use crate::modules::resource::domain::{ResourceGenericError, ResourceID};
+use crate::modules::resource::repository::ResourceRepository;
+use crate::modules::common::application::ICommandHandler;
+use crate::modules::tag::domain::TagID;
+use crate::modules::tag::repository::TagRepository;
 
 #[derive(Deserialize)]
 pub struct ResourceRemoveTagCommand {

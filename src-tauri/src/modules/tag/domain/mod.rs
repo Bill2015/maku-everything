@@ -1,10 +1,10 @@
 
 use chrono::NaiveDateTime;
 use chrono::{DateTime, Utc};
-use crate::common::domain::{Porting, ID};
-use crate::category::domain::CategoryID;
-use crate::common::infrastructure::date;
-use crate::subject::domain::SubjectID;
+use crate::modules::common::domain::{Porting, ID};
+use crate::modules::category::domain::CategoryID;
+use crate::modules::common::infrastructure::date;
+use crate::modules::subject::domain::SubjectID;
 
 mod id;
 pub use id::TagID;

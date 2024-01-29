@@ -1,10 +1,10 @@
 use surrealdb::sql::thing;
 use surrealdb::sql::Datetime;
 
-use crate::common::domain::ID;
-use crate::common::infrastructure::IRepoMapper;
-use crate::category::domain::{CategoryAggregate, CategoryID};
-use crate::category::repository::CategoryDO;
+use crate::modules::common::domain::ID;
+use crate::modules::common::infrastructure::IRepoMapper;
+use crate::modules::category::domain::{CategoryAggregate, CategoryID};
+use crate::modules::category::repository::CategoryDO;
 
 // Mapper
 pub struct CategoryRepoMapper {}

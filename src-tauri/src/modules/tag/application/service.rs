@@ -1,12 +1,12 @@
 
 use anyhow::anyhow;
 
-use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
-use crate::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
-use crate::tag::domain::{TagError, TagID};
-use crate::tag::repository::{TAG_REPOSITORY, TAG_QUERY_REPOSITORY, TagRepository, TagQueryRepository};
-use crate::tag::application::command::{CreateTagCommand, CreateTagHandler};
-use crate::common::application::{ICommandHandler, IQueryHandler};
+use crate::modules::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
+use crate::modules::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
+use crate::modules::tag::domain::{TagError, TagID};
+use crate::modules::tag::repository::{TAG_REPOSITORY, TAG_QUERY_REPOSITORY, TagRepository, TagQueryRepository};
+use crate::modules::tag::application::command::{CreateTagCommand, CreateTagHandler};
+use crate::modules::common::application::{ICommandHandler, IQueryHandler};
 
 use super::command::*;
 use super::dto::*;

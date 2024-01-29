@@ -1,4 +1,4 @@
-use crate::resource::domain::ResourceGenericError;
+use crate::modules::resource::domain::ResourceGenericError;
 
 use super::types::TokenSymbol;
 use super::token::QueryToken;

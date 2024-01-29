@@ -4,10 +4,10 @@ use chrono::NaiveDateTime;
 use chrono::{DateTime, Utc};
 use url::Url;
 use serde::Serialize;
-use crate::category::domain::CategoryID;
-use crate::common::infrastructure::date;
-use crate::tag::domain::TagID;
-use crate::common::domain::{Porting, ID};
+use crate::modules::category::domain::CategoryID;
+use crate::modules::common::infrastructure::date;
+use crate::modules::tag::domain::TagID;
+use crate::modules::common::domain::{Porting, ID};
 
 
 mod id;

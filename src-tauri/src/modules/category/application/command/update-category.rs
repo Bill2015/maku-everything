@@ -2,10 +2,10 @@ use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::category::application::dto::UpdateCategoryDto;
-use crate::category::domain::{CategoryGenericError, CategoryID};
-use crate::category::repository::CategoryRepository;
-use crate::common::application::ICommandHandler;
+use crate::modules::category::application::dto::UpdateCategoryDto;
+use crate::modules::category::domain::{CategoryGenericError, CategoryID};
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::common::application::ICommandHandler;
 use crate::command_from_dto;
 
 #[derive(Deserialize)]

@@ -2,12 +2,12 @@ use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::category::application::dto::CreateCategoryDto;
-use crate::category::domain::CategoryAggregate;
-use crate::category::domain::CategoryGenericError;
-use crate::category::domain::CategoryID;
-use crate::category::repository::CategoryRepository;
-use crate::common::application::ICommandHandler;
+use crate::modules::category::application::dto::CreateCategoryDto;
+use crate::modules::category::domain::CategoryAggregate;
+use crate::modules::category::domain::CategoryGenericError;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::common::application::ICommandHandler;
 use crate::command_from_dto;
 
 

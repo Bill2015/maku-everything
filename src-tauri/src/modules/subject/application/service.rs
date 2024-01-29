@@ -1,11 +1,11 @@
 
 use anyhow::anyhow;
 
-use crate::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
-use crate::subject::domain::{SubjectError, SubjectID};
-use crate::subject::repository::{SUBJECT_REPOSITORY, SUBJECT_QUERY_REPOSITORY, SubjectRepository, SubjectQueryRepository};
-use crate::subject::application::command::{CreateSubjectCommand, CreateSubjectHandler};
-use crate::common::application::{ICommandHandler, IQueryHandler};
+use crate::modules::category::repository::{CategoryRepository, CATEGORY_REPOSITORY};
+use crate::modules::subject::domain::{SubjectError, SubjectID};
+use crate::modules::subject::repository::{SUBJECT_REPOSITORY, SUBJECT_QUERY_REPOSITORY, SubjectRepository, SubjectQueryRepository};
+use crate::modules::subject::application::command::{CreateSubjectCommand, CreateSubjectHandler};
+use crate::modules::common::application::{ICommandHandler, IQueryHandler};
 
 use super::command::*;
 use super::dto::*;

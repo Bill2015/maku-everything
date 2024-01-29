@@ -1,5 +1,5 @@
-use crate::resource::domain::ResourceGenericError;
-use crate::resource::infrastructure::{StringQLObject, StringQLObjectBuilder, StringQLPrefix, StringQLItem, SystemTag};
+use crate::modules::resource::domain::ResourceGenericError;
+use crate::modules::resource::infrastructure::{StringQLObject, StringQLObjectBuilder, StringQLPrefix, StringQLItem, SystemTag};
 
 use super::types::TokenSymbol;
 use super::token::QueryToken;

@@ -3,7 +3,7 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::thing;
 
-use crate::common::repository::env;
+use crate::modules::common::repository::env;
 use crate::tag::application::dto::TagResDto;
 use crate::tag::infrastructure::TagQueryBuilder;
 

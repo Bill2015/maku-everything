@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-use crate::category::domain::CategoryID;
-use crate::subject::domain::SubjectID;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::subject::domain::SubjectID;
 
 use super::TagID;
 

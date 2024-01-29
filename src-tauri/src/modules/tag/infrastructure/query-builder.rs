@@ -1,6 +1,6 @@
 use std::ops::Add;
 
-use crate::tag::application::query::ListTagQuery;
+use crate::modules::tag::application::query::ListTagQuery;
 
 #[derive(Debug)]
 pub struct TagQueryBuilder {

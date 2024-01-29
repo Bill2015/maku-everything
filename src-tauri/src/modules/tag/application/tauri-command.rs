@@ -1,4 +1,4 @@
-use crate::tag::domain::{TagError, TagID};
+use crate::modules::tag::domain::{TagError, TagID};
 
 use super::service::TAG_SERVICE;
 use super::dto::*;

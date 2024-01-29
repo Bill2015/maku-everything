@@ -2,16 +2,16 @@ use surrealdb::sql::Datetime;
 use surrealdb::sql::Thing;
 use surrealdb::sql::thing;
 
-use crate::category::domain::CategoryID;
-use crate::resource::domain::ResourceFileAggregate;
-use crate::resource::domain::ResourceUrlAggregate;
-use crate::resource::domain::{ResourceAggregate, ResourceID};
-use crate::resource::repository::ResourceFileDo;
-use crate::resource::repository::ResourceUrlDo;
-use crate::tag::domain::TagID;
-use crate::common::domain::ID;
-use crate::common::infrastructure::IRepoMapper;
-use crate::resource::repository::ResourceDO;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::resource::domain::ResourceFileAggregate;
+use crate::modules::resource::domain::ResourceUrlAggregate;
+use crate::modules::resource::domain::{ResourceAggregate, ResourceID};
+use crate::modules::resource::repository::ResourceFileDo;
+use crate::modules::resource::repository::ResourceUrlDo;
+use crate::modules::tag::domain::TagID;
+use crate::modules::common::domain::ID;
+use crate::modules::common::infrastructure::IRepoMapper;
+use crate::modules::resource::repository::ResourceDO;
 
 // Mapper
 pub struct ResourceRepoMapper {}

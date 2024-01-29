@@ -4,7 +4,7 @@ use once_cell::sync::Lazy;
 use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 
-use crate::common::repository::env;
+use crate::modules::common::repository::env;
 
 pub static PRE_DEFINED_REPOSITORY: PreDefinedRepository<'_> = PreDefinedRepository::init(&env::DB);
 

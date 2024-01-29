@@ -7,19 +7,19 @@ use serde::Deserialize;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 
-use crate::category::application::dto::ExportCategoryResDto;
 use crate::command_from_dto;
-use crate::category::application::dto::ImportCategoryDto;
-use crate::category::domain::{CategoryAggregate, CategoryGenericError, CategoryID, PortingCategoryObject};
-use crate::category::repository::CategoryRepository;
-use crate::common::application::ICommandHandler;
-use crate::common::domain::Porting;
-use crate::resource::domain::{ResourceAggregate, PortingResourceObject};
-use crate::resource::repository::ResourceRepository;
-use crate::subject::domain::{SubjectID, SubjectAggregate, PortingSubjectObject};
-use crate::subject::repository::SubjectRepository;
-use crate::tag::domain::{TagID, TagAggregate, PortingTagObject};
-use crate::tag::repository::TagRepository;
+use crate::modules::category::application::dto::ExportCategoryResDto;
+use crate::modules::category::application::dto::ImportCategoryDto;
+use crate::modules::category::domain::{CategoryAggregate, CategoryGenericError, CategoryID, PortingCategoryObject};
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::common::application::ICommandHandler;
+use crate::modules::common::domain::Porting;
+use crate::modules::resource::domain::{ResourceAggregate, PortingResourceObject};
+use crate::modules::resource::repository::ResourceRepository;
+use crate::modules::subject::domain::{SubjectID, SubjectAggregate, PortingSubjectObject};
+use crate::modules::subject::repository::SubjectRepository;
+use crate::modules::tag::domain::{TagID, TagAggregate, PortingTagObject};
+use crate::modules::tag::repository::TagRepository;
 
 #[derive(Deserialize)]
 pub struct ImportCategoryCommand {

@@ -4,9 +4,9 @@ use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
 
-use crate::common::domain::Porting;
-use crate::common::infrastructure::date;
-use crate::common::domain::ID;
+use crate::modules::common::domain::Porting;
+use crate::modules::common::infrastructure::date;
+use crate::modules::common::domain::ID;
 
 mod error;
 pub use error::CategoryGenericError;

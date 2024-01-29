@@ -6,7 +6,7 @@ use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use tauri::api::dialog::blocking::FileDialogBuilder;
 
-use crate::category::domain::{CategoryError, CategoryID};
+use crate::modules::category::domain::{CategoryError, CategoryID};
 
 use super::service::CATEGORY_SERVICE;
 use super::dto::*;

@@ -1,6 +1,6 @@
 use std::ops::Add;
 
-use crate::subject::application::query::ListSubjectQuery;
+use crate::modules::subject::application::query::ListSubjectQuery;
 
 #[derive(Debug)]
 pub struct SubjectQueryBuilder {

@@ -1,7 +1,8 @@
-use crate::tag::repository::TagQueryRepository;
-use crate::tag::infrastructure::TagQueryBuilder;
-use crate::resource::infrastructure::{AttributeValue, AttributeValueType, SystemTag};
-use crate::resource::domain::ResourceGenericError;
+use crate::modules::tag::repository::TagQueryRepository;
+use crate::modules::tag::infrastructure::TagQueryBuilder;
+use crate::modules::resource::infrastructure::{AttributeValue, AttributeValueType, SystemTag};
+use crate::modules::resource::domain::ResourceGenericError;
+
 use super::token::QueryToken;
 use super::types::TokenSymbol;
 

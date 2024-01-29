@@ -3,10 +3,10 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::thing;
 
-use crate::common::repository::{env, tablens};
-use crate::resource::application::dto::ResourceResDto;
-use crate::resource::application::dto::ResourceDetailDto;
-use crate::resource::infrastructure::{ResourceQueryBuilder, ResourceStringQL};
+use crate::modules::common::repository::{env, tablens};
+use crate::modules::resource::application::dto::ResourceResDto;
+use crate::modules::resource::application::dto::ResourceDetailDto;
+use crate::modules::resource::infrastructure::{ResourceQueryBuilder, ResourceStringQL};
 
 pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQueryRepository::init(&env::DB);
 

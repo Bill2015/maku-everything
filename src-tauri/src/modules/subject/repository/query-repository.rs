@@ -3,9 +3,9 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::thing;
 
-use crate::common::repository::{env, tablens};
-use crate::subject::application::dto::SubjectResDto;
-use crate::subject::infrastructure::SubjectQueryBuilder;
+use crate::modules::common::repository::{env, tablens};
+use crate::modules::subject::application::dto::SubjectResDto;
+use crate::modules::subject::infrastructure::SubjectQueryBuilder;
 
 pub static SUBJECT_QUERY_REPOSITORY: SubjectQueryRepository<'_> = SubjectQueryRepository::init(&env::DB);
 

@@ -1,4 +1,5 @@
-use std::{fmt::Debug, num::{IntErrorKind, ParseIntError}};
+use std::fmt::Debug;
+use std::num::{IntErrorKind, ParseIntError};
 
 use chrono::NaiveDate;
 

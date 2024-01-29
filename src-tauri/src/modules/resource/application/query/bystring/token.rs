@@ -1,4 +1,4 @@
-use crate::resource::infrastructure::AttributeValue;
+use crate::modules::resource::infrastructure::AttributeValue;
 
 use super::types::TokenSymbol;
 

@@ -1,7 +1,7 @@
 use surrealdb::sql::Thing;
 use serde::{Deserialize, Serialize};
 
-use crate::common::application::thing_serialize;
+use crate::modules::common::application::thing_serialize;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ResourceUrlDto {

@@ -4,11 +4,11 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
-use crate::common::infrastructure::IRepoMapper;
-use crate::common::repository::{env, CommonRepository, COMMON_REPOSITORY};
-use crate::common::repository::tablens;
-use crate::resource::domain::{ResourceAggregate, ResourceID};
-use crate::resource::infrastructure::{ResourceQueryBuilder, ResourceRepoMapper};
+use crate::modules::common::infrastructure::IRepoMapper;
+use crate::modules::common::repository::{env, CommonRepository, COMMON_REPOSITORY};
+use crate::modules::common::repository::tablens;
+use crate::modules::resource::domain::{ResourceAggregate, ResourceID};
+use crate::modules::resource::infrastructure::{ResourceQueryBuilder, ResourceRepoMapper};
 
 use super::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationRepository};
 

@@ -1,10 +1,10 @@
 use anyhow::Error;
 use async_trait::async_trait;
 
-use crate::common::application::IQueryHandler;
-use crate::tag::domain::TagGenericError;
-use crate::tag::repository::TagQueryRepository;
-use crate::tag::application::dto::TagResDto;
+use crate::modules::common::application::IQueryHandler;
+use crate::modules::tag::domain::TagGenericError;
+use crate::modules::tag::repository::TagQueryRepository;
+use crate::modules::tag::application::dto::TagResDto;
 
 pub struct GetAllTagQuery { }
 

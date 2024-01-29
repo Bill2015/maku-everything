@@ -1,10 +1,10 @@
 use anyhow::Error;
 use async_trait::async_trait;
 
-use crate::common::application::IQueryHandler;
-use crate::subject::domain::SubjectGenericError;
-use crate::subject::repository::SubjectQueryRepository;
-use crate::subject::application::dto::SubjectResDto;
+use crate::modules::common::application::IQueryHandler;
+use crate::modules::subject::domain::SubjectGenericError;
+use crate::modules::subject::repository::SubjectQueryRepository;
+use crate::modules::subject::application::dto::SubjectResDto;
 
 pub struct GetAllSubjectQuery { }
 

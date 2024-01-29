@@ -1,4 +1,4 @@
-use crate::resource::infrastructure::SystemTag;
+use crate::modules::resource::infrastructure::SystemTag;
 use crate::utils::StringUtils;
 
 use super::types::QueryingStrChar;

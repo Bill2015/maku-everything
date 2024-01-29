@@ -1,12 +1,12 @@
 use surrealdb::sql::thing;
 use surrealdb::sql::Datetime;
 
-use crate::category::domain::CategoryID;
-use crate::subject::domain::SubjectID;
-use crate::tag::domain::{TagAggregate, TagID};
-use crate::common::infrastructure::IRepoMapper;
-use crate::common::domain::ID;
-use crate::tag::repository::TagDO;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::subject::domain::SubjectID;
+use crate::modules::tag::domain::{TagAggregate, TagID};
+use crate::modules::common::infrastructure::IRepoMapper;
+use crate::modules::common::domain::ID;
+use crate::modules::tag::repository::TagDO;
 
 // Mapper
 pub struct TagRepoMapper {}

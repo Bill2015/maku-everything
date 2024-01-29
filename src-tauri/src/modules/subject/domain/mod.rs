@@ -1,10 +1,10 @@
 use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
-use crate::common::domain::Porting;
-use crate::common::domain::ID;
-use crate::category::domain::CategoryID;
-use crate::common::infrastructure::date;
+use crate::modules::common::domain::Porting;
+use crate::modules::common::domain::ID;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::common::infrastructure::date;
 
 mod id;
 pub use id::SubjectID;

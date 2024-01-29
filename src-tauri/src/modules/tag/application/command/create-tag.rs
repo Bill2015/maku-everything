@@ -2,15 +2,15 @@ use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::category::domain::CategoryID;
-use crate::category::repository::CategoryRepository;
 use crate::command_from_dto;
-use crate::subject::domain::SubjectID;
-use crate::subject::repository::SubjectRepository;
-use crate::tag::application::dto::CreateTagDto;
-use crate::tag::domain::{TagAggregate, TagGenericError, TagID};
-use crate::tag::repository::TagRepository;
-use crate::common::application::ICommandHandler;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::subject::domain::SubjectID;
+use crate::modules::subject::repository::SubjectRepository;
+use crate::modules::tag::application::dto::CreateTagDto;
+use crate::modules::tag::domain::{TagAggregate, TagGenericError, TagID};
+use crate::modules::tag::repository::TagRepository;
+use crate::modules::common::application::ICommandHandler;
 
 #[derive(Deserialize)]
 pub struct CreateTagCommand {

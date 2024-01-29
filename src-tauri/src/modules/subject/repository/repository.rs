@@ -4,10 +4,10 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
-use crate::common::infrastructure::IRepoMapper;
-use crate::common::repository::{env, tablens, CommonRepository, COMMON_REPOSITORY};
-use crate::subject::domain::{SubjectAggregate, SubjectID};
-use crate::subject::infrastructure::{SubjectQueryBuilder, SubjectRepoMapper};
+use crate::modules::common::infrastructure::IRepoMapper;
+use crate::modules::common::repository::{env, tablens, CommonRepository, COMMON_REPOSITORY};
+use crate::modules::subject::domain::{SubjectAggregate, SubjectID};
+use crate::modules::subject::infrastructure::{SubjectQueryBuilder, SubjectRepoMapper};
 
 pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&env::DB, &COMMON_REPOSITORY);
 

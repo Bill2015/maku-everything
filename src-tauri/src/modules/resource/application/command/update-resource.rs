@@ -3,10 +3,10 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
-use crate::resource::application::dto::UpdateResourceDto;
-use crate::resource::domain::{ResourceGenericError, ResourceID};
-use crate::resource::repository::ResourceRepository;
-use crate::common::application::ICommandHandler;
+use crate::modules::resource::application::dto::UpdateResourceDto;
+use crate::modules::resource::domain::{ResourceGenericError, ResourceID};
+use crate::modules::resource::repository::ResourceRepository;
+use crate::modules::common::application::ICommandHandler;
 
 #[derive(Deserialize)]
 pub struct UpdateResourceCommand {

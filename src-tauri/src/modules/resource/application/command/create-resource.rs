@@ -2,12 +2,12 @@ use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::category::repository::CategoryRepository;
 use crate::command_from_dto;
-use crate::resource::application::dto::CreateResourceDto;
-use crate::resource::domain::{ResourceAggregate, ResourceGenericError, ResourceID};
-use crate::resource::repository::ResourceRepository;
-use crate::common::application::ICommandHandler;
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::resource::application::dto::CreateResourceDto;
+use crate::modules::resource::domain::{ResourceAggregate, ResourceGenericError, ResourceID};
+use crate::modules::resource::repository::ResourceRepository;
+use crate::modules::common::application::ICommandHandler;
 
 #[derive(Deserialize)]
 pub struct CreateResourceCommand {

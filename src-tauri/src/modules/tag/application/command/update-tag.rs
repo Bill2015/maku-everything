@@ -3,10 +3,10 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
-use crate::tag::application::dto::UpdateTagDto;
-use crate::tag::domain::{TagGenericError, TagID};
-use crate::tag::repository::TagRepository;
-use crate::common::application::ICommandHandler;
+use crate::modules::tag::application::dto::UpdateTagDto;
+use crate::modules::tag::domain::{TagGenericError, TagID};
+use crate::modules::tag::repository::TagRepository;
+use crate::modules::common::application::ICommandHandler;
 
 #[derive(Deserialize)]
 pub struct UpdateTagCommand {

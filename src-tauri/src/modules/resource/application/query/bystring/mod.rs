@@ -1,12 +1,12 @@
 use anyhow::Error;
 use async_trait::async_trait;
 
-use crate::common::application::IQueryHandler;
-use crate::resource::application::dto::ResourceResDto;
-use crate::resource::domain::ResourceGenericError;
-use crate::resource::infrastructure::ResourceStringQL;
-use crate::resource::repository::ResourceQueryRepository;
-use crate::tag::repository::TagQueryRepository;
+use crate::modules::common::application::IQueryHandler;
+use crate::modules::resource::application::dto::ResourceResDto;
+use crate::modules::resource::domain::ResourceGenericError;
+use crate::modules::resource::infrastructure::ResourceStringQL;
+use crate::modules::resource::repository::ResourceQueryRepository;
+use crate::modules::tag::repository::TagQueryRepository;
 
 use self::semantic::StringQLSemantic;
 use self::sqlgen::StringQLObjectGenerator;

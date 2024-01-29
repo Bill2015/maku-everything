@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 
-use crate::common::repository::sql_predefn;
+use crate::modules::common::repository::sql_predefn;
 
 use super::{AttributeValue, AttributeValueType};
 

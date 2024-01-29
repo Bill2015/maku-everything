@@ -1,15 +1,15 @@
 
 use anyhow::anyhow;
 
-use crate::category::repository::{CATEGORY_REPOSITORY, CATEGORY_QUERY_REPOSITORY, CategoryRepository, CategoryQueryRepository};
-use crate::category::application::command::{CreateCategoryCommand, CreateCategoryHandler};
-use crate::common::application::{ICommandHandler, IQueryHandler};
-use crate::category::domain::{CategoryError, CategoryID};
-use crate::resource::repository::{ResourceRepository, RESOURCE_REPOSITORY};
-use crate::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
-use crate::tag::repository::{TagRepository, TAG_REPOSITORY};
+use crate::modules::category::repository::{CATEGORY_REPOSITORY, CATEGORY_QUERY_REPOSITORY, CategoryRepository, CategoryQueryRepository};
+use crate::modules::category::application::command::{CreateCategoryCommand, CreateCategoryHandler};
+use crate::modules::common::application::{ICommandHandler, IQueryHandler};
+use crate::modules::category::domain::{CategoryError, CategoryID};
+use crate::modules::resource::repository::{ResourceRepository, RESOURCE_REPOSITORY};
+use crate::modules::subject::repository::{SubjectRepository, SUBJECT_REPOSITORY};
+use crate::modules::tag::repository::{TagRepository, TAG_REPOSITORY};
 
-use super::command::{ExportCategoryCommand, ExportCategoryHandler, ImportCategoryCommand, ImportCategoryHandler, UpdateCategoryCommand, UpdateCategoryHandler};
+use super::command::*;
 use super::dto::*;
 use super::query::*;
 

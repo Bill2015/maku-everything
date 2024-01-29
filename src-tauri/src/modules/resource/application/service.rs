@@ -3,12 +3,12 @@ use std::process::Command;
 
 use anyhow::anyhow;
 
-use crate::common::application::{ICommandHandler, IQueryHandler};
-use crate::category::repository::CategoryRepository;
-use crate::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
-use crate::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, ResourceQueryRepository, RESOURCE_QUERY_REPOSITORY};
-use crate::category::repository::CATEGORY_REPOSITORY;
-use crate::tag::repository::{TagRepository, TAG_REPOSITORY, TagQueryRepository, TAG_QUERY_REPOSITORY};
+use crate::modules::common::application::{ICommandHandler, IQueryHandler};
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::resource::domain::{ResourceError, ResourceGenericError, ResourceID};
+use crate::modules::resource::repository::{RESOURCE_REPOSITORY, ResourceRepository, ResourceQueryRepository, RESOURCE_QUERY_REPOSITORY};
+use crate::modules::category::repository::CATEGORY_REPOSITORY;
+use crate::modules::tag::repository::{TagRepository, TAG_REPOSITORY, TagQueryRepository, TAG_QUERY_REPOSITORY};
 
 use super::command::*;
 use super::dto::*;

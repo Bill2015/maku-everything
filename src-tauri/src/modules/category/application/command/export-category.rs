@@ -3,20 +3,20 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
-use crate::category::application::dto::{ExportCategoryDto, ExportCategoryResDto};
-use crate::category::domain::CategoryGenericError;
-use crate::category::repository::CategoryRepository;
-use crate::common::application::ICommandHandler;
-use crate::common::domain::Porting;
-use crate::resource::domain::{PortingResourceObject, ResourceGenericError};
-use crate::resource::infrastructure::ResourceQueryBuilder;
-use crate::resource::repository::ResourceRepository;
-use crate::subject::domain::{PortingSubjectObject, SubjectGenericError};
-use crate::subject::infrastructure::SubjectQueryBuilder;
-use crate::subject::repository::SubjectRepository;
-use crate::tag::domain::{PortingTagObject, TagGenericError};
-use crate::tag::infrastructure::TagQueryBuilder;
-use crate::tag::repository::TagRepository;
+use crate::modules::category::application::dto::{ExportCategoryDto, ExportCategoryResDto};
+use crate::modules::category::domain::CategoryGenericError;
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::common::application::ICommandHandler;
+use crate::modules::common::domain::Porting;
+use crate::modules::resource::domain::{PortingResourceObject, ResourceGenericError};
+use crate::modules::resource::infrastructure::ResourceQueryBuilder;
+use crate::modules::resource::repository::ResourceRepository;
+use crate::modules::subject::domain::{PortingSubjectObject, SubjectGenericError};
+use crate::modules::subject::infrastructure::SubjectQueryBuilder;
+use crate::modules::subject::repository::SubjectRepository;
+use crate::modules::tag::domain::{PortingTagObject, TagGenericError};
+use crate::modules::tag::infrastructure::TagQueryBuilder;
+use crate::modules::tag::repository::TagRepository;
 
 #[derive(Deserialize)]
 pub struct ExportCategoryCommand {

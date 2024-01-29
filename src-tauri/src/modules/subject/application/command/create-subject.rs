@@ -2,13 +2,13 @@ use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::category::domain::CategoryID;
-use crate::category::repository::CategoryRepository;
 use crate::command_from_dto;
-use crate::subject::application::dto::CreateSubjectDto;
-use crate::subject::domain::{SubjectAggregate, SubjectGenericError, SubjectID};
-use crate::subject::repository::SubjectRepository;
-use crate::common::application::ICommandHandler;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::category::repository::CategoryRepository;
+use crate::modules::subject::application::dto::CreateSubjectDto;
+use crate::modules::subject::domain::{SubjectAggregate, SubjectGenericError, SubjectID};
+use crate::modules::subject::repository::SubjectRepository;
+use crate::modules::common::application::ICommandHandler;
 
 #[derive(Deserialize)]
 pub struct CreateSubjectCommand {

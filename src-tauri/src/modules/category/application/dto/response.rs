@@ -2,11 +2,11 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
-use crate::category::domain::PortingCategoryObject;
-use crate::subject::domain::PortingSubjectObject;
-use crate::tag::domain::PortingTagObject;
-use crate::resource::domain::PortingResourceObject;
-use crate::common::application::thing_serialize;
+use crate::modules::category::domain::PortingCategoryObject;
+use crate::modules::subject::domain::PortingSubjectObject;
+use crate::modules::tag::domain::PortingTagObject;
+use crate::modules::resource::domain::PortingResourceObject;
+use crate::modules::common::application::thing_serialize;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CategoryResDto {

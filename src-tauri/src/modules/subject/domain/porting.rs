@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-use crate::category::domain::CategoryID;
+use crate::modules::category::domain::CategoryID;
 
 use super::SubjectID;
 

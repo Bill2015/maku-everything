@@ -3,10 +3,10 @@ use surrealdb::Surreal;
 use surrealdb::sql::thing;
 use surrealdb::engine::remote::ws::Client;
 
-use crate::common::domain::ID;
-use crate::common::repository::{env, relatens};
-use crate::resource::domain::ResourceID;
-use crate::tag::domain::TagID;
+use crate::modules::common::domain::ID;
+use crate::modules::common::repository::{env, relatens};
+use crate::modules::resource::domain::ResourceID;
+use crate::modules::tag::domain::TagID;
 
 pub static RESOURCE_TAG_RELATION_REPOSITORY: ResourceTagRelationRepository<'_> = ResourceTagRelationRepository::init(&env::DB);
 /**

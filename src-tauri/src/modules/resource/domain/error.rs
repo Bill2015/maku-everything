@@ -1,7 +1,7 @@
 use serde::Serialize;
 use thiserror;
 use anyhow::Error;
-use crate::common::domain::ErrorBody;
+use crate::modules::common::domain::ErrorBody;
 use crate::serialize_error;
 
 #[derive(thiserror::Error, Debug)]

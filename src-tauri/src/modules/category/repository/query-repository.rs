@@ -3,8 +3,8 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::thing;
 
-use crate::common::repository::{env, tablens};
-use crate::category::application::dto::CategoryResDto;
+use crate::modules::common::repository::{env, tablens};
+use crate::modules::category::application::dto::CategoryResDto;
 
 pub static CATEGORY_QUERY_REPOSITORY: CategoryQueryRepository<'_> = CategoryQueryRepository::init(&env::DB);
 

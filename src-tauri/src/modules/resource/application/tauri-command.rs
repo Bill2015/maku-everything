@@ -1,4 +1,4 @@
-use crate::resource::domain::{ResourceError, ResourceID};
+use crate::modules::resource::domain::{ResourceError, ResourceID};
 
 use super::service::RESOURCE_SERVICE;
 use super::dto::*;

@@ -4,10 +4,10 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::{Thing, Datetime, thing};
 
-use crate::common::infrastructure::IRepoMapper;
-use crate::common::repository::{env, tablens};
-use crate::category::domain::CategoryAggregate;
-use crate::category::infrastructure::CategoryRepoMapper;
+use crate::modules::common::infrastructure::IRepoMapper;
+use crate::modules::common::repository::{env, tablens};
+use crate::modules::category::domain::CategoryAggregate;
+use crate::modules::category::infrastructure::CategoryRepoMapper;
 
 pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::init(&env::DB);
 

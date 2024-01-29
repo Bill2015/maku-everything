@@ -1,10 +1,10 @@
 use anyhow::Error;
 use async_trait::async_trait;
 
-use crate::common::application::IQueryHandler;
-use crate::resource::domain::ResourceGenericError;
-use crate::resource::repository::ResourceQueryRepository;
-use crate::resource::application::dto::ResourceResDto;
+use crate::modules::common::application::IQueryHandler;
+use crate::modules::resource::domain::ResourceGenericError;
+use crate::modules::resource::repository::ResourceQueryRepository;
+use crate::modules::resource::application::dto::ResourceResDto;
 
 pub struct GetByIdResourceQuery { 
     pub id: String,

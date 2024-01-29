@@ -1,10 +1,10 @@
 use anyhow::Error;
 use async_trait::async_trait;
 
-use crate::common::application::IQueryHandler;
-use crate::category::repository::CategoryQueryRepository;
-use crate::category::application::dto::CategoryResDto;
-use crate::category::domain::CategoryGenericError;
+use crate::modules::common::application::IQueryHandler;
+use crate::modules::category::repository::CategoryQueryRepository;
+use crate::modules::category::application::dto::CategoryResDto;
+use crate::modules::category::domain::CategoryGenericError;
 
 pub struct GetByIdCategoryQuery { 
     pub id: String,

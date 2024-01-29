@@ -37,7 +37,7 @@ pub mod env {
     use surrealdb::engine::remote::ws::Ws;
     use surrealdb::opt::auth::Root;
 
-    use crate::common::repository::PRE_DEFINED_REPOSITORY;
+    use crate::modules::common::repository::PRE_DEFINED_REPOSITORY;
     pub static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
     pub async fn connent_db() -> Result<String, surrealdb::Error> {

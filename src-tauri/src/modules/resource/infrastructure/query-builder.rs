@@ -1,6 +1,6 @@
 use std::ops::Add;
 
-use crate::resource::application::query::ListResourceQuery;
+use crate::modules::resource::application::query::ListResourceQuery;
 
 #[derive(Debug)]
 pub struct ResourceQueryBuilder {

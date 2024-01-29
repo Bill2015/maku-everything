@@ -4,12 +4,12 @@ use surrealdb::Surreal;
 use surrealdb::sql::thing;
 use surrealdb::engine::remote::ws::Client;
 
-use crate::category::domain::CategoryID;
-use crate::common::domain::ID;
-use crate::common::repository::env;
-use crate::resource::domain::ResourceID;
-use crate::subject::domain::SubjectID;
-use crate::tag::domain::TagID;
+use crate::modules::category::domain::CategoryID;
+use crate::modules::common::domain::ID;
+use crate::modules::common::repository::env;
+use crate::modules::resource::domain::ResourceID;
+use crate::modules::subject::domain::SubjectID;
+use crate::modules::tag::domain::TagID;
 
 pub static COMMON_REPOSITORY: CommonRepository<'_> = CommonRepository::init(&env::DB);
 
