@@ -1,13 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use tauri::api::process::Command;
-use common::repository;
+use modules::common::repository;
+use modules::{category, tag, subject, resource};
 
-mod common;
-mod resource;
-mod category;
-mod tag;
-mod subject;
+mod modules;
 mod utils;
 
 
