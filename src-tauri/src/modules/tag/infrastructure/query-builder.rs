@@ -42,7 +42,7 @@ impl TagQueryBuilder {
 
     pub fn set_name(mut self, name: &String) -> TagQueryBuilder {
         if !name.is_empty() {
-            self.name = Some(format!("string::lowercase(name) == string::lowercase(\'{}\')", name));
+            self.name = Some(format!("string::lowercase(name) == string::lowercase(\"{}\")", name));
         }
         self
     }
@@ -66,7 +66,7 @@ impl TagQueryBuilder {
     pub fn set_belong_subject_name(mut self, subject_name: &String) -> TagQueryBuilder {
         if !subject_name.is_empty() {
             self.belong_subject_name = Some(
-                format!("string::lowercase(belong_subject.name) == string::lowercase(\'{}\')", subject_name)
+                format!("string::lowercase(belong_subject.name) == string::lowercase(\"{}\")", subject_name)
             );
         }
         self
