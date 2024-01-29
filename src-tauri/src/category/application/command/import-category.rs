@@ -140,9 +140,14 @@ impl<'a> ImportCategoryHandler<'a> {
         let mut new_resources: Vec<ResourceAggregate> = Vec::new();
 
         for res in resources {
+            let new_tags = res.tags
+                .into_iter()
+                .map(|val| tagids.get(&val.to_string()).unwrap().to_owned())
+                .collect::<Vec<TagID>>();
             let new_res = ResourceAggregate::import_from(PortingResourceObject {
                 belong_category: category_id.clone(),
                 root_path: new_root.to_string(),
+                tags: new_tags,
                 ..res
             })?;
 
