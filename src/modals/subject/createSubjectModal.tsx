@@ -3,27 +3,35 @@ import { Modal, Button, Grid, Input, Title } from '@mantine/core';
 import { SubjectMutation } from '@api/subject';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateSubjectModal } from '@store/modal';
+import { ErrorResBody } from '@api/common';
+import { showNotification } from '@components/notification';
 
 export function CreateSubjectModal() {
     const { activeCategory } = useActiveCategoryRedux();
-    const [opened, { close }] = useCreateSubjectModal();
+    const [opened, { close, confirmClose, cancelClose }] = useCreateSubjectModal();
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const createSubject = SubjectMutation.useCreate();
 
-    const handleCreateConfirm = useCallback(() => {
+    const handleCreateConfirm = useCallback(async () => {
         if (activeCategory === null) {
             return;
         }
-        createSubject.mutateAsync({
-            name:            name,
-            description:     description,
-            belong_category: activeCategory.id,
-        });
-        setName('');
-        setDescription('');
-        close();
-    }, [createSubject, description, name, activeCategory, close]);
+        try {
+            await createSubject.mutateAsync({
+                name:            name,
+                description:     description,
+                belong_category: activeCategory.id,
+            });
+            setName('');
+            setDescription('');
+            confirmClose();
+        }
+        catch (e) {
+            const error = e as ErrorResBody;
+            showNotification('Create Subject Failed', error.message, 'error');
+        }
+    }, [createSubject, description, name, activeCategory, confirmClose]);
 
     if (activeCategory === null) {
         return null;
@@ -50,7 +58,7 @@ export function CreateSubjectModal() {
                     <Input placeholder="resource description" value={description} onChange={(e) => setDescription(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                    <Button color="pink">Cancel</Button>
+                    <Button color="pink" onClick={cancelClose}>Cancel</Button>
                 </Grid.Col>
                 <Grid.Col span={6} style={{ textAlign: 'end' }}>
                     <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>

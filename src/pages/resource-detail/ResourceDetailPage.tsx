@@ -7,6 +7,7 @@ import {
 } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
+import { ModalName, useModelConfirmAction } from '@store/modal';
 import { ResourceMutation, ResourceQuery } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { SubjectQuery } from '@api/subject';
@@ -41,6 +42,10 @@ export default function ResourcesDetailPage() {
             exporeFile.mutateAsync(resourceData.root_path + resourceData.file.path);
         }
     }, [exporeFile, resourceData]);
+
+    // refetch when create the new tag & subject
+    useModelConfirmAction(ModalName.CreateSubject, resourceRefetch);
+    useModelConfirmAction(ModalName.CreateTag, resourceRefetch);
 
     if (!resourceData) {
         return <Box>404 Not Found</Box>;

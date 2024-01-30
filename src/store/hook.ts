@@ -10,5 +10,5 @@ export const useGlobalSelector = () => useAppSelector((state = store.getState())
 export const useGlobalDispatch = () => useAppDispatch();
 
 // Model state
-export const useModelSelector = () => useAppSelector((state = store.getState()) => state.modal);
-export const useModelDispatch = () => useAppDispatch();
+export const useModalSelector = () => useAppSelector((state = store.getState()) => state.modal);
+export const useModalDispatch = () => useAppDispatch();

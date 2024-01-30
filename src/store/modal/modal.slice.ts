@@ -11,6 +11,8 @@ export enum ModalName {
 
 interface ModalReduxProps {
     opened: boolean,
+    isConfirm: boolean,
+    isCancel: boolean,
 }
 
 export interface ModalState {
@@ -19,11 +21,31 @@ export interface ModalState {
 
 const initialState: ModalState = {
     modals: {
-        [ModalName.importCategory]: { opened: false },
-        [ModalName.CreateCategory]: { opened: false },
-        [ModalName.CreateSubject]:  { opened: false },
-        [ModalName.CreateTag]:      { opened: false },
-        [ModalName.CreateResource]: { opened: false },
+        [ModalName.importCategory]: {
+            opened:    false,
+            isConfirm: false,
+            isCancel:  false,
+        },
+        [ModalName.CreateCategory]: {
+            opened:    false,
+            isConfirm: false,
+            isCancel:  false,
+        },
+        [ModalName.CreateSubject]: {
+            opened:    false,
+            isConfirm: false,
+            isCancel:  false,
+        },
+        [ModalName.CreateTag]: {
+            opened:    false,
+            isConfirm: false,
+            isCancel:  false,
+        },
+        [ModalName.CreateResource]: {
+            opened:    false,
+            isConfirm: false,
+            isCancel:  false,
+        },
     },
 };
 
@@ -31,9 +53,9 @@ const modalSlice = createSlice({
     name:     'modal',
     initialState,
     reducers: {
-        setModalOpenStatus: (state, action: PayloadAction<{ name: ModalName, open: boolean }>) => {
-            const { name, open } = action.payload;
-            state.modals[name] = { ...state.modals[name], opened: open };
+        setModalOpenStatus: (state, action: PayloadAction<{ name: ModalName, status: Partial<ModalReduxProps> }>) => {
+            const { name, status } = action.payload;
+            state.modals[name] = { ...state.modals[name], ...status };
         },
     },
 });

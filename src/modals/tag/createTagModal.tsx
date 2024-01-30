@@ -5,10 +5,12 @@ import { useActiveCategoryRedux } from '@store/global';
 import { useCreateTagModal } from '@store/modal';
 import { SubjectSelect } from '@components/input';
 import { SubjectQuery } from '@api/subject';
+import { ErrorResBody } from '@api/common';
+import { showNotification } from '@components/notification';
 
 export function CreateTagModal() {
     const { activeCategory } = useActiveCategoryRedux();
-    const [opened, { close }] = useCreateTagModal();
+    const [opened, { close, confirmClose, cancelClose }] = useCreateTagModal();
     const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
     const [name, setName] = useState<string>('');
     const [belongSubject, setBelongSubject] = useState<{ value: string, id: string } | null>(null);
@@ -19,16 +21,22 @@ export function CreateTagModal() {
         if (activeCategory === null || belongSubject === null) {
             return;
         }
-        createTag.mutateAsync({
-            name:            name,
-            description:     description,
-            belong_category: activeCategory.id,
-            belong_subject:  belongSubject.id,
-        });
-        setName('');
-        setDescription('');
-        close();
-    }, [createTag, description, name, activeCategory, belongSubject, close]);
+        try {
+            createTag.mutateAsync({
+                name:            name,
+                description:     description,
+                belong_category: activeCategory.id,
+                belong_subject:  belongSubject.id,
+            });
+            setName('');
+            setDescription('');
+            confirmClose();
+        }
+        catch (e) {
+            const error = e as ErrorResBody;
+            showNotification('Create Tag Failed', error.message, 'error');
+        }
+    }, [createTag, description, name, activeCategory, belongSubject, confirmClose]);
 
     if (activeCategory === null) {
         return null;
@@ -66,7 +74,7 @@ export function CreateTagModal() {
                     <Input placeholder="resource description" value={description} onChange={(e) => setDescription(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                    <Button color="pink">Cancel</Button>
+                    <Button color="pink" onClick={cancelClose}>Cancel</Button>
                 </Grid.Col>
                 <Grid.Col span={6} style={{ textAlign: 'end' }}>
                     <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>

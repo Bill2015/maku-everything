@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Box, Stack, Title, Skeleton, ScrollArea, Divider } from '@mantine/core';
+import { Stack, Title, Skeleton, ScrollArea, Divider } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { useResourceDetailNavigate } from '@router/navigateHook';
@@ -7,6 +7,7 @@ import { ResourceMutation, ResourceQuery, ResourceResDto } from '@api/resource';
 import { ComplexSearchInput, TauriDropZone } from '@components/input';
 import { StackGrid } from '@components/layout';
 import { showNotification } from '@components/notification';
+import { ModalName, useModelConfirmAction } from '@store/modal';
 import { TagQuery } from '@api/tag';
 
 import { ResourceCard } from './components/ResourceCard';
@@ -25,7 +26,7 @@ export default function ResourcesPage() {
         showNotification('Search Failed', error.message, 'error');
     });
 
-    const { data: tagData } = TagQuery.useGetByCategory(activeCategory.id);
+    const { data: tagData, refetch: tagRefetch } = TagQuery.useGetByCategory(activeCategory.id);
 
     const createResource = ResourceMutation.useCreate();
 
@@ -36,6 +37,7 @@ export default function ResourcesPage() {
         }
     }, [activeCategory, navigateResourceTo]);
 
+    // drop file to upload
     const onDropFiles = useCallback(async (filePaths: string[]) => {
         if (filePaths.length === 1) {
             const _ = await createResource.mutateAsync({
@@ -48,8 +50,18 @@ export default function ResourcesPage() {
         }
     }, [activeCategory, createResource, resourceRefetch]);
 
+    // when create the resource, refetch
+    useModelConfirmAction(ModalName.CreateResource, () => {
+        resourceRefetch();
+    });
+
+    // when create the tag, refetch
+    useModelConfirmAction(ModalName.CreateTag, () => {
+        tagRefetch();
+    });
+
     if (activeCategory === null) {
-        return <Box>A</Box>;
+        return <Title>Category Not Founded</Title>;
     }
     return (
         <Stack gap="lg" p={0}>

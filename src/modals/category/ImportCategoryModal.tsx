@@ -6,7 +6,7 @@ import { showNotification } from '@components/notification';
 import { ErrorResBody } from '@api/common';
 
 export function ImportCategoryModal() {
-    const [opened, { close }] = useImportCategoryModal();
+    const [opened, { close, confirmClose, cancelClose }] = useImportCategoryModal();
 
     const [rootPath, setRootPath] = useState<string>('');
     const [file, setFile] = useState<File | null>(null);
@@ -27,14 +27,13 @@ export function ImportCategoryModal() {
                 reader.readAsText(file);
             });
             showNotification('Import Category Successful', '', 'success');
+            confirmClose();
         }
         catch (e) {
             const error = e as ErrorResBody;
             showNotification('Import Category Failed', error.message, 'error');
         }
-
-        close();
-    }, [file, rootPath, close, importCategory]);
+    }, [file, rootPath, confirmClose, importCategory]);
 
     return (
         <Modal opened={opened} onClose={close} title={<Title order={2}>Import New Category</Title>} centered>
@@ -57,7 +56,7 @@ export function ImportCategoryModal() {
                 />
 
                 <Group justify="space-between">
-                    <Button color="pink">Cancel</Button>
+                    <Button color="pink" onClick={cancelClose}>Cancel</Button>
                     <Button color="lime" onClick={handleConfirm}>Confirm</Button>
                 </Group>
             </Stack>

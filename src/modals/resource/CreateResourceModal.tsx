@@ -3,10 +3,12 @@ import { Modal, Button, Grid, Input, Title } from '@mantine/core';
 import { ResourceMutation } from '@api/resource';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateResourceModal } from '@store/modal';
+import { ErrorResBody } from '@api/common';
+import { showNotification } from '@components/notification';
 
 export function CreateResourceModal() {
     const { activeCategory } = useActiveCategoryRedux();
-    const [opened, { close }] = useCreateResourceModal();
+    const [opened, { close, confirmClose, cancelClose }] = useCreateResourceModal();
 
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
@@ -14,18 +16,24 @@ export function CreateResourceModal() {
     const [urlPath, setUrlPath] = useState<string>('');
     const createResource = ResourceMutation.useCreate();
 
-    const handleCreateConfirm = useCallback(() => {
+    const handleCreateConfirm = useCallback(async () => {
         setName('');
         setDescription('');
-        createResource.mutateAsync({
-            name:            name,
-            description:     description,
-            belong_category: activeCategory.id,
-            file_path:       filePath,
-            url_path:        urlPath,
-        });
-        close();
-    }, [description, name, filePath, urlPath, activeCategory, createResource, close]);
+        try {
+            await createResource.mutateAsync({
+                name:            name,
+                description:     description,
+                belong_category: activeCategory.id,
+                file_path:       filePath,
+                url_path:        urlPath,
+            });
+            confirmClose();
+        }
+        catch (e) {
+            const error = e as ErrorResBody;
+            showNotification('Create Resource Failed', error.message, 'error');
+        }
+    }, [description, name, filePath, urlPath, activeCategory, createResource, confirmClose]);
 
     return (
         <Modal opened={opened} onClose={close} title={<Title order={2}>Create New Resource</Title>} centered>
@@ -61,7 +69,7 @@ export function CreateResourceModal() {
                     <Input placeholder="URL path" value={urlPath} onChange={(e) => setUrlPath(e.target.value)} />
                 </Grid.Col>
                 <Grid.Col span={6}>
-                    <Button color="pink">Cancel</Button>
+                    <Button color="pink" onClick={cancelClose}>Cancel</Button>
                 </Grid.Col>
                 <Grid.Col span={6} style={{ textAlign: 'end' }}>
                     <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
