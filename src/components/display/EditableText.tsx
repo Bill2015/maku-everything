@@ -81,7 +81,9 @@ export function EditableText(props: EditableTextProps) {
                 >
                     {newValue}
                 </Box>
-                <Badge color="indigo" pos="absolute" right={0} variant="outline">modifying</Badge>
+                <Badge color="indigo" pos="absolute" right={0} variant="outline" style={{ zIndex: 99 }}>
+                    modifying
+                </Badge>
             </>
         );
     }
