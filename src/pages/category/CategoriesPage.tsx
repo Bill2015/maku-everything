@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { Grid, Stack, Skeleton, Title, Button, ScrollArea, Flex } from '@mantine/core';
 
+import { useImportCategoryModal } from '@store/modal';
 import { CategoryCreateDto, CategoryMutation, CategoryQuery } from '@api/category';
 
 import { CategoryCard, CreateCategoryModal } from './components';
@@ -11,15 +12,20 @@ export default function CategoriesPage() {
     const createCategory = CategoryMutation.useCreate();
 
     const [opened, { open, close }] = useDisclosure(false);
+    const [importCategoryOpened, _] = useImportCategoryModal();
 
     const categoryItems = categories.map((val) => <CategoryCard key={val.id} data={val} />);
 
     // When Create Confirm
     const handleCreateConfirm = useCallback(async (data: CategoryCreateDto) => {
-        const _ = await createCategory.mutateAsync(data);
+        await createCategory.mutateAsync(data);
         close();
         categoriesRefetch();
     }, [categoriesRefetch, close, createCategory]);
+
+    useEffect(() => {
+        categoriesRefetch();
+    }, [importCategoryOpened, categoriesRefetch]);
 
     return (
         <>

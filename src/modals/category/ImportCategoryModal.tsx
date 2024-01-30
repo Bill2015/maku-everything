@@ -2,6 +2,8 @@ import { useCallback, useState } from 'react';
 import { Modal, Title, Stack, Input, FileInput, Button, Group } from '@mantine/core';
 import { useImportCategoryModal } from '@store/modal';
 import { CategoryMutation } from '@api/category';
+import { showNotification } from '@components/notification';
+import { ErrorResBody } from '@api/common';
 
 export function ImportCategoryModal() {
     const [opened, { close }] = useImportCategoryModal();
@@ -10,15 +12,27 @@ export function ImportCategoryModal() {
     const [file, setFile] = useState<File | null>(null);
     const importCategory = CategoryMutation.useImport();
 
-    const handleConfirm = useCallback(() => {
+    const handleConfirm = useCallback(async () => {
         if (!file || !rootPath) {
             return;
         }
-        const reader = new FileReader();
-        reader.onloadend = async (ev) => {
-            await importCategory.mutateAsync({ new_root_path: rootPath, data: ev.target!.result as string });
-        };
-        reader.readAsText(file);
+        try {
+            const _ = await new Promise<string>((reslove, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = async (ev) => {
+                    importCategory.mutateAsync({ new_root_path: rootPath, data: ev.target!.result as string })
+                        .then(reslove)
+                        .catch(reject);
+                };
+                reader.readAsText(file);
+            });
+            showNotification('Import Category Successful', '', 'success');
+        }
+        catch (e) {
+            const error = e as ErrorResBody;
+            showNotification('Import Category Failed', error.message, 'error');
+        }
+
         close();
     }, [file, rootPath, close, importCategory]);
 

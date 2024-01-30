@@ -16,7 +16,7 @@ function useBaseModalHook(name: ModalName): [boolean, { open: () => void, close:
 
     const close = useCallback(() => {
         dispatch(setModalOpenStatus({ name: name, open: false }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
 
     return [opened, { open, close }];
