@@ -1,11 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 import { ResourceAPI } from './ResourceAPI';
-import { ResourceCreateDto, ResourceTagOperateDto } from './Dto';
+import { ResourceCreateDto, ResourceTagOperateDto, ResourceUpdateDto } from './Dto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace ResourceMutation {
     export function useCreate() {
         const mutationFn = (data: ResourceCreateDto) => ResourceAPI.create(data);
+
+        return useMutation({ mutationFn: mutationFn });
+    }
+
+    export function useUpdate() {
+        const mutationFn = (data: ResourceUpdateDto) => ResourceAPI.update(data);
 
         return useMutation({ mutationFn: mutationFn });
     }

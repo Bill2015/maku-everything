@@ -8,10 +8,12 @@ import {
 
 import { useActiveCategoryRedux } from '@store/global';
 import { ModalName, useModelConfirmAction } from '@store/modal';
-import { ResourceMutation, ResourceQuery } from '@api/resource';
+import { ResourceMutation, ResourceQuery, ResourceUpdateDto } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { SubjectQuery } from '@api/subject';
+import { EditableText } from '@components/display';
 import { ReturnButton } from '@components/input';
+import { showNotification } from '@components/notification';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
 import { ResourceDisplay } from './components/ResourceDisplay';
 
@@ -24,6 +26,7 @@ export default function ResourcesDetailPage() {
     // when new subject group was created, use for auto focus
     const [newSubjectId, setNewSubjectId] = useState<string>('');
 
+    const updateResource = ResourceMutation.useUpdate();
     const exporeFile = ResourceMutation.useExporeFile();
     const addResourceTag = ResourceMutation.useAddTag();
     const removeResourceTag = ResourceMutation.useRemoveTag();
@@ -42,6 +45,15 @@ export default function ResourcesDetailPage() {
             exporeFile.mutateAsync(resourceData.root_path + resourceData.file.path);
         }
     }, [exporeFile, resourceData]);
+
+    const handleResourceUpdate = useCallback(async (fieldName: keyof ResourceUpdateDto, newVal: string) => {
+        if (resourceId) {
+            updateResource.mutateAsync({ id: resourceId, [fieldName]: newVal })
+                .catch((e) => showNotification('Update Resource Failed', e.message, 'error'))
+                .then(() => resourceRefetch())
+                .then(() => showNotification('Update Resource Successful', '', 'success'));
+        }
+    }, [resourceId, updateResource, resourceRefetch]);
 
     // refetch when create the new tag & subject
     useModelConfirmAction(ModalName.CreateSubject, resourceRefetch);
@@ -76,7 +88,21 @@ export default function ResourcesDetailPage() {
                         </Button>
                     </Group>
                     <ScrollArea.Autosize mx="auto" mah="600px" type="hover" classNames={{ scrollbar: 'mgra' }}>
-                        <Text style={{ wordBreak: 'break-all' }} fz="1em">{resourceData.name}</Text>
+                        <EditableText
+                            name="name"
+                            fz="1.5rem"
+                            fw="bold"
+                            value={resourceData.name}
+                            onChange={(val) => handleResourceUpdate('name', val)}
+                        />
+                        <EditableText
+                            name="description"
+                            fz="1rem"
+                            opacity="0.5"
+                            fw="initial"
+                            value={resourceData.description}
+                            onChange={(val) => handleResourceUpdate('description', val)}
+                        />
                         <ResourceTagStack>
                             {resourceTagData.map(({ subjectId, subjectName, tags }) => (
                                 <ResourceTagStack.Group

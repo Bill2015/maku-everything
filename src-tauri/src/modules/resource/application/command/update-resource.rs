@@ -57,12 +57,12 @@ impl ICommandHandler<UpdateResourceCommand> for UpdateResourceHandler<'_> {
 
         // change name
         if name.is_some() {
-            resource.change_name(name.unwrap());
+            resource.change_name(name.unwrap())?;
         }
 
         // change description
         if description.is_some() {
-            resource.change_description(description.unwrap());
+            resource.change_description(description.unwrap())?;
         }
 
         // change auth

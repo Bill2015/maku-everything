@@ -44,6 +44,16 @@ export interface ResourceCreateDto {
     url_path?: string | null,
 }
 
+export interface ResourceUpdateDto {
+    id: string,
+
+    name?: string,
+
+    description?: string,
+
+    auth?: boolean,
+}
+
 export interface ResourceTagOperateDto {
     id: string;
 

@@ -1,6 +1,13 @@
 /* eslint-disable camelcase */
 import { invoke } from '@tauri-apps/api/tauri';
-import { QueryResoruceDto, ResourceCreateDto, ResourceDetailDto, ResourceResDto, ResourceTagOperateDto } from './Dto';
+import {
+    QueryResoruceDto,
+    ResourceCreateDto,
+    ResourceDetailDto,
+    ResourceResDto,
+    ResourceTagOperateDto,
+    ResourceUpdateDto,
+} from './Dto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace ResourceAPI {
@@ -26,6 +33,10 @@ export namespace ResourceAPI {
 
     export function create(data: ResourceCreateDto) {
         return invoke<string>('create_resource', { data });
+    }
+
+    export function update(data: ResourceUpdateDto) {
+        return invoke<string>('update_resource', { data });
     }
 
     export function exporeTheFile(filePath: string) {

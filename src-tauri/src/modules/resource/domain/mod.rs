@@ -174,9 +174,6 @@ impl ResourceAggregate {
     }
 
     pub fn change_description(&mut self, new_description: String) -> Result<(), ResourceGenericError> {
-        if new_description.is_empty() {
-            return Err(ResourceGenericError::DescriptionIsEmpty());
-        }
         self.description = new_description;
         Ok(())
     }

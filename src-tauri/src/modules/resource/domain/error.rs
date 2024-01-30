@@ -78,9 +78,6 @@ pub enum ResourceGenericError {
     #[error("Name is empty")]
     NameIsEmpty(),
 
-    #[error("Description is empty")]
-    DescriptionIsEmpty(),
-
     #[error("Can't not add same tag")]
     AddSameTag(),
 
