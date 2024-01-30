@@ -58,7 +58,7 @@ function App() {
                     <MainNavbar />
                 </AppShell.Navbar>
 
-                <AppShell.Main mah="100vh" display="flex">
+                <AppShell.Main pos="relative" display="flex">
                     <Suspense fallback={<Box>FallBack</Box>}>
                         {routes}
                     </Suspense>
