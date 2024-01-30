@@ -1,12 +1,15 @@
 use anyhow::Error;
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::command_from_dto;
 use crate::modules::common::application::IQueryHandler;
 use crate::modules::resource::domain::ResourceGenericError;
 use crate::modules::resource::infrastructure::ResourceQueryBuilder;
 use crate::modules::resource::repository::ResourceQueryRepository;
-use crate::modules::resource::application::dto::ResourceResDto;
+use crate::modules::resource::application::dto::{ResourceListQueryDto, ResourceResDto};
 
+#[derive(Deserialize)]
 pub struct ListResourceQuery { 
     pub id: Option<String>,
 
@@ -16,6 +19,7 @@ pub struct ListResourceQuery {
 
     pub order_by: Option<String>,
 }
+command_from_dto!(ListResourceQuery, ResourceListQueryDto);
 
 // =====================================
 pub struct ListResourceHandler<'a> {

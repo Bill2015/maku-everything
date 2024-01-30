@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ResourceAPI } from './ResourceAPI';
-import { ResourceTagDto } from './Dto';
+import { ResourceResDto, ResourceTagDto } from './Dto';
 
 export interface IResourceTagGroup {
     subjectName: string;
@@ -35,8 +35,8 @@ export namespace ResourceQuery {
         });
     }
 
-    export function useGetByCategory(categoryId: string | null) {
-        const queryfn = () => ResourceAPI.query({ belong_category: categoryId! });
+    export function useGetByCategory(categoryId: string | null, orderBy?: keyof ResourceResDto) {
+        const queryfn = () => ResourceAPI.query({ belong_category: categoryId!, order_by: orderBy });
 
         return useQuery({
             queryKey:        ['resource', 'belong-category', categoryId],

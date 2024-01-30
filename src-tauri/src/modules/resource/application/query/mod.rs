@@ -10,9 +10,9 @@ pub use get_by_id::*;
 mod detail;
 pub use detail::*;
 
-#[path ="./query-resource.rs"]
-mod query;
-pub use query::*;
+#[path ="./list-resource.rs"]
+mod list;
+pub use list::*;
 
 mod bystring;
 pub use bystring::*;

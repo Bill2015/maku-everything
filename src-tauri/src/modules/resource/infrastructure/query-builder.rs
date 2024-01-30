@@ -70,7 +70,7 @@ impl ResourceQueryBuilder {
 
     pub fn set_order_by(mut self, field_name: &String) -> ResourceQueryBuilder {
         if !field_name.is_empty() {
-            self.order_by = Some(format!("ORDER BY {}", field_name));
+            self.order_by = Some(format!(" ORDER BY {} DESC ", field_name));
         }
         self
     }
@@ -98,7 +98,7 @@ impl ResourceQueryBuilder {
         
         // order By query string
         if let Some(order_by) = &self.order_by {
-            let reuslt = query_string.add(format!(" ORDER BY {}", order_by).as_str());
+            let reuslt = query_string.add(order_by.as_str());
             return reuslt;
         }
         

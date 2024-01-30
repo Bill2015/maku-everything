@@ -37,3 +37,14 @@ pub struct ResourceRemoveTagDto {
 
     pub tag_id: String,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct ResourceListQueryDto {
+    pub id: Option<String>,
+
+    pub name: Option<String>,
+
+    pub belong_category: Option<String>, 
+
+    pub order_by: Option<String>,
+}

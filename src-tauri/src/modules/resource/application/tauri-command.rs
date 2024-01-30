@@ -79,19 +79,9 @@ pub async fn explore_the_file(file_path: String) -> Result<(), ResourceError> {
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn list_resource(
-    id: Option<String>,
-    name: Option<String>,
-    belong_category: Option<String>, 
-    order_by: Option<String>,
-) -> Result<Vec<ResourceResDto>, ResourceError> {
+pub async fn list_resource(data: ResourceListQueryDto) -> Result<Vec<ResourceResDto>, ResourceError> {
     let result = RESOURCE_SERVICE
-        .list_resource(
-            id, 
-            name, 
-            belong_category, 
-            order_by
-        )
+        .list_resource(data)
         .await?;
 
     Ok(result)

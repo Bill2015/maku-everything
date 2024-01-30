@@ -20,7 +20,7 @@ export default function ResourcesPage() {
         data: resourceData,
         isFetching: isResourceFetching,
         refetch: resourceRefetch,
-    } = ResourceQuery.useGetByCategory(activeCategory.id);
+    } = ResourceQuery.useGetByCategory(activeCategory.id, 'updated_at');
 
     const { data: searchResult } = ResourceQuery.useStringQuering(search, activeCategory.id, (error) => {
         showNotification('Search Failed', error.message, 'error');

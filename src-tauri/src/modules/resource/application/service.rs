@@ -140,19 +140,8 @@ impl<'a> ResourceService<'a> {
         Ok(())
     }
 
-    pub async fn list_resource(
-        &self, 
-        id: Option<String>,
-        name: Option<String>,
-        belong_category: Option<String>, 
-        order_by: Option<String>,
-    ) -> Result<Vec<ResourceResDto>, ResourceError> {
-        let query = ListResourceQuery { 
-            id,
-            name,
-            belong_category,
-            order_by
-        };
+    pub async fn list_resource(&self, data: ResourceListQueryDto) -> Result<Vec<ResourceResDto>, ResourceError> {
+        let query = ListResourceQuery::from(data);
         
         let result = ListResourceHandler::register(self.resource_query_repo)
             .query(query)
