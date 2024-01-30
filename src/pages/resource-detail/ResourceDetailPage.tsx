@@ -72,20 +72,24 @@ export default function ResourcesDetailPage() {
                         haveUrl={!!resourceData.url}
                         host={resourceData.url?.host}
                         url={resourceData.url?.full}
-                        filePath={convertFileSrc(resourceData.root_path + resourceData.file?.path)}
+                        filePath={convertFileSrc(`${resourceData.root_path}${resourceData.file?.path}`)}
                     />
                 </Grid.Col>
                 <Grid.Col span={{ lg: 6, sm: 12 }} h="100%">
                     <Group gap="xs" pos="relative">
                         <Flex fz="sm" c="dimmed" align="center" pr="60px" lh={2} style={{ flexWrap: 'wrap', wordBreak: 'break-all' }}>
-                            {resourceData.root_path}
+                            { resourceData.file ? resourceData.root_path : resourceData.url?.full}
                             {
                                 resourceData.file && <Text component="span" fw={500} fz="sm">{resourceData.file.path}</Text>
                             }
                         </Flex>
-                        <Button onClick={handleExporeClick} pos="absolute" right="30px" variant="subtle" p={0} fz="1.75em">
-                            <FcOpenedFolder />
-                        </Button>
+                        {
+                            resourceData.file && (
+                                <Button onClick={handleExporeClick} pos="absolute" right="30px" variant="subtle" p={0} fz="1.75em">
+                                    <FcOpenedFolder />
+                                </Button>
+                            )
+                        }
                     </Group>
                     <ScrollArea.Autosize mx="auto" mah="600px" type="hover" classNames={{ scrollbar: 'mgra' }}>
                         <EditableText
