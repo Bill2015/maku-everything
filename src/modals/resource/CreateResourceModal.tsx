@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import { Modal, Button, Grid, Input, Title } from '@mantine/core';
 import { ResourceMutation } from '@api/resource';
 import { useActiveCategoryRedux } from '@store/global';
-import { useCreateResourceModel } from '@store/modal';
+import { useCreateResourceModal } from '@store/modal';
 
 export function CreateResourceModal() {
     const { activeCategory } = useActiveCategoryRedux();
-    const { opened, close } = useCreateResourceModel();
+    const [opened, { close }] = useCreateResourceModal();
 
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');

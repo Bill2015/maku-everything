@@ -9,14 +9,14 @@ import { RiFunctionLine } from 'react-icons/ri';
 import { IoAdd } from 'react-icons/io5';
 
 import { useActiveCategoryRedux } from '@store/global';
-import { useCreateResourceModel, useCreateSubjectModel, useCreateTagModel } from '@store/modal';
+import { useCreateResourceModal, useCreateSubjectModal, useCreateTagModal } from '@store/modal';
 
 export function CategoryContainer() {
     const { activeCategory } = useActiveCategoryRedux();
 
-    const { open: openSubject } = useCreateSubjectModel();
-    const { open: openTag } = useCreateTagModel();
-    const { open: openResource } = useCreateResourceModel();
+    const [_subject, { open: openSubject }] = useCreateSubjectModal();
+    const [_tag, { open: openTag }] = useCreateTagModal();
+    const [_resource, { open: openResource }] = useCreateResourceModal();
 
     const iconStyle = { width: '1em', height: '1em' };
     const [isOpen, setOpen] = useState<boolean>(true);

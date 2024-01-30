@@ -2,11 +2,11 @@ import { useCallback, useState } from 'react';
 import { Modal, Button, Grid, Input, Title } from '@mantine/core';
 import { SubjectMutation } from '@api/subject';
 import { useActiveCategoryRedux } from '@store/global';
-import { useCreateSubjectModel } from '@store/modal';
+import { useCreateSubjectModal } from '@store/modal';
 
 export function CreateSubjectModal() {
     const { activeCategory } = useActiveCategoryRedux();
-    const { opened, close } = useCreateSubjectModel();
+    const [opened, { close }] = useCreateSubjectModal();
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const createSubject = SubjectMutation.useCreate();

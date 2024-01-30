@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 import { Modal, Title, Stack, Input, FileInput, Button, Group } from '@mantine/core';
-import { useImportCategoryModel } from '@store/modal';
+import { useImportCategoryModal } from '@store/modal';
 import { CategoryMutation } from '@api/category';
 
 export function ImportCategoryModal() {
-    const { opened, close } = useImportCategoryModel();
+    const [opened, { close }] = useImportCategoryModal();
 
     const [rootPath, setRootPath] = useState<string>('');
     const [file, setFile] = useState<File | null>(null);

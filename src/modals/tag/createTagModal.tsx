@@ -2,13 +2,13 @@ import { useCallback, useState } from 'react';
 import { Modal, Button, Grid, Input, Title, Text } from '@mantine/core';
 import { TagMutation } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
-import { useCreateTagModel } from '@store/modal';
+import { useCreateTagModal } from '@store/modal';
 import { SubjectSelect } from '@components/input';
 import { SubjectQuery } from '@api/subject';
 
 export function CreateTagModal() {
     const { activeCategory } = useActiveCategoryRedux();
-    const { opened, close } = useCreateTagModel();
+    const [opened, { close }] = useCreateTagModal();
     const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
     const [name, setName] = useState<string>('');
     const [belongSubject, setBelongSubject] = useState<{ value: string, id: string } | null>(null);

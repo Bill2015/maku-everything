@@ -4,7 +4,7 @@ import { LuImport } from 'react-icons/lu';
 import { BsGear } from 'react-icons/bs';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { useHomeNavigate } from '@router/navigateHook';
-import { useImportCategoryModel } from '@store/modal';
+import { useImportCategoryModal } from '@store/modal';
 
 import Logo from '@assets/logo.png';
 
@@ -50,7 +50,7 @@ function HeaderMenuItem(props: PropsWithChildren) {
 
 export function MainHeader() {
     const navigateToHome = useHomeNavigate();
-    const { open } = useImportCategoryModel();
+    const [_, { open }] = useImportCategoryModal();
 
     return (
         <Group px="sm" gap={5}>

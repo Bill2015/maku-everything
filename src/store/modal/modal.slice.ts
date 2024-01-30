@@ -1,47 +1,43 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ModelReduxProps {
+// eslint-disable-next-line no-shadow
+export enum ModalName {
+    importCategory,
+    CreateCategory,
+    CreateSubject,
+    CreateTag,
+    CreateResource,
+}
+
+interface ModalReduxProps {
     opened: boolean,
 }
 
 export interface ModalState {
-    importCategory: ModelReduxProps;
-    createSubject: ModelReduxProps;
-    createTag: ModelReduxProps;
-    createResource: ModelReduxProps;
+    modals: {[key in ModalName]: ModalReduxProps}
 }
 
 const initialState: ModalState = {
-    importCategory: { opened: false },
-    createSubject:  { opened: false },
-    createTag:      { opened: false },
-    createResource: { opened: false },
+    modals: {
+        [ModalName.importCategory]: { opened: false },
+        [ModalName.CreateCategory]: { opened: false },
+        [ModalName.CreateSubject]:  { opened: false },
+        [ModalName.CreateTag]:      { opened: false },
+        [ModalName.CreateResource]: { opened: false },
+    },
 };
 
 const modalSlice = createSlice({
     name:     'modal',
     initialState,
     reducers: {
-        setImportCategoryModelOpen: (state, action: PayloadAction<boolean>) => {
-            state.importCategory.opened = action.payload;
-        },
-        setCreateSubjectModelOpen: (state, action: PayloadAction<boolean>) => {
-            state.createSubject.opened = action.payload;
-        },
-        setCreateTagModelOpen(state, action: PayloadAction<boolean>) {
-            state.createTag.opened = action.payload;
-        },
-        setCreateResourceModelOpen(state, action: PayloadAction<boolean>) {
-            state.createResource.opened = action.payload;
+        setModalOpenStatus: (state, action: PayloadAction<{ name: ModalName, open: boolean }>) => {
+            const { name, open } = action.payload;
+            state.modals[name] = { ...state.modals[name], opened: open };
         },
     },
 });
 
-export const {
-    setImportCategoryModelOpen,
-    setCreateSubjectModelOpen,
-    setCreateTagModelOpen,
-    setCreateResourceModelOpen,
-} = modalSlice.actions;
+export const { setModalOpenStatus } = modalSlice.actions;
 
 export default modalSlice.reducer;

@@ -1,76 +1,39 @@
 import { useCallback } from 'react';
 import { useModelSelector, useModelDispatch } from '../hook';
 import {
-    setCreateResourceModelOpen,
-    setCreateSubjectModelOpen,
-    setCreateTagModelOpen,
-    setImportCategoryModelOpen,
+    ModalName,
+    setModalOpenStatus,
 } from './modal.slice';
 
-export function useImportCategoryModel() {
-    const { opened } = useModelSelector().importCategory;
+function useBaseModalHook(name: ModalName): [boolean, { open: () => void, close: () => void }] {
+    const { opened } = useModelSelector().modals[name];
     const dispatch = useModelDispatch();
 
     const open = useCallback(() => {
-        dispatch(setImportCategoryModelOpen(true));
+        dispatch(setModalOpenStatus({ name: name, open: true }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
 
     const close = useCallback(() => {
-        dispatch(setImportCategoryModelOpen(false));
+        dispatch(setModalOpenStatus({ name: name, open: false }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch]);
 
-    return {
-        opened, open, close,
-    };
+    return [opened, { open, close }];
 }
 
-export function useCreateSubjectModel() {
-    const { opened } = useModelSelector().createSubject;
-    const dispatch = useModelDispatch();
-
-    const open = useCallback(() => {
-        dispatch(setCreateSubjectModelOpen(true));
-    }, [dispatch]);
-
-    const close = useCallback(() => {
-        dispatch(setCreateSubjectModelOpen(false));
-    }, [dispatch]);
-
-    return {
-        opened, open, close,
-    };
+export function useImportCategoryModal() {
+    return useBaseModalHook(ModalName.importCategory);
 }
 
-export function useCreateTagModel() {
-    const { opened } = useModelSelector().createTag;
-    const dispatch = useModelDispatch();
-
-    const open = useCallback(() => {
-        dispatch(setCreateTagModelOpen(true));
-    }, [dispatch]);
-
-    const close = useCallback(() => {
-        dispatch(setCreateTagModelOpen(false));
-    }, [dispatch]);
-
-    return {
-        opened, open, close,
-    };
+export function useCreateSubjectModal() {
+    return useBaseModalHook(ModalName.CreateSubject);
 }
 
-export function useCreateResourceModel() {
-    const { opened } = useModelSelector().createResource;
-    const dispatch = useModelDispatch();
+export function useCreateTagModal() {
+    return useBaseModalHook(ModalName.CreateTag);
+}
 
-    const open = useCallback(() => {
-        dispatch(setCreateResourceModelOpen(true));
-    }, [dispatch]);
-
-    const close = useCallback(() => {
-        dispatch(setCreateResourceModelOpen(false));
-    }, [dispatch]);
-
-    return {
-        opened, open, close,
-    };
+export function useCreateResourceModal() {
+    return useBaseModalHook(ModalName.CreateResource);
 }
