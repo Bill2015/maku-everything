@@ -1,4 +1,4 @@
-import { InvokeArgs, invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/tauri';
 import { SubjectResDto, SubjectCreateDto, QuerySubjectDto } from './Dto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -11,8 +11,8 @@ export namespace SubjectAPI {
         return invoke<SubjectResDto>('get_subject_by_id');
     }
 
-    export function query(queryDto: QuerySubjectDto) {
-        return invoke<SubjectResDto[]>('list_subjects', queryDto as unknown as InvokeArgs);
+    export function query(data: QuerySubjectDto) {
+        return invoke<SubjectResDto[]>('list_subjects', { data });
     }
 
     export function create(data: SubjectCreateDto) {

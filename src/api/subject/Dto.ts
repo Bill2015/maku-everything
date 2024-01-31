@@ -40,4 +40,8 @@ export interface QuerySubjectDto {
     belong_category?: string;
 
     order_by?: string;
+
+    limit?: number;
+
+    start?: number;
 }

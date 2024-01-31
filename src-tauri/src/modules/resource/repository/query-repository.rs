@@ -91,7 +91,6 @@ impl<'a> ResourceQueryRepository<'a> {
     }
 
     pub async fn query(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<ResourceResDto>> {
-        dbg!(&builder_result.to_string());
         let sql = format!(
             r#"SELECT 
                 *,

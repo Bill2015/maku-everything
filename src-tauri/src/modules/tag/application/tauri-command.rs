@@ -40,29 +40,9 @@ pub async fn get_tag_by_id(id: String) -> Result<Option<TagResDto>, TagError> {
 }
 
 #[tauri::command(rename_all = "snake_case")]
-pub async fn list_tags(
-    id: Option<String>,
-    name: Option<String>,
-    belong_category: Option<String>, 
-    belong_subject: Option<String>,
-    belong_subject_name: Option<String>,
-    tagging_resource: Option<String>,
-    order_by: Option<String>,
-    limit: Option<i64>,
-    start: Option<i64>,
-) -> Result<Vec<TagResDto>, TagError> {
+pub async fn list_tags(data: QueryTagDto) -> Result<Vec<TagResDto>, TagError> {
     let result = TAG_SERVICE
-        .list_tags(
-            id, 
-            name, 
-            belong_category, 
-            belong_subject, 
-            belong_subject_name,
-            tagging_resource, 
-            order_by,
-            limit,
-            start,
-        )
+        .list_tags(data)
         .await?;
 
     Ok(result)

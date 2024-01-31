@@ -106,4 +106,8 @@ export interface QueryResoruceDto {
     belong_category?: string;
 
     order_by?: string;
+
+    limit?: number;
+
+    start?: number;
 }

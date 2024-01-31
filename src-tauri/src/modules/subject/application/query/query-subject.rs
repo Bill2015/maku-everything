@@ -1,13 +1,16 @@
 use anyhow::Error;
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::command_from_dto;
 use crate::modules::common::application::IQueryHandler;
 use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::subject::domain::SubjectGenericError;
 use crate::modules::subject::infrastructure::SubjectQueryBuilder;
 use crate::modules::subject::repository::SubjectQueryRepository;
-use crate::modules::subject::application::dto::SubjectResDto;
+use crate::modules::subject::application::dto::{QuerySubjectDto, SubjectResDto};
 
+#[derive(Deserialize)]
 pub struct ListSubjectQuery { 
     pub id: Option<String>,
 
@@ -21,6 +24,7 @@ pub struct ListSubjectQuery {
 
     pub start: Option<i64>,
 }
+command_from_dto!(ListSubjectQuery, QuerySubjectDto);
 
 // =====================================
 pub struct ListSubjectHandler<'a> {

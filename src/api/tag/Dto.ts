@@ -43,4 +43,8 @@ export interface QueryTagDto {
     tagging_resource?: string;
 
     order_by?: string;
+
+    limit?: number;
+
+    start?: number;
 }

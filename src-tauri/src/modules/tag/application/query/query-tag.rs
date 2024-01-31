@@ -1,13 +1,16 @@
 use anyhow::Error;
 use async_trait::async_trait;
+use serde::Deserialize;
 
+use crate::command_from_dto;
 use crate::modules::common::application::IQueryHandler;
 use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::tag::domain::TagGenericError;
 use crate::modules::tag::infrastructure::TagQueryBuilder;
 use crate::modules::tag::repository::TagQueryRepository;
-use crate::modules::tag::application::dto::TagResDto;
+use crate::modules::tag::application::dto::{QueryTagDto, TagResDto};
 
+#[derive(Deserialize)]
 pub struct ListTagQuery { 
     pub id: Option<String>,
 
@@ -27,6 +30,7 @@ pub struct ListTagQuery {
 
     pub start: Option<i64>,
 }
+command_from_dto!(ListTagQuery, QueryTagDto);
 
 // =====================================
 pub struct ListTagHandler<'a> {
