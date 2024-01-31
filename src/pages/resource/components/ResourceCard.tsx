@@ -1,6 +1,4 @@
-import {
-    Card, Group, Text, Button, Tooltip, Divider, Accordion, Stack,
-} from '@mantine/core';
+import { Card, Group, Text, Button, Tooltip, Accordion, Stack } from '@mantine/core';
 import { ResourceResDto } from '@api/resource';
 import { DateTimeDisplayer, LinkIcon, ResourceThumbnailDisplayer } from '@components/display';
 
@@ -16,7 +14,7 @@ export function ResourceCard(props: ResourceCardProps) {
     const { data, onDetailClick } = props;
 
     return (
-        <Card shadow="sm" padding="lg" radius="md" withBorder>
+        <Card shadow="sm" padding="lg" radius="md" withBorder classNames={{ root: classes.cardroot }}>
             <Card.Section>
                 {
                     data.url && (
@@ -24,14 +22,13 @@ export function ResourceCard(props: ResourceCardProps) {
                             pos="absolute"
                             top="5px"
                             right="5%"
-                            host={data.url!.host}
-                            url={data.url!.full}
+                            url={data.url!}
                         />
                     )
                 }
                 <ResourceThumbnailDisplayer data={data} />
             </Card.Section>
-            <Accordion defaultValue="" classNames={{ content: classes.accordioncontent }}>
+            <Accordion defaultValue="" classNames={{ content: classes.acccontent }}>
                 <Accordion.Item value={data.name}>
                     <Accordion.Control p={0} h="28px">
                         <Tooltip label={data.name} openDelay={500}>
@@ -39,7 +36,6 @@ export function ResourceCard(props: ResourceCardProps) {
                         </Tooltip>
                     </Accordion.Control>
                     <Accordion.Panel p={0} style={{ zIndex: 9999 }}>
-                        <Divider />
                         <Text pt="xs">{data.description}</Text>
 
                         <Stack gap="xs">

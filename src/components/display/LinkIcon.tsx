@@ -14,21 +14,22 @@ const URL_ICON_MAPPER = new Map<string, IconType>();
 URL_ICON_MAPPER.set(UrlHost.Youtube, FaYoutube);
 
 export interface LinkIconProps extends ActionIconProps {
-    /** Host of URL, for example: **www.youtube.com**  */
-    host: string;
+    /** URLs */
+    url: {
+        full: string;
 
-    /** full URL string */
-    url: string;
+        host: string;
+    };
 }
 
 /**
  * According URL host to determin which icon will be showing */
 export function LinkIcon(props: LinkIconProps) {
-    const { host, url, ...actionIconProps } = props;
+    const { url, ...actionIconProps } = props;
 
     const IconElement = (() => {
-        if (URL_ICON_MAPPER.has(host)) {
-            return URL_ICON_MAPPER.get(host)!;
+        if (URL_ICON_MAPPER.has(url.host)) {
+            return URL_ICON_MAPPER.get(url.host)!;
         }
         // defualt icon
         return FaLink;
@@ -37,7 +38,7 @@ export function LinkIcon(props: LinkIconProps) {
     return (
         <Tooltip
             withArrow
-            label={`↖️ ${url}`}
+            label={`↖️ ${url.full}`}
             classNames={{ tooltip: classes.tooltip }}
             offset={10}
         >
@@ -46,9 +47,9 @@ export function LinkIcon(props: LinkIconProps) {
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...actionIconProps}
                 onClick={() => {
-                    open(url)
+                    open(url.full)
                         .catch(() => {
-                            showNotification('Invalid URL', url, 'error');
+                            showNotification('Invalid URL', url.full, 'error');
                         });
                 }}
             >
