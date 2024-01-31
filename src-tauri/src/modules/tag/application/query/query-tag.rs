@@ -52,10 +52,10 @@ impl IQueryHandler<ListTagQuery> for ListTagHandler<'_>{
     type Output = Vec<TagResDto>;
 
     async fn query(&self, query: ListTagQuery) -> Result<Self::Output, Error> {
-        let buildr_result = TagQueryBuilder::from(query).build()?;
+        let builder_result = TagQueryBuilder::from(query).build()?;
 
         let result = self.tag_repo
-            .query(buildr_result)
+            .query(builder_result)
             .await;
     
         match result {

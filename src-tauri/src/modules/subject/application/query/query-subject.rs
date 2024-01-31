@@ -46,10 +46,10 @@ impl IQueryHandler<ListSubjectQuery> for ListSubjectHandler<'_>{
     type Output = Vec<SubjectResDto>;
 
     async fn query(&self, query: ListSubjectQuery) -> Result<Self::Output, Error> {
-        let query_builder = SubjectQueryBuilder::from(query).build()?;
+        let builder_result = SubjectQueryBuilder::from(query).build()?;
 
         let result = self.subject_repo
-            .query(query_builder)
+            .query(builder_result)
             .await;
     
         match result {

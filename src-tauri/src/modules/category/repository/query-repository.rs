@@ -3,6 +3,7 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::thing;
 
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens};
 use crate::modules::category::application::dto::CategoryResDto;
 
@@ -46,6 +47,26 @@ impl<'a> CategoryQueryRepository<'a> {
         let result: Option<CategoryResDto> = response
             .take(0)
             .unwrap_or(None);
+
+        Ok(result) 
+    }
+
+    pub async fn query(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<CategoryResDto>> {
+        let sql = format!(r#"
+            SELECT 
+                *,
+                {}
+            FROM subject WHERE {}"#, 
+            Self::RESOURCE_NUM_FIELD,
+            builder_result.to_string());
+
+        let mut response = self.db
+            .query(sql)
+            .await?;
+
+        let result: Vec<CategoryResDto> = response
+            .take(0)
+            .unwrap();
 
         Ok(result) 
     }

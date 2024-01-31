@@ -71,6 +71,7 @@ fn main() {
             category::application::export_category,
             category::application::get_all_category,
             category::application::get_category_by_id,
+            category::application::list_categories,
             subject::application::create_subject,
             subject::application::update_subject,
             subject::application::get_all_subject,

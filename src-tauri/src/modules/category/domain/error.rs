@@ -19,6 +19,9 @@ pub enum CategoryError {
     #[error("Get specific Category by id failed")]
     GetById(Error),
 
+    #[error("Querying Category failed")]
+    Query(Error),
+
     #[error("Import category failed")]
     Import(Error),
 
@@ -36,6 +39,7 @@ impl Serialize for CategoryError {
             CategoryError::Update(source) => serialize_error!(self, source),
             CategoryError::GetAll(source) => serialize_error!(self, source),
             CategoryError::GetById(source) => serialize_error!(self, source),
+            CategoryError::Query(source) => serialize_error!(self, source),
             CategoryError::Import(source) => serialize_error!(self, source),
             CategoryError::Export(source) => serialize_error!(self, source),
         };

@@ -120,4 +120,15 @@ impl<'a> CategoryService<'a> {
 
         Ok(result)
     }
+
+    pub async fn list_categories(&self, data: QueryCategoryDto) -> Result<Vec<CategoryResDto>, CategoryError> {
+        let query = ListCategoryQuery::from(data);
+        
+        let result = ListCategoryHandler::register(self.category_queryrepo)
+            .query(query)
+            .await
+            .map_err(|err| CategoryError::Query(anyhow!(err)))?;
+
+        Ok(result)
+    }
 }

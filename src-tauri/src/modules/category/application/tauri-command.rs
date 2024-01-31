@@ -74,3 +74,12 @@ pub async fn get_category_by_id(id: String) -> Result<Option<CategoryResDto>, Ca
 
     Ok(result)
 }
+
+#[tauri::command]
+pub async fn list_categories(data: QueryCategoryDto) -> Result<Vec<CategoryResDto>, CategoryError> {
+    let result = CATEGORY_SERVICE
+        .list_categories(data)
+        .await?;
+
+    Ok(result)
+}
