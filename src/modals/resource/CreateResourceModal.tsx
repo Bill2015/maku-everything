@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
-import { Modal, Button, Grid, Input, Title } from '@mantine/core';
+import { Button, Grid, Input } from '@mantine/core';
 import { ResourceMutation } from '@api/resource';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateResourceModal } from '@store/modal';
 import { ErrorResBody } from '@api/common';
 import { showNotification } from '@components/notification';
+import { BaseModal } from '@components/modal';
 
 export function CreateResourceModal() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -36,7 +37,7 @@ export function CreateResourceModal() {
     }, [description, name, filePath, urlPath, activeCategory, createResource, confirmClose]);
 
     return (
-        <Modal opened={opened} onClose={close} title={<Title order={2}>Create New Resource</Title>} centered>
+        <BaseModal opened={opened} onClose={close} title="Create New Resource" centered>
             <Grid>
                 <Grid.Col span={4}>
                     In:
@@ -75,6 +76,6 @@ export function CreateResourceModal() {
                     <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
                 </Grid.Col>
             </Grid>
-        </Modal>
+        </BaseModal>
     );
 }

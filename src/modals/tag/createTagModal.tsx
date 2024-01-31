@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Modal, Button, Grid, Input, Title, Text } from '@mantine/core';
+import { Button, Grid, Input, Text } from '@mantine/core';
 import { TagMutation } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateTagModal } from '@store/modal';
@@ -7,6 +7,7 @@ import { SubjectSelect } from '@components/input';
 import { SubjectQuery } from '@api/subject';
 import { ErrorResBody } from '@api/common';
 import { showNotification } from '@components/notification';
+import { BaseModal } from '@components/modal';
 
 export function CreateTagModal() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -42,7 +43,7 @@ export function CreateTagModal() {
         return null;
     }
     return (
-        <Modal opened={opened} onClose={close} title={<Title order={2}>Create New Tag</Title>} centered>
+        <BaseModal opened={opened} onClose={close} title="Create New Tag" centered>
             <Grid>
                 <Grid.Col span={4}>
                     Belong Category:
@@ -80,6 +81,6 @@ export function CreateTagModal() {
                     <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
                 </Grid.Col>
             </Grid>
-        </Modal>
+        </BaseModal>
     );
 }

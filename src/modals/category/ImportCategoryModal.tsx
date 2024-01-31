@@ -1,9 +1,10 @@
 import { useCallback, useState } from 'react';
-import { Modal, Title, Stack, Input, FileInput, Button, Group } from '@mantine/core';
+import { Stack, Input, FileInput, Button, Group } from '@mantine/core';
 import { useImportCategoryModal } from '@store/modal';
 import { CategoryMutation } from '@api/category';
 import { showNotification } from '@components/notification';
 import { ErrorResBody } from '@api/common';
+import { BaseModal } from '@components/modal';
 
 export function ImportCategoryModal() {
     const [opened, { close, confirmClose, cancelClose }] = useImportCategoryModal();
@@ -36,7 +37,7 @@ export function ImportCategoryModal() {
     }, [file, rootPath, confirmClose, importCategory]);
 
     return (
-        <Modal opened={opened} onClose={close} title={<Title order={2}>Import New Category</Title>} centered>
+        <BaseModal opened={opened} onClose={close} title="Import New Category">
             <Stack>
                 <Input.Wrapper required label="Root path">
                     <Input
@@ -60,6 +61,6 @@ export function ImportCategoryModal() {
                     <Button color="lime" onClick={handleConfirm}>Confirm</Button>
                 </Group>
             </Stack>
-        </Modal>
+        </BaseModal>
     );
 }

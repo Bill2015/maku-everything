@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
-import { Modal, ModalProps, Button, Grid, Input, Title } from '@mantine/core';
+import { ModalProps, Button, Grid, Input } from '@mantine/core';
 import { CategoryCreateDto } from '@api/category';
+import { BaseModal } from '@components/modal';
 
 export interface CreateCategoryModalProps extends ModalProps {
     onConfirm: (data: CategoryCreateDto) => void;
@@ -24,7 +25,7 @@ export function CreateCategoryModal(props: CreateCategoryModalProps) {
 
     return (
         // eslint-disable-next-line react/jsx-props-no-spreading
-        <Modal {...modelProps} title={<Title order={2}>Create New Category</Title>} centered>
+        <BaseModal {...modelProps} title="Create New Category" centered>
             <Grid>
                 <Grid.Col span={4}>
                     Name:
@@ -51,6 +52,6 @@ export function CreateCategoryModal(props: CreateCategoryModalProps) {
                     <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
                 </Grid.Col>
             </Grid>
-        </Modal>
+        </BaseModal>
     );
 }

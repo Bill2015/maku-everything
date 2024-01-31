@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
-import { Modal, Button, Grid, Input, Title } from '@mantine/core';
+import { Button, Grid, Input } from '@mantine/core';
 import { SubjectMutation } from '@api/subject';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateSubjectModal } from '@store/modal';
 import { ErrorResBody } from '@api/common';
 import { showNotification } from '@components/notification';
+import { BaseModal } from '@components/modal';
 
 export function CreateSubjectModal() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -37,7 +38,7 @@ export function CreateSubjectModal() {
         return null;
     }
     return (
-        <Modal opened={opened} onClose={close} title={<Title order={2}>Create New Subject</Title>} centered>
+        <BaseModal opened={opened} onClose={close} title="Create New Subject" centered>
             <Grid>
                 <Grid.Col span={4}>
                     Belong:
@@ -64,6 +65,6 @@ export function CreateSubjectModal() {
                     <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
                 </Grid.Col>
             </Grid>
-        </Modal>
+        </BaseModal>
     );
 }
