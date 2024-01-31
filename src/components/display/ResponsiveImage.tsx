@@ -1,41 +1,40 @@
-import { Container, Skeleton, MantineStyleProp } from '@mantine/core';
-import { ComponentProps, useCallback, useState } from 'react';
+/* eslint-disable react/jsx-props-no-spreading */
+import * as lodash from 'lodash';
+import { Image, ImageProps, Loader } from '@mantine/core';
+import { useState } from 'react';
 
-export interface ResponsiveImageProps extends ComponentProps<'img'> { }
+import classes from './ResponsiveImage.module.scss';
+
+export interface ResponsiveImageProps extends ImageProps {
+    alt: string;
+
+    useBackgoundImg?: boolean;
+}
 
 export function ResponsiveImage(props: ResponsiveImageProps) {
-    const { alt, src } = props;
-    const [size, setSize] = useState<{w: number, h: number}>({ w: 0, h: 0 });
-    const [isLoaded, setLoaded] = useState<boolean>(false);
+    const { alt, src, useBackgoundImg = false, ...imgProps } = props;
+    const [isLoaded, setLoaded] = useState<boolean>(true);
 
-    const measuredRef = useCallback((node: HTMLImageElement) => {
-        if (node !== null && isLoaded) {
-            setSize({ w: node.naturalWidth, h: node.naturalHeight });
-        }
-    }, [isLoaded]);
-
-    // if Image width larger than height which mean it need to change flex direction to vertical align
-    const needVerticalAlign: MantineStyleProp = size.w >= size.h
-        ? {
-            display:        'flex',
-            flexDirection:  'column',
-            justifyContent: 'center',
-        } : {};
+    const sourceProps = useBackgoundImg ? { style: { backgroundImage: `url("${src}")` } } : { src: src, alt: alt };
 
     return (
-        <Container h="100%" style={needVerticalAlign}>
-            <img
-                ref={measuredRef}
+        <>
+            { !isLoaded && (
+                <Loader
+                    w="100%"
+                    display="flex"
+                    size="lg"
+                    h={lodash.random(100, 300)}
+                    style={{ alignItems: 'center', justifyContent: 'center' }}
+                />
+            ) }
+            <Image
                 onLoad={() => setLoaded(true)}
-                alt={alt}
-                src={src}
-                hidden={(size.w + size.h) === 0}
-                width={(size.w < size.h) ? 'inherit' : '100%'}
-                height={(size.w >= size.h) ? 'inherit' : '100%'}
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...props}
+                hidden={!isLoaded}
+                className={classes.responsiveImg}
+                {...imgProps}
+                {...sourceProps}
             />
-            { ((size.w + size.h) === 0) && <Skeleton w="100%" h="100%" /> }
-        </Container>
+        </>
     );
 }

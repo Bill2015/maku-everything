@@ -1,0 +1,14 @@
+.previewImg {
+    width: 0px;
+    height: 100%;
+    flex: 1;
+    transition: flex 0.75s;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50%;
+
+    @include hover {
+        background-size: contain;
+        flex: 14;
+    }
+}

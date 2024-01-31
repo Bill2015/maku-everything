@@ -36,9 +36,9 @@ export default function CategoriesPage() {
                         <Button onClick={open}>Create Category</Button>
                     </Grid.Col>
                 </Grid>
-                <ScrollArea style={{ textAlign: 'start', margin: 0 }}>
+                <ScrollArea style={{ textAlign: 'start', margin: 0 }} mah="80vh">
                     <Skeleton visible={isCategoriesLoading}>
-                        <Flex align="flex-start" gap="sm" wrap="wrap">
+                        <Flex align="flex-start" gap="sm" wrap="wrap" pr={20} pl={20}>
                             {categoryItems}
                         </Flex>
                     </Skeleton>

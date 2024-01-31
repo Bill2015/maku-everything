@@ -4,6 +4,7 @@
     display: flex;
     color: var(--mantine-color-default-color);
     gap: 5px;
+    flex-grow: 1;
 
     &:hover {
         background-color: var(--mantine-color-scheme);

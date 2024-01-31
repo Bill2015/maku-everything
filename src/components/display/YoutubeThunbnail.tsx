@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { CiImageOff } from 'react-icons/ci';
 import { Center, Image } from '@mantine/core';
 import { getYoutubeVideoId } from '@utils/urlParser';
@@ -5,8 +6,10 @@ import { getYoutubeVideoId } from '@utils/urlParser';
 import { useMemo, useRef, useState } from 'react';
 import { ResponsiveImageProps } from './ResponsiveImage';
 
-export interface YoutubeThumbnailProps extends Omit<ResponsiveImageProps, 'src'> {
+export interface YoutubeThumbnailProps extends Omit<ResponsiveImageProps, 'src' | 'ref'> {
     url: string;
+
+    useBackgoundImg?: boolean;
 }
 
 /**
@@ -19,7 +22,7 @@ export interface YoutubeThumbnailProps extends Omit<ResponsiveImageProps, 'src'>
  * #### Default
  * https://img.youtube.com/vi/${videoId}/0.jpg */
 export function YoutubeThumbnail(props: YoutubeThumbnailProps) {
-    const { url } = props;
+    const { url, alt, useBackgoundImg = false, ...imgProps } = props;
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const ref = useRef<HTMLImageElement | null>(null);
@@ -50,6 +53,8 @@ export function YoutubeThumbnail(props: YoutubeThumbnailProps) {
         return createURL(videoId, 'max-resoultion');
     }, [url, isLoaded]);
 
+    const sourceProps = useBackgoundImg ? { style: { backgroundImage: `url(${imageURL})` } } : { src: imageURL, alt: alt };
+
     if (!imageURL) {
         return (
             <Center>
@@ -61,13 +66,10 @@ export function YoutubeThumbnail(props: YoutubeThumbnailProps) {
     return (
         <Image
             ref={ref}
-            style={{
-                objectFit: 'scale-down',
-                width:     '100%',
-                height:    '100%',
-            }}
             onLoad={() => setIsLoaded(true)}
             src={imageURL}
+            {...imgProps}
+            {...sourceProps}
         />
     );
 }

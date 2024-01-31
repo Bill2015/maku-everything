@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ResourceAPI } from './ResourceAPI';
-import { ResourceResDto, ResourceTagDto } from './Dto';
+import { QueryResoruceDto, ResourceResDto, ResourceTagDto } from './Dto';
 
 export interface IResourceTagGroup {
     subjectName: string;
@@ -42,6 +42,18 @@ export namespace ResourceQuery {
             queryKey:        ['resource', 'belong-category', categoryId],
             queryFn:         queryfn,
             enabled:         !!categoryId,
+            placeholderData: [],
+            initialData:     [],
+        });
+    }
+
+    export function useQuerying(query: QueryResoruceDto) {
+        const queryfn = () => ResourceAPI.query(query);
+
+        return useQuery({
+            queryKey:        ['resource', query],
+            queryFn:         queryfn,
+            enabled:         !!query,
             placeholderData: [],
             initialData:     [],
         });

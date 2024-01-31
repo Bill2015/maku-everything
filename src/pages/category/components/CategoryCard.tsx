@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import {
     Card, Group, Text, Badge, Button, rem, Spoiler, Box, Title, Divider, ActionIcon, Menu,
 } from '@mantine/core';
@@ -8,10 +9,13 @@ import { LuPin } from 'react-icons/lu';
 
 import { CategoryMutation, CategoryResDto } from '@api/category';
 
+import { ImagePreviewFlex } from '@components/layout';
+import { ResourceThumbnailDisplayer } from '@components/display';
 import { showNotification } from '@components/notification';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCategoryNavigate } from '@router/navigateHook';
-import { useCallback } from 'react';
+import { ResourceQuery } from '@api/resource';
+
 import classes from './CategoryCard.module.scss';
 
 export interface CategoryCardProps {
@@ -19,45 +23,59 @@ export interface CategoryCardProps {
 }
 
 export function CategoryCard(props: CategoryCardProps) {
-    const { data } = props;
+    const { data: categoryData } = props;
     const { setActiveCategory } = useActiveCategoryRedux();
     const navigateCategoryTo = useCategoryNavigate();
     const exportCategory = CategoryMutation.useExport();
 
+    const { data: resourceData } = ResourceQuery.useQuerying({
+        belong_category: categoryData.id,
+        order_by:        'updated_at',
+        limit:           5,
+    });
+
     // on load category
     const handleLoadClick = useCallback(async () => {
-        showNotification('Loaded Category', data.name);
-        setActiveCategory({ id: data.id, name: data.name });
-        navigateCategoryTo(data.name);
-    }, [data, setActiveCategory, navigateCategoryTo]);
+        showNotification('Loaded Category', categoryData.name);
+        setActiveCategory({ id: categoryData.id, name: categoryData.name });
+        navigateCategoryTo(categoryData.name);
+    }, [categoryData, setActiveCategory, navigateCategoryTo]);
 
     // on export click
     const handleExportClick = useCallback(async () => {
-        await exportCategory.mutateAsync({ id: data.id });
-    }, [exportCategory, data]);
+        await exportCategory.mutateAsync({ id: categoryData.id });
+    }, [exportCategory, categoryData]);
 
     return (
         <Card shadow="sm" padding="md" pt="xs" radius="md" withBorder classNames={{ root: classes.card }}>
+            <Card.Section>
+                <ImagePreviewFlex>
+                    {
+                        resourceData.map((data) => <ResourceThumbnailDisplayer key={data.id} data={data} useBackgoundImg />)
+                    }
+                </ImagePreviewFlex>
+            </Card.Section>
+
             <Title order={3} display="flex">
-                <Box component="span" pr="sm">{data.name}</Box>
-                <Badge color="cyan" variant="light" mt={rem(8)}>{data.resource_num}</Badge>
+                <Box component="span" pr="sm">{categoryData.name}</Box>
+                <Badge color="cyan" variant="light" mt={rem(8)}>{categoryData.resource_num}</Badge>
             </Title>
             <Divider orientation="horizontal" size={1} />
 
             <Spoiler maxHeight={120} showLabel="Show more" hideLabel="Hide">
                 <Box maw={300}>
-                    <Text>{data.description}</Text>
+                    <Text>{categoryData.description}</Text>
                 </Box>
             </Spoiler>
 
             <Group mt="md" mb="xs">
                 <Text style={{ width: '100%' }} size={rem(5)}>
                     Created At:
-                    {data.created_at}
+                    {categoryData.created_at}
                 </Text>
                 <Text style={{ width: '100%' }} size={rem(5)}>
                     Updated At:
-                    {data.updated_at}
+                    {categoryData.updated_at}
                 </Text>
             </Group>
 
@@ -81,7 +99,7 @@ export function CategoryCard(props: CategoryCardProps) {
                 </Menu.Target>
                 <Menu.Dropdown>
                     <Menu.Label>
-                        {`${data.name}`}
+                        {`${categoryData.name}`}
                     </Menu.Label>
                     <Menu.Item leftSection={<IoSettingsOutline />}>
                         Settings
