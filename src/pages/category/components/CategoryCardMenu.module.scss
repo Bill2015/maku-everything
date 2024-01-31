@@ -1,0 +1,17 @@
+.menuBtn {
+    color: var(--mantine-color-default-color);
+    opacity: 0.55;
+    border: none;
+    right: 0px;
+    top: 2px;
+
+    &[aria-expanded="true"] {
+        color: var(--mantine-primary-color-3);   
+        opacity: 1.0; 
+    }
+
+    svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}

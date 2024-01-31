@@ -1,9 +1,8 @@
-import { convertFileSrc } from '@tauri-apps/api/tauri';
 import {
-    Card, Group, Text, Button, rem, Tooltip, Divider, Accordion,
+    Card, Group, Text, Button, Tooltip, Divider, Accordion, Stack,
 } from '@mantine/core';
 import { ResourceResDto } from '@api/resource';
-import { LinkIcon, ResponsiveImage, YoutubeThumbnail } from '@components/display';
+import { DateTimeDisplayer, LinkIcon, ResourceThumbnailDisplayer } from '@components/display';
 
 import classes from './ResourceCard.module.scss';
 
@@ -30,11 +29,7 @@ export function ResourceCard(props: ResourceCardProps) {
                         />
                     )
                 }
-                {
-                    data.file === null
-                        ? <YoutubeThumbnail url={data.url!.full} />
-                        : <ResponsiveImage src={convertFileSrc(data.root_path + data.file!.path)} alt={data.name} width="100%" height="100%" />
-                }
+                <ResourceThumbnailDisplayer data={data} />
             </Card.Section>
             <Accordion defaultValue="" classNames={{ content: classes.accordioncontent }}>
                 <Accordion.Item value={data.name}>
@@ -47,18 +42,14 @@ export function ResourceCard(props: ResourceCardProps) {
                         <Divider />
                         <Text pt="xs">{data.description}</Text>
 
-                        <Text style={{ width: '100%' }} size={rem(5)}>
-                            Created At:
-                            {data.created_at}
-                        </Text>
-                        <Text style={{ width: '100%' }} size={rem(5)}>
-                            Updated At:
-                            {data.updated_at}
-                        </Text>
+                        <Stack gap="xs">
+                            <DateTimeDisplayer label="Created At:" date={data.created_at} />
+                            <DateTimeDisplayer label="Updated At:" date={data.updated_at} />
 
-                        <Group justify="flex-end">
-                            <Button onClick={() => onDetailClick(data)}>Detail</Button>
-                        </Group>
+                            <Group justify="flex-end">
+                                <Button onClick={() => onDetailClick(data)}>Detail</Button>
+                            </Group>
+                        </Stack>
                     </Accordion.Panel>
                 </Accordion.Item>
             </Accordion>

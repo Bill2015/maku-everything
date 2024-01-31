@@ -1,22 +1,19 @@
 import { useCallback } from 'react';
 import {
-    Card, Group, Text, Badge, Button, rem, Spoiler, Box, Title, Divider, ActionIcon, Menu,
+    Card, Group, Text, Badge, Button, rem, Spoiler, Box, Title, Divider, Stack,
 } from '@mantine/core';
-import { CgExport } from 'react-icons/cg';
-import { MdOutlineMoreVert } from 'react-icons/md';
-import { IoSettingsOutline } from 'react-icons/io5';
-import { LuPin } from 'react-icons/lu';
 
 import { CategoryMutation, CategoryResDto } from '@api/category';
 
 import { ImagePreviewFlex } from '@components/layout';
-import { ResourceThumbnailDisplayer } from '@components/display';
+import { ResourceThumbnailDisplayer, DateTimeDisplayer } from '@components/display';
 import { showNotification } from '@components/notification';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCategoryNavigate } from '@router/navigateHook';
 import { ResourceQuery } from '@api/resource';
 
 import classes from './CategoryCard.module.scss';
+import { CategoryCardMenu } from './CategoryCardMenu';
 
 export interface CategoryCardProps {
     data: CategoryResDto;
@@ -56,9 +53,13 @@ export function CategoryCard(props: CategoryCardProps) {
                 </ImagePreviewFlex>
             </Card.Section>
 
-            <Title order={3} display="flex">
+            <Title order={3} display="flex" pos="relative">
                 <Box component="span" pr="sm">{categoryData.name}</Box>
                 <Badge color="cyan" variant="light" mt={rem(8)}>{categoryData.resource_num}</Badge>
+                <CategoryCardMenu
+                    name={categoryData.name}
+                    onExportclick={handleExportClick}
+                />
             </Title>
             <Divider orientation="horizontal" size={1} />
 
@@ -68,51 +69,14 @@ export function CategoryCard(props: CategoryCardProps) {
                 </Box>
             </Spoiler>
 
-            <Group mt="md" mb="xs">
-                <Text style={{ width: '100%' }} size={rem(5)}>
-                    Created At:
-                    {categoryData.created_at}
-                </Text>
-                <Text style={{ width: '100%' }} size={rem(5)}>
-                    Updated At:
-                    {categoryData.updated_at}
-                </Text>
-            </Group>
+            <Stack mt="md" mb="xs" gap="xs">
+                <DateTimeDisplayer label="Created At:" date={categoryData.created_at} />
+                <DateTimeDisplayer label="Updated At:" date={categoryData.updated_at} />
+            </Stack>
 
             <Group>
                 <Button onClick={handleLoadClick}>Load</Button>
             </Group>
-
-            <Menu
-                shadow="md"
-                withArrow
-                loop
-                width={200}
-                position="bottom-start"
-                arrowSize={14}
-                offset={0}
-            >
-                <Menu.Target>
-                    <ActionIcon pos="absolute" variant="outline" classNames={{ root: classes.menuBtn }}>
-                        <MdOutlineMoreVert />
-                    </ActionIcon>
-                </Menu.Target>
-                <Menu.Dropdown>
-                    <Menu.Label>
-                        {`${categoryData.name}`}
-                    </Menu.Label>
-                    <Menu.Item leftSection={<IoSettingsOutline />}>
-                        Settings
-                    </Menu.Item>
-                    <Menu.Item leftSection={<LuPin />}>
-                        Pin
-                    </Menu.Item>
-                    <Menu.Item leftSection={<CgExport />} onClick={handleExportClick}>
-                        Export
-                    </Menu.Item>
-                </Menu.Dropdown>
-            </Menu>
-
         </Card>
     );
 }
