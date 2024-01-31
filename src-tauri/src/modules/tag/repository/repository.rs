@@ -4,12 +4,12 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
-use crate::modules::common::infrastructure::IRepoMapper;
+use crate::modules::common::infrastructure::{IRepoMapper, QueryBuilderResult};
 use crate::modules::common::repository::env;
 use crate::modules::common::repository::tablens;
 use crate::modules::common::repository::{CommonRepository, COMMON_REPOSITORY};
 use crate::tag::domain::{TagAggregate, TagID};
-use crate::tag::infrastructure::{TagQueryBuilder, TagRepoMapper};
+use crate::tag::infrastructure::TagRepoMapper;
 
 pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -43,12 +43,12 @@ impl<'a> TagRepository<'a> {
         }
     }
 
-    pub async fn get_by(&self, builder: TagQueryBuilder) -> surrealdb::Result<Vec<TagAggregate>> {
+    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<TagAggregate>> {
         let sql = format!(r#"
             SELECT 
                 *
             FROM type::table($table) WHERE {}"#, 
-            builder.build());
+            builder_result.to_string());
 
         let result: Vec<TagAggregate> = self.db
             .query(sql)

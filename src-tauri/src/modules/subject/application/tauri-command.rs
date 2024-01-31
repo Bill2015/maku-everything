@@ -45,13 +45,17 @@ pub async fn list_subjects(
     name: Option<String>,
     belong_category: Option<String>, 
     order_by: Option<String>,
+    limit: Option<i64>,
+    start: Option<i64>,
 ) -> Result<Vec<SubjectResDto>, SubjectError> {
     let result = SUBJECT_SERVICE
         .list_subjects(
             id, 
             name, 
             belong_category, 
-            order_by
+            order_by,
+            limit,
+            start,
         )
         .await?;
 

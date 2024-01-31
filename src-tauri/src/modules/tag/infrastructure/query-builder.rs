@@ -1,9 +1,12 @@
 use std::ops::Add;
 
+use crate::impl_query_builder;
+use crate::modules::common::infrastructure::{QueryBuilder, BaseQueryBuilder, BaseQueryBuilderError, QueryBuilderResult};
 use crate::modules::tag::application::query::ListTagQuery;
 
-#[derive(Debug)]
 pub struct TagQueryBuilder {
+    pub base_builder: BaseQueryBuilder,
+
     pub id: Option<String>,
 
     pub name: Option<String>,
@@ -15,135 +18,66 @@ pub struct TagQueryBuilder {
     pub belong_subject_name: Option<String>,
 
     pub tagging_resource: Option<String>,
-
-    pub order_by: Option<String>,
 }
+impl_query_builder!(TagQueryBuilder, { id, name, belong_category, belong_subject, belong_subject_name, tagging_resource });
 
 impl TagQueryBuilder {
     pub fn new() -> TagQueryBuilder {
-        TagQueryBuilder { 
+        TagQueryBuilder {
+            base_builder: BaseQueryBuilder::new(),
             id: None,
             name: None,
             belong_category: None,
             belong_subject: None,
             belong_subject_name: None,
             tagging_resource: None,
-            order_by: None,
         }
     }
 
-    pub fn set_id<S: Into<String>>(mut self, id: S) -> TagQueryBuilder {
-        let id: String = id.into();
-        if !id.is_empty() {
-            self.id = Some(format!("id == {}", id));
-        }
-        self
-    }
+    fn build_string(&self) -> Result<String, BaseQueryBuilderError> {
+        let qdata: Vec<Option<String>> = vec![
+            self.id.as_ref()
+                .map(|v| format!("id == {}", v).into()),
 
-    pub fn set_name(mut self, name: &String) -> TagQueryBuilder {
-        if !name.is_empty() {
-            self.name = Some(format!("string::lowercase(name) == string::lowercase(\"{}\")", name));
-        }
-        self
-    }
+            self.name.as_ref()
+                .map(|v| format!("string::lowercase(name) == string::lowercase(\"{}\")", v)),
 
-    pub fn set_belong_category<S: Into<String>>(mut self, category_id: S) -> TagQueryBuilder {
-        let category_id: String = category_id.into();
-        if !category_id.is_empty() {
-            self.belong_category = Some(format!("belong_category == '{}'", category_id));
-        }
-        self
-    }
+            self.belong_category.as_ref()
+                .map(|v| format!("belong_category == \"{}\"", v)),
 
-    pub fn set_belong_subject<S: Into<String>>(mut self, subject_id: S) -> TagQueryBuilder {
-        let subject_id: String = subject_id.into();
-        if !subject_id.is_empty() {
-            self.belong_subject = Some(format!("belong_subject == {}", subject_id));
-        } 
-        self
-    }
+            self.belong_subject.as_ref()
+                .map(|v| format!("belong_subject == {}", v)),
 
-    pub fn set_belong_subject_name(mut self, subject_name: &String) -> TagQueryBuilder {
-        if !subject_name.is_empty() {
-            self.belong_subject_name = Some(
-                format!("string::lowercase(belong_subject.name) == string::lowercase(\"{}\")", subject_name)
-            );
-        }
-        self
-    }
+            self.belong_subject_name.as_ref()
+                .map(|v| format!("string::lowercase(belong_subject.name) == string::lowercase(\"{}\")", v)),
 
-    pub fn set_tagging_resource(mut self, resource_id: &String) -> TagQueryBuilder {
-        if !resource_id.is_empty() {
-            self.tagging_resource = Some(format!("->tagging.out CONTAINS {}", resource_id));
-        }
-        self
-    }
-
-    pub fn set_order_by(mut self, field_name: &String) -> TagQueryBuilder {
-        if !field_name.is_empty() {
-            self.order_by = Some(format!("ORDER BY {}", field_name));
-        }
-        self
-    }
-
-    pub fn build(&self) -> String {
-        let mut query_data: Vec<Option<String>> = Vec::new();
-        // NOTE: It seems a code smell
-        query_data.push(self.id.to_owned());
-        query_data.push(self.name.to_owned());
-        query_data.push(self.belong_category.to_owned());
-        query_data.push(self.belong_subject.to_owned());
-        query_data.push(self.belong_subject_name.to_owned());
-        query_data.push(self.tagging_resource.to_owned());
-        
-        let query_string: String = query_data
-                                .iter()
-                                .filter(|x| x.is_some())
-                                .map(|v| String::from(v.as_ref().unwrap()))
-                                .collect::<Vec<String>>()
-                                .join(" AND ");
-        
-        // order By query string
-        if let Some(order_by) = &self.order_by {
-            let reuslt = query_string.add(format!(" ORDER BY {}", order_by).as_str());
-            return reuslt;
-        }
-        
-        query_string
+            self.tagging_resource.as_ref()
+                .map(|v| format!("->tagging.out CONTAINS {}", v))
+        ];
+    
+        let base_result = self.base_builder.build()?;
+        Ok(qdata
+            .into_iter()
+            .filter_map(|x| x)
+            .collect::<Vec<String>>()
+            .join(" AND ")
+            .add(" ")
+            .add(base_result.to_string().as_str())
+        )
     }
 }
 
 impl From<ListTagQuery> for TagQueryBuilder {
     fn from(value: ListTagQuery) -> Self {
-        let mut builder = TagQueryBuilder::new();
-
-        if let Some(id) = value.id {
-            builder = builder.set_id(id);
-        }
-
-        if let Some(name) = value.name {
-            builder = builder.set_name(&name);
-        }
-
-        if let Some(category_id) = value.belong_category {
-            builder = builder.set_belong_category(&category_id);
-        }
-
-        if let Some(subject_id) = value.belong_subject {
-            builder = builder.set_belong_subject(&subject_id);
-        }
-
-        if let Some(subject_name) = value.belong_subject_name {
-            builder = builder.set_belong_subject_name(&subject_name);
-        }
-
-        if let Some(resource_id) = value.tagging_resource {
-            builder = builder.set_tagging_resource(&resource_id);
-        }
-
-        if let Some(field_name) = value.order_by {
-            builder = builder.set_order_by(&field_name);
-        }
+        let builder = TagQueryBuilder {
+            base_builder: BaseQueryBuilder::from_value(value.order_by, value.limit, value.start),
+            id: value.id,
+            name: value.name,
+            belong_category: value.belong_category,
+            belong_subject: value.belong_subject,
+            belong_subject_name: value.belong_subject_name,
+            tagging_resource: value.tagging_resource,
+        };
 
         builder
     }

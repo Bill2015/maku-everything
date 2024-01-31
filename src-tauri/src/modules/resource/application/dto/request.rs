@@ -47,4 +47,8 @@ pub struct ResourceListQueryDto {
     pub belong_category: Option<String>, 
 
     pub order_by: Option<String>,
+
+    pub limit: Option<i64>,
+
+    pub start: Option<i64>,
 }

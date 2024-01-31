@@ -2,6 +2,7 @@ use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::modules::common::application::IQueryHandler;
+use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::tag::domain::TagGenericError;
 use crate::modules::tag::infrastructure::TagQueryBuilder;
 use crate::modules::tag::repository::TagQueryRepository;
@@ -21,6 +22,10 @@ pub struct ListTagQuery {
     pub tagging_resource: Option<String>,
 
     pub order_by: Option<String>,
+
+    pub limit: Option<i64>,
+
+    pub start: Option<i64>,
 }
 
 // =====================================
@@ -43,10 +48,10 @@ impl IQueryHandler<ListTagQuery> for ListTagHandler<'_>{
     type Output = Vec<TagResDto>;
 
     async fn query(&self, query: ListTagQuery) -> Result<Self::Output, Error> {
-        let query_builder = TagQueryBuilder::from(query);
+        let buildr_result = TagQueryBuilder::from(query).build()?;
 
         let result = self.tag_repo
-            .query(query_builder)
+            .query(buildr_result)
             .await;
     
         match result {

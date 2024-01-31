@@ -2,6 +2,7 @@ use anyhow::Error;
 use async_trait::async_trait;
 
 use crate::modules::common::application::IQueryHandler;
+use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::subject::domain::SubjectGenericError;
 use crate::modules::subject::infrastructure::SubjectQueryBuilder;
 use crate::modules::subject::repository::SubjectQueryRepository;
@@ -15,6 +16,10 @@ pub struct ListSubjectQuery {
     pub belong_category: Option<String>, 
 
     pub order_by: Option<String>,
+    
+    pub limit: Option<i64>,
+
+    pub start: Option<i64>,
 }
 
 // =====================================
@@ -37,7 +42,7 @@ impl IQueryHandler<ListSubjectQuery> for ListSubjectHandler<'_>{
     type Output = Vec<SubjectResDto>;
 
     async fn query(&self, query: ListSubjectQuery) -> Result<Self::Output, Error> {
-        let query_builder = SubjectQueryBuilder::from(query);
+        let query_builder = SubjectQueryBuilder::from(query).build()?;
 
         let result = self.subject_repo
             .query(query_builder)

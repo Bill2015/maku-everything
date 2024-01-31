@@ -85,12 +85,16 @@ impl<'a> SubjectService<'a> {
         name: Option<String>,
         belong_category: Option<String>, 
         order_by: Option<String>,
+        limit: Option<i64>,
+        start: Option<i64>,
     ) -> Result<Vec<SubjectResDto>, SubjectError> {
         let query = ListSubjectQuery { 
             id,
             name,
             belong_category,
-            order_by
+            order_by,
+            limit,
+            start,
         };
         
         let result = ListSubjectHandler::register(self.subject_queryrepo)

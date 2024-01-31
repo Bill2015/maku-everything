@@ -1,3 +1,4 @@
+use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::tag::repository::TagQueryRepository;
 use crate::modules::tag::infrastructure::TagQueryBuilder;
 use crate::modules::resource::infrastructure::{AttributeValue, AttributeValueType, SystemTag};
@@ -90,17 +91,20 @@ impl<'a> StringQLSemantic<'a> {
         for token in self.tokens.iter_mut() {
             if let QueryToken::TagToken { namespace, value, .. } = token {
                 let mut builder = TagQueryBuilder::new()
-                    .set_name(&value);
+                    .set_name(value.to_string());
 
                 if let Some(namepace) = namespace {
-                    builder = builder.set_belong_subject_name(&namepace);
+                    builder = builder.set_belong_subject_name(namepace.to_string());
                 }
 
                 if let Some(category) = self.belong_category {
                     builder = builder.set_belong_category(category);
                 }
 
-                let result = &self.repo.query(builder)
+                let builder_result = builder.build()
+                    .map_err(|err| ResourceGenericError::InvalidQueryingString { message: err.to_string() })?;
+
+                let result = &self.repo.query(builder_result)
                     .await
                     .or(Err(ResourceGenericError::DBInternalError()))?;
 

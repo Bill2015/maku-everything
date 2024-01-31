@@ -3,9 +3,9 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::thing;
 
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::env;
 use crate::tag::application::dto::TagResDto;
-use crate::tag::infrastructure::TagQueryBuilder;
 
 pub static TAG_QUERY_REPOSITORY: TagQueryRepository<'_> = TagQueryRepository::init(&env::DB);
 
@@ -68,9 +68,7 @@ impl<'a> TagQueryRepository<'a> {
         Ok(result) 
     }
 
-    pub async fn query(&self, builder: TagQueryBuilder) -> surrealdb::Result<Vec<TagResDto>> {
-        let query_string = builder.build();
-
+    pub async fn query(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<TagResDto>> {
         let sql = format!(r#"
             SELECT 
                 *,
@@ -81,7 +79,7 @@ impl<'a> TagQueryRepository<'a> {
             Self::SUBJECT_NAME_FIELD,
             Self::CATEGORY_NAME_FIELD,
             Self::TAGGED_COUNT_FIELD,
-            query_string = query_string);
+            query_string = builder_result.to_string());
 
         let mut response = self.db
             .query(sql)

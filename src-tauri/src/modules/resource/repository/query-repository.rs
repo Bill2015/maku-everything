@@ -3,10 +3,11 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::thing;
 
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens};
 use crate::modules::resource::application::dto::ResourceResDto;
 use crate::modules::resource::application::dto::ResourceDetailDto;
-use crate::modules::resource::infrastructure::{ResourceQueryBuilder, ResourceStringQL};
+use crate::modules::resource::infrastructure::ResourceStringQL;
 
 pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQueryRepository::init(&env::DB);
 
@@ -89,15 +90,14 @@ impl<'a> ResourceQueryRepository<'a> {
         Ok(result) 
     }
 
-    pub async fn query(&self, builder: ResourceQueryBuilder) -> surrealdb::Result<Vec<ResourceResDto>> {
-        let query_string = builder.build();
-
+    pub async fn query(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<ResourceResDto>> {
+        dbg!(&builder_result.to_string());
         let sql = format!(
             r#"SELECT 
                 *,
                 {}
             FROM type::table($table) WHERE {query_string}"#, 
-            Self::ROOT_PATH_FIELD, query_string = query_string);
+            Self::ROOT_PATH_FIELD, query_string = builder_result.to_string());
 
         let result: Vec<ResourceResDto> = self.db
             .query(sql)

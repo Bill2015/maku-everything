@@ -4,6 +4,7 @@ use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::modules::common::application::IQueryHandler;
+use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::resource::domain::ResourceGenericError;
 use crate::modules::resource::infrastructure::ResourceQueryBuilder;
 use crate::modules::resource::repository::ResourceQueryRepository;
@@ -18,6 +19,10 @@ pub struct ListResourceQuery {
     pub belong_category: Option<String>, 
 
     pub order_by: Option<String>,
+
+    pub limit: Option<i64>,
+
+    pub start: Option<i64>,
 }
 command_from_dto!(ListResourceQuery, ResourceListQueryDto);
 
@@ -41,10 +46,10 @@ impl IQueryHandler<ListResourceQuery> for ListResourceHandler<'_>{
     type Output = Vec<ResourceResDto>;
 
     async fn query(&self, query: ListResourceQuery) -> Result<Self::Output, Error> {
-        let query_builder = ResourceQueryBuilder::from(query);
+        let builder_result = ResourceQueryBuilder::from(query).build()?;
 
         let result = self.resource_repo
-            .query(query_builder)
+            .query(builder_result)
             .await;
     
         match result {

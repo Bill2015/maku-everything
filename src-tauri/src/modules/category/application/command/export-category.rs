@@ -8,6 +8,7 @@ use crate::modules::category::domain::CategoryGenericError;
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::common::application::ICommandHandler;
 use crate::modules::common::domain::Porting;
+use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::resource::domain::{PortingResourceObject, ResourceGenericError};
 use crate::modules::resource::infrastructure::ResourceQueryBuilder;
 use crate::modules::resource::repository::ResourceRepository;
@@ -74,6 +75,7 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .get_by(
                 SubjectQueryBuilder::new()
                     .set_belong_category(&category_id)
+                    .build()?
             )
             .await
             .or(Err(SubjectGenericError::DBInternalError()))?
@@ -87,6 +89,7 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .get_by(
                 TagQueryBuilder::new()
                     .set_belong_category(&category_id)
+                    .build()?
             )
             .await
             .or(Err(TagGenericError::DBInternalError()))?
@@ -100,6 +103,7 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .get_by(
                 ResourceQueryBuilder::new()
                     .set_belong_category(&category_id)
+                    .build()?
             )
             .await
             .or(Err(ResourceGenericError::DBInternalError()))?

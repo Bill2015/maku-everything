@@ -96,6 +96,8 @@ impl<'a> TagService<'a> {
         belong_subject_name: Option<String>,
         tagging_resource: Option<String>,
         order_by: Option<String>,
+        limit: Option<i64>,
+        start: Option<i64>,
     ) -> Result<Vec<TagResDto>, TagError> {
         let query = ListTagQuery { 
             id,
@@ -104,7 +106,9 @@ impl<'a> TagService<'a> {
             belong_subject,
             belong_subject_name,
             tagging_resource,
-            order_by
+            order_by,
+            limit,
+            start,
         };
         
         let result = ListTagHandler::register(self.tag_queryrepo)

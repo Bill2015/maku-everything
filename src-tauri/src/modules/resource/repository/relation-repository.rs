@@ -3,7 +3,6 @@ use surrealdb::Surreal;
 use surrealdb::sql::thing;
 use surrealdb::engine::remote::ws::Client;
 
-use crate::modules::common::domain::ID;
 use crate::modules::common::repository::{env, relatens};
 use crate::modules::resource::domain::ResourceID;
 use crate::modules::tag::domain::TagID;
