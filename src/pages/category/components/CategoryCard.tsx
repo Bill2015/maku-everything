@@ -93,7 +93,7 @@ export function CategoryCard(props: CategoryCardProps) {
                 offset={0}
             >
                 <Menu.Target>
-                    <ActionIcon pos="absolute" right="10px" variant="outline" classNames={{ root: classes.menuBtn }}>
+                    <ActionIcon pos="absolute" variant="outline" classNames={{ root: classes.menuBtn }}>
                         <MdOutlineMoreVert />
                     </ActionIcon>
                 </Menu.Target>
