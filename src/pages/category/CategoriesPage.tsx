@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
-import { Grid, Stack, Skeleton, Title, Button, ScrollArea, Flex } from '@mantine/core';
+import { Grid, Stack, Skeleton, Title, Button, ScrollArea } from '@mantine/core';
 
 import { ModalName, useModelConfirmAction } from '@store/modal';
 import { CategoryCreateDto, CategoryMutation, CategoryQuery } from '@api/category';
@@ -12,8 +12,6 @@ export default function CategoriesPage() {
     const createCategory = CategoryMutation.useCreate();
 
     const [opened, { open, close }] = useDisclosure(false);
-
-    const categoryItems = categories.map((val) => <CategoryCard key={val.id} data={val} />);
 
     // When Create Confirm
     const handleCreateConfirm = useCallback(async (data: CategoryCreateDto) => {
@@ -36,13 +34,18 @@ export default function CategoriesPage() {
                         <Button onClick={open}>Create Category</Button>
                     </Grid.Col>
                 </Grid>
-                <ScrollArea style={{ textAlign: 'start', margin: 0 }} mah="80vh">
+                <ScrollArea.Autosize type="auto">
                     <Skeleton visible={isCategoriesLoading}>
-                        <Flex align="flex-start" gap="sm" wrap="wrap" pr={20} pl={20}>
-                            {categoryItems}
-                        </Flex>
+                        <Grid w="inherit" p={10}>
+                            {categories.map((val) => (
+                                // eslint-disable-next-line object-curly-newline
+                                <Grid.Col span={{ base: 12, xs: 6, sm: 6, md: 4, lg: 3 }}>
+                                    <CategoryCard key={val.id} data={val} />
+                                </Grid.Col>
+                            ))}
+                        </Grid>
                     </Skeleton>
-                </ScrollArea>
+                </ScrollArea.Autosize>
             </Stack>
             <CreateCategoryModal
                 opened={opened}

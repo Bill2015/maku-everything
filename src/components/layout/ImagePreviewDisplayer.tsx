@@ -21,7 +21,7 @@ export function ImagePreviewFlex(props: ImagePreviewFlexProps) {
     });
 
     return (
-        <Flex h={300} display="flex" align="center" justify="center">
+        <Flex h={200} display="flex" align="center" justify="center">
             {newChildren}
         </Flex>
     );

@@ -10,9 +10,13 @@
     max-height: 1px;
 } */
 
-.main > * {
-    width: 100%;
+.main {
+    max-height: 100dvh;
+    & > * {
+        width: 100%;
+    }
 }
+
 
 .notification {
     --notification-color: var(--mantine-color-body) !important;
