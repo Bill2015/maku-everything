@@ -4,7 +4,6 @@ use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
 
-use crate::modules::common::domain::Porting;
 use crate::modules::common::infrastructure::date;
 use crate::modules::common::domain::ID;
 
@@ -30,7 +29,7 @@ pub struct CategoryAggregate {
 }
 
 impl CategoryAggregate {
-    fn relove_path(path: String) -> Result<String, CategoryGenericError> {
+    pub fn relove_path(path: String) -> Result<String, CategoryGenericError> {
         // path can't be empty
         if path.is_empty() {
             return Err(CategoryGenericError::RootPathIsEmpty());
@@ -110,27 +109,3 @@ impl CategoryAggregate {
         self.auth = new_auth;
     }
 }
-
-impl Porting<PortingCategoryObject> for CategoryAggregate {
-    type Err = CategoryGenericError;
-    fn import_from(data: PortingCategoryObject) -> Result<Self, Self::Err> {
-        let new_path = Self::relove_path(data.root_path)?;
-        let mut category = Self::new(data.name, data.description, new_path)?;
-        category.set_created_at(&data.created_at)?;
-        category.set_updated_at(&data.updated_at)?;
-        Ok(category)
-    }
-
-    fn export_to(self) -> Result<PortingCategoryObject, Self::Err> {
-        Ok(PortingCategoryObject {
-            id: self.id,
-            name: self.name,
-            description: self.description,
-            root_path: self.root_path,
-            created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
-            updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
-            auth: self.auth,
-        })
-    }
-}
-

@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use serde::Serialize;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::common::infrastructure::date;
-use crate::modules::common::domain::{Porting, ID};
+use crate::modules::common::domain::ID;
 
 mod id;
 pub use id::ResourceID;
@@ -125,54 +125,4 @@ impl ResourceAggregate {
     pub fn get_mut_tagging(&mut self) -> &mut ResourceTaggingEntity {
         &mut self.tagging
     }
-}
-
-impl Porting<PortingResourceObject> for ResourceAggregate {
-    type Err = ResourceGenericError;
-
-    fn import_from(data: PortingResourceObject) -> Result<Self, Self::Err> {
-        let file = data.file
-            .map(|val| ResourceFileVO::new(&data.root_path, val))
-            .transpose()?;
-
-        let url = data.url
-            .map(|val| ResourceUrlVO::new(val))
-            .transpose()?;
-
-        let tagging = ResourceTaggingEntity::try_from(data.tags)?;
-
-        let new_res = ResourceAggregate {
-            id: ResourceID::new(),
-            name: data.name,
-            description: data.description,
-            belong_category: data.belong_category,
-            root_path: data.root_path,
-            file: file,
-            url: url,
-            auth: data.auth,
-            tagging: tagging,
-            created_at: NaiveDateTime::parse_from_str(&data.created_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
-            updated_at: NaiveDateTime::parse_from_str(&data.updated_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
-        };
-
-        Ok(new_res)
-    }
-
-    fn export_to(self) -> Result<PortingResourceObject, Self::Err> {
-        Ok(PortingResourceObject {
-            id: self.id,
-            name: self.name,
-            description: self.description,
-            belong_category: self.belong_category,
-            file: self.file.map(|x| x.path),
-            root_path: self.root_path,
-            url: self.url.map(|x| x.full),
-            created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
-            updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
-            tags: self.tagging.into(),
-            auth: self.auth,            
-        })
-    }
-
-    
 }
