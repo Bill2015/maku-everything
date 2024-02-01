@@ -52,4 +52,8 @@ impl ResourceTaggingEntity {
     pub fn vals(&self) -> &Vec<ResourceTaggingVO> {
         &self.tags
     }
+
+    pub fn get(self) -> (Vec<ResourceTaggingVO>, Vec<ResourceTaggingVO>, Vec<ResourceTaggingVO>) {
+        (self.tags, self.add_tags, self.del_tags)
+    }
 }

@@ -154,7 +154,6 @@ impl<'a> ImportCategoryHandler<'a> {
                 tags: new_tags,
                 ..res
             })?;
-            dbg!(&new_res);
 
             new_resources.push(new_res);
         }
