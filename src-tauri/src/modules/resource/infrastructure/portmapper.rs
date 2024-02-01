@@ -1,7 +1,5 @@
-use chrono::NaiveDateTime;
-
 use crate::modules::common::domain::{Porting, ID};
-use crate::modules::common::infrastructure::date;
+use crate::modules::common::infrastructure::dateutils;
 use crate::modules::resource::domain::entities::ResourceTaggingEntity;
 use crate::modules::resource::domain::valueobj::{ResourceFileVO, ResourceTaggingVO, ResourceUrlVO};
 use crate::modules::resource::domain::{PortingResourceObject, PortingResourceTaggingObject, ResourceAggregate, ResourceGenericError, ResourceID};
@@ -13,7 +11,7 @@ impl Porting<Vec<PortingResourceTaggingObject>> for ResourceTaggingEntity {
         let tags = data
             .into_iter()
             .map(|val| {
-                if let Ok(date) = NaiveDateTime::parse_from_str(&val.added_at, date::DATE_TIME_FORMAT) {
+                if let Ok(date) = dateutils::parse(&val.added_at) {
                     return Ok(ResourceTaggingVO { id: val.id, added_at: date.and_utc() });
                 }
                 
@@ -29,7 +27,7 @@ impl Porting<Vec<PortingResourceTaggingObject>> for ResourceTaggingEntity {
             .into_iter()
             .map(move |x| PortingResourceTaggingObject {
                 id: x.id.clone(),
-                added_at: x.added_at.format(date::DATE_TIME_FORMAT).to_string(),
+                added_at: dateutils::format(x.added_at),
             })
             .collect::<Vec<PortingResourceTaggingObject>>()
         )
@@ -60,8 +58,12 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
             url: url,
             auth: data.auth,
             tagging: tagging,
-            created_at: NaiveDateTime::parse_from_str(&data.created_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
-            updated_at: NaiveDateTime::parse_from_str(&data.updated_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
+            created_at: dateutils::parse(&data.created_at)
+                .map_err(|_| ResourceGenericError::InvalidDateFormat())?
+                .and_utc(),
+            updated_at: dateutils::parse(&data.updated_at)
+                .map_err(|_| ResourceGenericError::InvalidDateFormat())?
+                .and_utc(),
         };
 
         Ok(new_res)
@@ -76,8 +78,8 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
             file: self.file.map(|x| x.path),
             root_path: self.root_path,
             url: self.url.map(|x| x.full),
-            created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
-            updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
+            created_at: dateutils::format(self.created_at),
+            updated_at: dateutils::format(self.updated_at),
             tags: self.tagging.export_to()?,
             auth: self.auth,            
         })

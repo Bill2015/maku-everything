@@ -1,8 +1,6 @@
-use chrono::NaiveDateTime;
-
 use crate::modules::common::domain::{Porting, ID};
 use crate::modules::category::domain::{CategoryAggregate, CategoryGenericError, CategoryID, PortingCategoryObject};
-use crate::modules::common::infrastructure::date;
+use crate::modules::common::infrastructure::dateutils;
 
 impl Porting<PortingCategoryObject> for CategoryAggregate {
     type Err = CategoryGenericError;
@@ -14,8 +12,12 @@ impl Porting<PortingCategoryObject> for CategoryAggregate {
             description: data.description,
             root_path: new_path,
             auth: data.auth,
-            created_at: NaiveDateTime::parse_from_str(&data.created_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
-            updated_at: NaiveDateTime::parse_from_str(&data.updated_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
+            created_at: dateutils::parse(&data.created_at)
+                .map_err(|_| CategoryGenericError::InvalidDateFormat())?
+                .and_utc(),
+            updated_at: dateutils::parse(&data.updated_at)
+                .map_err(|_| CategoryGenericError::InvalidDateFormat())?
+                .and_utc(),
         };
         
         Ok(category)
@@ -27,8 +29,8 @@ impl Porting<PortingCategoryObject> for CategoryAggregate {
             name: self.name,
             description: self.description,
             root_path: self.root_path,
-            created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
-            updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
+            created_at: dateutils::format(self.created_at),
+            updated_at: dateutils::format(self.updated_at),
             auth: self.auth,
         })
     }

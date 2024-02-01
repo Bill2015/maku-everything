@@ -1,8 +1,7 @@
-use chrono::NaiveDateTime;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use crate::modules::category::domain::CategoryID;
-use crate::modules::common::infrastructure::date;
+use crate::modules::common::infrastructure::dateutils;
 use crate::modules::common::domain::ID;
 
 mod id;
@@ -99,7 +98,7 @@ impl ResourceAggregate {
     }
 
     pub fn set_updated_at(&mut self, new_date: &str) -> Result<(), ResourceGenericError>{
-        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+        if let Ok(date) = dateutils::parse(new_date) {
             self.updated_at = date.and_utc();
             return Ok(())
         }
@@ -107,7 +106,7 @@ impl ResourceAggregate {
     }
 
     pub fn set_created_at(&mut self, new_date: &str) -> Result<(), ResourceGenericError> {
-        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+        if let Ok(date) = dateutils::parse(new_date) {
             self.created_at = date.and_utc();
             return Ok(())
         }

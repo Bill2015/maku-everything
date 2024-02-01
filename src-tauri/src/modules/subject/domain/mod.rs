@@ -1,9 +1,8 @@
-use chrono::NaiveDateTime;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
 use crate::modules::common::domain::ID;
 use crate::modules::category::domain::CategoryID;
-use crate::modules::common::infrastructure::date;
+use crate::modules::common::infrastructure::dateutils;
 
 mod id;
 pub use id::SubjectID;
@@ -61,7 +60,7 @@ impl SubjectAggregate {
     }
 
     pub fn set_updated_at(&mut self, new_date: &str) -> Result<(), SubjectGenericError> {
-        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+        if let Ok(date) = dateutils::parse(new_date) {
             self.updated_at = date.and_utc();
             return Ok(())
         }
@@ -69,7 +68,7 @@ impl SubjectAggregate {
     }
 
     pub fn set_created_at(&mut self, new_date: &str) -> Result<(), SubjectGenericError> {
-        if let Ok(date) = NaiveDateTime::parse_from_str(new_date, date::DATE_TIME_FORMAT) {
+        if let Ok(date) = dateutils::parse(new_date) {
             self.created_at = date.and_utc();
             return Ok(())
         }
