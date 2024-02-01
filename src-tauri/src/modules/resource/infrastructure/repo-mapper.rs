@@ -1,13 +1,13 @@
 use surrealdb::sql::Datetime;
-use surrealdb::sql::Thing;
 use surrealdb::sql::thing;
 
 use crate::modules::category::domain::CategoryID;
+use crate::modules::resource::domain::valueobj::ResourceTaggingVO;
 use crate::modules::resource::domain::valueobj::{ResourceFileVO, ResourceUrlVO};
 use crate::modules::resource::domain::{ResourceAggregate, ResourceID};
 use crate::modules::resource::repository::ResourceFileDo;
+use crate::modules::resource::repository::ResourceTagingDo;
 use crate::modules::resource::repository::ResourceUrlDo;
-use crate::modules::tag::domain::TagID;
 use crate::modules::common::domain::ID;
 use crate::modules::common::infrastructure::IRepoMapper;
 use crate::modules::resource::repository::ResourceDO;
@@ -16,10 +16,10 @@ use crate::modules::resource::repository::ResourceDO;
 pub struct ResourceRepoMapper {}
 impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
     fn do_to_aggregate(resource_do: ResourceDO) -> ResourceAggregate {
-        let tags: Vec<TagID> = resource_do.tags
+        let tags = resource_do.tags
             .iter()
-            .map(|x| TagID::from(x.to_string()))
-            .collect();
+            .map(|x| ResourceTaggingVO::from_do(x.id.to_string(), x.added_at.0) )
+            .collect::<Vec<ResourceTaggingVO>>();
 
         let file = match resource_do.file {
             Some(value) => Some(ResourceFileVO::from_do(
@@ -57,9 +57,12 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
     }
     
     fn aggregate_to_do(aggregate: ResourceAggregate) -> ResourceDO {
-        let tags: Vec<Thing> = aggregate.tags
+        let tags: Vec<ResourceTagingDo> = aggregate.tags
             .iter()
-            .map(|x| thing(x.to_str()).unwrap())
+            .map(|x| ResourceTagingDo { 
+                id: thing(x.id.to_str()).unwrap(),
+                added_at: Datetime(x.added_at),
+            })
             .collect();
 
         let file = match aggregate.file {

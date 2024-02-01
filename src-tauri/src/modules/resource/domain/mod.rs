@@ -3,8 +3,8 @@ use chrono::{DateTime, Utc};
 use serde::Serialize;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::common::infrastructure::date;
-use crate::modules::tag::domain::TagID;
 use crate::modules::common::domain::{Porting, ID};
+use crate::modules::tag::domain::TagID;
 
 
 mod id;
@@ -13,9 +13,11 @@ mod error;
 pub use error::ResourceError;
 pub use error::ResourceGenericError;
 mod porting;
-pub use porting::PortingResourceObject;
+pub use porting::{PortingResourceObject, PortingResourceTaggingObject};
 pub mod valueobj;
-use valueobj::{ResourceFileVO, ResourceUrlVO};
+use valueobj::{ResourceFileVO, ResourceUrlVO, ResourceTaggingVO};
+pub mod entities;
+
 
 // =====================================================
 #[derive(Debug, Serialize)]
@@ -28,9 +30,9 @@ pub struct ResourceAggregate {
     pub file: Option<ResourceFileVO>,
     pub url: Option<ResourceUrlVO>,
     pub auth: bool,
-    pub tags: Vec<TagID>,
-    pub new_tags: Vec<TagID>,
-    pub del_tags: Vec<TagID>,
+    pub tags: Vec<ResourceTaggingVO>,
+    pub new_tags: Vec<ResourceTaggingVO>,
+    pub del_tags: Vec<ResourceTaggingVO>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -64,7 +66,6 @@ impl ResourceAggregate {
             true => file.as_ref().unwrap().name.clone(),
             false => name,
         };
-
         
         Ok(ResourceAggregate {
             id: ResourceID::new(),
@@ -122,21 +123,21 @@ impl ResourceAggregate {
     }
 
     pub fn add_tag(&mut self, tag_id: &TagID) -> Result<(), ResourceGenericError> {
-        if self.tags.contains(tag_id) {
+        if self.tags.iter().any(|v| v.id == *tag_id) {
             return Err(ResourceGenericError::AddSameTag());
         }
 
-        self.new_tags.push(tag_id.clone());
+        self.new_tags.push(ResourceTaggingVO::new(tag_id.to_str()));
 
         Ok(())
     }
 
     pub fn del_tag(&mut self, tag_id: &TagID) -> Result<(), ResourceGenericError> {
-        if self.tags.contains(tag_id) == false {
+        if self.tags.iter().any(|v| v.id == *tag_id) == false {
             return Err(ResourceGenericError::TagNotExists());
         }
-    
-        self.del_tags.push(tag_id.clone());
+
+        self.del_tags.push(ResourceTaggingVO::new(tag_id.to_str()));
         
         Ok(())
     }
@@ -147,24 +148,37 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
     type Err = ResourceGenericError;
 
     fn import_from(data: PortingResourceObject) -> Result<Self, Self::Err> {
-        let mut new_res = ResourceAggregate::new(
-            data.name,
-            data.description,
-            &data.belong_category,
-            data.root_path,
-            None,
-            data.url,
-        )?;
-        new_res.set_created_at(&data.created_at)?;
-        new_res.set_updated_at(&data.updated_at)?;
+        let file = data.file
+            .map(|val| ResourceFileVO::new(&data.root_path, val))
+            .transpose()?;
 
-        if let Some(file) = data.file {
-            new_res.change_file(file)?;
-        }
+        let url = data.url
+            .map(|val| ResourceUrlVO::new(val))
+            .transpose()?;
 
-        for tag in data.tags {
-            new_res.add_tag(&tag)?;
-        }
+        let tags = data.tags
+            .into_iter()
+            .map(|val| ResourceTaggingVO {
+                id: val.id, 
+                added_at: NaiveDateTime::parse_from_str(&val.added_at, date::DATE_TIME_FORMAT).unwrap().and_utc() 
+            })
+            .collect::<Vec<ResourceTaggingVO>>();
+
+        let new_res = ResourceAggregate {
+            id: ResourceID::new(),
+            name: data.name,
+            description: data.description,
+            belong_category: data.belong_category,
+            root_path: data.root_path,
+            file: file,
+            url: url,
+            auth: data.auth,
+            tags: Vec::new(),
+            new_tags: tags,
+            del_tags: Vec::new(),
+            created_at: NaiveDateTime::parse_from_str(&data.created_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
+            updated_at: NaiveDateTime::parse_from_str(&data.updated_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
+        };
 
         Ok(new_res)
     }
@@ -180,7 +194,10 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
             url: self.url.map(|x| x.full),
             created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
             updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
-            tags: self.tags,
+            tags: self.tags.into_iter().map(|x| PortingResourceTaggingObject {
+                id: x.id,
+                added_at: x.added_at.format(date::DATE_TIME_FORMAT).to_string(),
+            }).collect(),
             auth: self.auth,            
         })
     }

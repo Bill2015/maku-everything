@@ -4,6 +4,13 @@ use crate::modules::{category::domain::CategoryID, tag::domain::TagID};
 
 use super::ResourceID;
 
+
+#[derive(Serialize, Deserialize)]
+pub struct PortingResourceTaggingObject {
+    pub id: TagID,
+    pub added_at: String,
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct PortingResourceObject {
     pub id: ResourceID,
@@ -24,7 +31,7 @@ pub struct PortingResourceObject {
 
     pub updated_at: String,
 
-    pub tags: Vec<TagID>,
+    pub tags: Vec<PortingResourceTaggingObject>,
 
     pub auth: bool,
 }

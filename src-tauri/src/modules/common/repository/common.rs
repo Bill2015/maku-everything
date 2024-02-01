@@ -5,7 +5,6 @@ use surrealdb::sql::thing;
 use surrealdb::engine::remote::ws::Client;
 
 use crate::modules::category::domain::CategoryID;
-use crate::modules::common::domain::ID;
 use crate::modules::common::repository::env;
 use crate::modules::resource::domain::ResourceID;
 use crate::modules::subject::domain::SubjectID;

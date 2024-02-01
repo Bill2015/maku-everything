@@ -4,8 +4,8 @@ use surrealdb::sql::thing;
 use surrealdb::engine::remote::ws::Client;
 
 use crate::modules::common::repository::{env, relatens};
+use crate::modules::resource::domain::valueobj::ResourceTaggingVO;
 use crate::modules::resource::domain::ResourceID;
-use crate::modules::tag::domain::TagID;
 
 pub static RESOURCE_TAG_RELATION_REPOSITORY: ResourceTagRelationRepository<'_> = ResourceTagRelationRepository::init(&env::DB);
 /**
@@ -45,16 +45,15 @@ impl<'a> ResourceTagRelationRepository<'a> {
         Ok(())
     }
 
-    pub async fn save(&self, target_resource: &ResourceID, new_tags: Vec<TagID>, del_tags: Vec<TagID>) -> surrealdb::Result<()> {
+    pub async fn save(&self, target_resource: &ResourceID, new_tags: Vec<ResourceTaggingVO>, del_tags: Vec<ResourceTaggingVO>) -> surrealdb::Result<()> {
         let resource_id = target_resource.to_string();
-        let newiter = new_tags.iter();
-        for val in newiter {
-            self.create_relation(&val.to_string(), &resource_id).await?
+        for val in new_tags {
+            self.create_relation(&val.id.to_string(), &resource_id).await?
         }
 
         let deliter = del_tags.iter();
         for val in deliter {
-            self.delete_relation(&val.to_string(), &resource_id).await?
+            self.delete_relation(&val.id.to_string(), &resource_id).await?
         }
 
 

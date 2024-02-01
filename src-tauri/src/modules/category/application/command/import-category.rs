@@ -14,6 +14,7 @@ use crate::modules::category::domain::{CategoryAggregate, CategoryGenericError, 
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::common::application::ICommandHandler;
 use crate::modules::common::domain::Porting;
+use crate::modules::resource::domain::PortingResourceTaggingObject;
 use crate::modules::resource::domain::{ResourceAggregate, PortingResourceObject};
 use crate::modules::resource::repository::ResourceRepository;
 use crate::modules::subject::domain::{SubjectID, SubjectAggregate, PortingSubjectObject};
@@ -78,7 +79,7 @@ impl<'a> ImportCategoryHandler<'a> {
 
         // check resource's tags is exists
         resources.iter().flat_map(|val| &val.tags).try_for_each(|val| {
-            match  tag_id_set.contains(&val.to_string()) {
+            match  tag_id_set.contains(&val.id.to_string()) {
                 true => Ok(()),
                 false => Err(CategoryGenericError::ImportTagIdNotExists())
             }
@@ -142,14 +143,18 @@ impl<'a> ImportCategoryHandler<'a> {
         for res in resources {
             let new_tags = res.tags
                 .into_iter()
-                .map(|val| tagids.get(&val.to_string()).unwrap().to_owned())
-                .collect::<Vec<TagID>>();
+                .map(|val| PortingResourceTaggingObject { 
+                    id: tagids.get(&val.id.to_string()).unwrap().to_owned(), 
+                    added_at: val.added_at,
+                })
+                .collect::<Vec<PortingResourceTaggingObject>>();
             let new_res = ResourceAggregate::import_from(PortingResourceObject {
                 belong_category: category_id.clone(),
                 root_path: new_root.to_string(),
                 tags: new_tags,
                 ..res
             })?;
+            dbg!(&new_res);
 
             new_resources.push(new_res);
         }

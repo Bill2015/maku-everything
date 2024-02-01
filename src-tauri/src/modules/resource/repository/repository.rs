@@ -32,6 +32,14 @@ pub struct ResourceUrlDo {
     pub full: String,
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ResourceTagingDo {
+    #[serde(alias = "in")]
+    pub id: Thing,
+
+    pub added_at: Datetime,
+}
+
 /**
  * Resource Data Object */
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -49,13 +57,10 @@ pub struct ResourceDO {
     pub belong_category: Thing,
 
     #[serde(skip_serializing)]
-    #[serde(default = "default_vec")]
-    pub tags: Vec<Thing>,
+    #[serde(default = "Vec::new")]
+    pub tags: Vec<ResourceTagingDo>,
 }
 
-fn default_vec() -> Vec<Thing> {
-    Vec::new()
-}
 /**
  * Repository */
 pub struct ResourceRepository<'a> {
@@ -82,7 +87,8 @@ impl<'a> ResourceRepository<'a> {
             SELECT 
                 *,
                 belong_category.root_path as root_path,
-                <-tagging.in as tags
+                <-tagging.* AS tags
+            OMIT tags.id, tags.out
             FROM type::table($table) WHERE {}"#, 
             builder_result.to_string());
 
@@ -103,7 +109,8 @@ impl<'a> ResourceRepository<'a> {
             SELECT 
                 *,
                 belong_category.root_path as root_path,
-                <-tagging.in as tags
+                <-tagging.* AS tags
+            OMIT tags.id, tags.out
             FROM type::table($table) 
             WHERE id == $id"#;
 
