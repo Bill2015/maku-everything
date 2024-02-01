@@ -12,7 +12,7 @@ import { TagQuery } from '@api/tag';
 
 import { ResourceCard } from './components/ResourceCard';
 
-export default function ResourcesPage() {
+export default function ResourceListPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const navigateResourceTo = useResourceDetailNavigate();
     const [search, setSearch] = useState<string>('');

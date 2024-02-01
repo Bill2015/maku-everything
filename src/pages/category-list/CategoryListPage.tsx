@@ -7,7 +7,7 @@ import { CategoryCreateDto, CategoryMutation, CategoryQuery } from '@api/categor
 
 import { CategoryCard, CreateCategoryModal } from './components';
 
-export default function CategoriesPage() {
+export default function CategoryListPage() {
     const { data: categories, isLoading: isCategoriesLoading, refetch: categoriesRefetch } = CategoryQuery.useGetAll();
     const createCategory = CategoryMutation.useCreate();
 

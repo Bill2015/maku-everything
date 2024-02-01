@@ -2,14 +2,14 @@ import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import { CategoryContainer } from '@pages/common';
 
-const CategoriesPage = React.lazy(() => import(/* webpackChunkName: "category-page" */ '@pages/category/CategoriesPage'));
-const ResourcePage = React.lazy(() => import(/* webpackChunkName: "resources-page" */ '@pages/resource/ResourcesPage'));
+const CategoryListPage = React.lazy(() => import(/* webpackChunkName: "category-page" */ '@pages/category-list/CategoryListPage'));
+const ResourceListPage = React.lazy(() => import(/* webpackChunkName: "resources-page" */ '@pages/resource-list/ResourceListPage'));
 const ResourcesDetailPage = React.lazy(() => import(/* webpackChunkName: "resources-detail-page" */ '@pages/resource-detail/ResourceDetailPage'));
 
 export const ROUTE_OBJECTS: RouteObject[] = [
     {
         path:    '/',
-        element: <CategoriesPage />,
+        element: <CategoryListPage />,
     },
     {
         path:     '/category/:categoryName/*',
@@ -17,7 +17,7 @@ export const ROUTE_OBJECTS: RouteObject[] = [
         children: [
             {
                 path:    '*',
-                element: <ResourcePage />,
+                element: <ResourceListPage />,
             },
             {
                 path:    'resource/:resourceId',
