@@ -39,7 +39,7 @@ export default function CategoriesPage() {
                         <Grid w="inherit" p={10}>
                             {categories.map((val) => (
                                 // eslint-disable-next-line object-curly-newline
-                                <Grid.Col span={{ base: 12, xs: 6, sm: 6, md: 4, lg: 3 }}>
+                                <Grid.Col key={val.id} span={{ base: 12, xs: 6, sm: 6, md: 4, lg: 3 }}>
                                     <CategoryCard key={val.id} data={val} />
                                 </Grid.Col>
                             ))}

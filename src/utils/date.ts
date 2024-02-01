@@ -1,8 +1,8 @@
 import * as dayjs from 'dayjs';
 
-export type DateTimeUnit = Extract<dayjs.OpUnitType, 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes'>;
+export type DateTimeUnit = Extract<dayjs.OpUnitType, 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds'>;
 
-const DATE_STAMPS: DateTimeUnit[] = ['years', 'months', 'weeks', 'days', 'hours', 'minutes'];
+const DATE_STAMPS: DateTimeUnit[] = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
 
 export type DateTimeInterval = { value: number, stamp: DateTimeUnit };
 

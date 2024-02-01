@@ -15,6 +15,7 @@ const DATETIME_DISPLAYER_MAPPER: { [key in DateTimeUnit]: string } = {
     months:  'months ago',
     years:   'years ago',
     weeks:   'weeks ago',
+    seconds: 'seconds ago',
 };
 
 export function DateTimeDisplayer(props: DateTimeDisplayerProps) {
@@ -22,17 +23,17 @@ export function DateTimeDisplayer(props: DateTimeDisplayerProps) {
 
     const result = getDateTimeInterval(date);
 
-    if (!result) {
-        return <Text>Time travel is real!</Text>;
-    }
-
     return (
         <Box>
             <Text fz="0.75rem" opacity="0.75">
                 {label}
             </Text>
             <Text style={{ lineHeight: 0.7 }} {...textProps}>
-                {`${result.value} ${DATETIME_DISPLAYER_MAPPER[result.stamp]}`}
+                {
+                    result
+                        ? `${result.value} ${DATETIME_DISPLAYER_MAPPER[result.stamp]}`
+                        : 'jsut now'
+                }
                 <Text component="span" pl={5} fz={10} opacity="0.5" style={{ lineHeight: 0.5 }}>
                     {`(${formatDateTime(date)})`}
                 </Text>
