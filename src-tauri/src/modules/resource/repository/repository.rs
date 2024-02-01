@@ -4,11 +4,10 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
-use crate::modules::common::infrastructure::{IRepoMapper, QueryBuilderResult};
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, CommonRepository, COMMON_REPOSITORY};
 use crate::modules::common::repository::tablens;
 use crate::modules::resource::domain::{ResourceAggregate, ResourceID};
-use crate::modules::resource::infrastructure::ResourceRepoMapper;
 
 use super::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationRepository};
 
@@ -33,7 +32,7 @@ pub struct ResourceUrlDo {
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ResourceTagingDo {
+pub struct ResourceTaggingDo {
     #[serde(alias = "in")]
     pub id: Thing,
 
@@ -58,7 +57,7 @@ pub struct ResourceDO {
 
     #[serde(skip_serializing)]
     #[serde(default = "Vec::new")]
-    pub tags: Vec<ResourceTagingDo>,
+    pub tags: Vec<ResourceTaggingDo>,
 }
 
 /**
@@ -98,7 +97,7 @@ impl<'a> ResourceRepository<'a> {
             .await?
             .take::<Vec<ResourceDO>>(0)?
             .into_iter()
-            .map(|val| { ResourceRepoMapper::do_to_aggregate(val) })
+            .map(|val| ResourceAggregate::from(val) )
             .collect();
 
         Ok(result) 
@@ -120,19 +119,12 @@ impl<'a> ResourceRepository<'a> {
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
-        let result: Vec<ResourceDO> = response
-            .take(0)?;
+        let result: Option<ResourceAggregate> = response
+            .take::<Vec<ResourceDO>>(0)?
+            .pop()
+            .map(|val| ResourceAggregate::from(val));
 
-        let item = result
-            .first();
-
-
-        let aggregate = match item {
-            Some(value) => Some(ResourceRepoMapper::do_to_aggregate(value.clone())),
-            None => None,
-        };
-
-        Ok(aggregate)
+        Ok(result)
     }
 
     pub async fn is_exist(&self, id: &String) -> bool {
@@ -157,10 +149,9 @@ impl<'a> ResourceRepository<'a> {
 
     pub async fn save(&self, data: ResourceAggregate) -> surrealdb::Result<ResourceAggregate> {
         let belong_category = data.belong_category.clone(); 
-        let new_tags = data.new_tags.clone();
-        let del_tags = data.del_tags.clone();
+        let tagging = data.get_tagging().clone();
 
-        let resource_do = ResourceRepoMapper::aggregate_to_do(data);
+        let resource_do: ResourceDO = data.into();
         let id: Thing = resource_do.id.clone();
         
         let is_new: bool = !self.is_exist(&id.to_string()).await;
@@ -188,7 +179,7 @@ impl<'a> ResourceRepository<'a> {
         // tag adding
         let resource_id = ResourceID::from(new_id);
         self.tag_relation_repo
-            .save(&resource_id, new_tags, del_tags)
+            .save(&resource_id, is_new, tagging)
             .await?;
 
 
@@ -212,7 +203,7 @@ impl<'a> ResourceRepository<'a> {
             .await?;
 
         let aggregate: Option<ResourceAggregate> = match result {
-            Some(value) => Some(ResourceRepoMapper::do_to_aggregate(value)),
+            Some(value) => Some(ResourceAggregate::from(value)),
             None => None,
         };
 

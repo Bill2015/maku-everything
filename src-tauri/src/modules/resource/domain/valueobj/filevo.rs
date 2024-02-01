@@ -45,13 +45,4 @@ impl ResourceFileVO {
             }
         )
     }
-
-    pub fn from_do(uuid: String, name: String, path: String, ext: String) -> Self {
-        ResourceFileVO {
-            uuid: uuid,
-            name: name,
-            path: path,
-            ext: ext,
-        }
-    } 
 }

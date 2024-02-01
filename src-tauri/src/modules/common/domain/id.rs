@@ -47,5 +47,17 @@ macro_rules! impl_domain_id {
                 self.to_string()
             }
         }
+
+        impl Into<Thing> for $id_type {
+            fn into(self) -> Thing {
+                thing(self.0.as_str()).unwrap()
+            }
+        }
+
+        impl From<Thing> for $id_type {
+            fn from(val: Thing) -> Self {
+                Self(val.to_string())
+            }
+        }
     };
 }

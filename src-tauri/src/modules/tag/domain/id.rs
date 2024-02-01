@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use surrealdb::sql::Id;
+use surrealdb::sql::{Id, Thing, thing};
 use crate::modules::common::domain::ID;
 use crate::modules::common::repository::tablens;
 use crate::impl_domain_id;

@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 
-use crate::modules::resource::domain::ResourceGenericError;
 use crate::modules::tag::domain::TagID;
 
 #[derive(Debug, Clone, Serialize)]
@@ -17,11 +16,4 @@ impl ResourceTaggingVO {
             added_at: Utc::now(),
         }
     }
-
-    pub fn from_do(tag_id: String, added_at: DateTime<Utc>) -> Self {
-        Self {
-            id: TagID::from(tag_id),
-            added_at,
-        }
-    } 
 }

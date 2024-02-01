@@ -24,11 +24,4 @@ impl ResourceUrlVO {
             }
         )
     }
-
-    pub fn from_do(host: String, full: String) -> Self {
-        ResourceUrlVO {
-            host: host,
-            full: full,
-        }
-    }
 }

@@ -4,8 +4,6 @@ use serde::Serialize;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::common::infrastructure::date;
 use crate::modules::common::domain::{Porting, ID};
-use crate::modules::tag::domain::TagID;
-
 
 mod id;
 pub use id::ResourceID;
@@ -15,7 +13,9 @@ pub use error::ResourceGenericError;
 mod porting;
 pub use porting::{PortingResourceObject, PortingResourceTaggingObject};
 pub mod valueobj;
-use valueobj::{ResourceFileVO, ResourceUrlVO, ResourceTaggingVO};
+use valueobj::{ResourceFileVO, ResourceUrlVO};
+
+use self::entities::ResourceTaggingEntity;
 pub mod entities;
 
 
@@ -30,9 +30,7 @@ pub struct ResourceAggregate {
     pub file: Option<ResourceFileVO>,
     pub url: Option<ResourceUrlVO>,
     pub auth: bool,
-    pub tags: Vec<ResourceTaggingVO>,
-    pub new_tags: Vec<ResourceTaggingVO>,
-    pub del_tags: Vec<ResourceTaggingVO>,
+    pub tagging: ResourceTaggingEntity,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -76,9 +74,7 @@ impl ResourceAggregate {
             file: file,
             url: url,
             auth: false,
-            tags: Vec::new(),
-            new_tags: Vec::new(),
-            del_tags: Vec::new(),
+            tagging: ResourceTaggingEntity::default(),
             created_at: Utc::now(),
             updated_at: Utc::now(),
         })
@@ -122,26 +118,13 @@ impl ResourceAggregate {
         self.auth = flag;
     }
 
-    pub fn add_tag(&mut self, tag_id: &TagID) -> Result<(), ResourceGenericError> {
-        if self.tags.iter().any(|v| v.id == *tag_id) {
-            return Err(ResourceGenericError::AddSameTag());
-        }
-
-        self.new_tags.push(ResourceTaggingVO::new(tag_id.to_str()));
-
-        Ok(())
+    pub fn get_tagging(&self) -> &ResourceTaggingEntity {
+        &self.tagging
     }
 
-    pub fn del_tag(&mut self, tag_id: &TagID) -> Result<(), ResourceGenericError> {
-        if self.tags.iter().any(|v| v.id == *tag_id) == false {
-            return Err(ResourceGenericError::TagNotExists());
-        }
-
-        self.del_tags.push(ResourceTaggingVO::new(tag_id.to_str()));
-        
-        Ok(())
+    pub fn get_mut_tagging(&mut self) -> &mut ResourceTaggingEntity {
+        &mut self.tagging
     }
-
 }
 
 impl Porting<PortingResourceObject> for ResourceAggregate {
@@ -156,13 +139,7 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
             .map(|val| ResourceUrlVO::new(val))
             .transpose()?;
 
-        let tags = data.tags
-            .into_iter()
-            .map(|val| ResourceTaggingVO {
-                id: val.id, 
-                added_at: NaiveDateTime::parse_from_str(&val.added_at, date::DATE_TIME_FORMAT).unwrap().and_utc() 
-            })
-            .collect::<Vec<ResourceTaggingVO>>();
+        let tagging = ResourceTaggingEntity::try_from(data.tags)?;
 
         let new_res = ResourceAggregate {
             id: ResourceID::new(),
@@ -173,9 +150,7 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
             file: file,
             url: url,
             auth: data.auth,
-            tags: Vec::new(),
-            new_tags: tags,
-            del_tags: Vec::new(),
+            tagging: tagging,
             created_at: NaiveDateTime::parse_from_str(&data.created_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
             updated_at: NaiveDateTime::parse_from_str(&data.updated_at, date::DATE_TIME_FORMAT).unwrap().and_utc(),
         };
@@ -194,10 +169,7 @@ impl Porting<PortingResourceObject> for ResourceAggregate {
             url: self.url.map(|x| x.full),
             created_at: self.created_at.format(date::DATE_TIME_FORMAT).to_string(),
             updated_at: self.updated_at.format(date::DATE_TIME_FORMAT).to_string(),
-            tags: self.tags.into_iter().map(|x| PortingResourceTaggingObject {
-                id: x.id,
-                added_at: x.added_at.format(date::DATE_TIME_FORMAT).to_string(),
-            }).collect(),
+            tags: self.tagging.into(),
             auth: self.auth,            
         })
     }
