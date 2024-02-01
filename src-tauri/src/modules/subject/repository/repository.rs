@@ -4,10 +4,9 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
-use crate::modules::common::infrastructure::{IRepoMapper, QueryBuilderResult};
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens, CommonRepository, COMMON_REPOSITORY};
 use crate::modules::subject::domain::{SubjectAggregate, SubjectID};
-use crate::modules::subject::infrastructure::SubjectRepoMapper;
 
 pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -53,7 +52,7 @@ impl<'a> SubjectRepository<'a> {
             .await?
             .take::<Vec<SubjectDO>>(0)?
             .into_iter()
-            .map(|val| { SubjectRepoMapper::do_to_aggregate(val) })
+            .map(|val| { SubjectAggregate::from(val) })
             .collect();
 
         Ok(result) 
@@ -68,19 +67,12 @@ impl<'a> SubjectRepository<'a> {
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
-        let result: Vec<SubjectDO> = response
-            .take(0)?;
+        let result: Option<SubjectAggregate> = response
+            .take::<Vec<SubjectDO>>(0)?
+            .pop()
+            .map(|val| SubjectAggregate::from(val));
 
-        let item = result
-            .first();
-
-
-        let aggregate = match item {
-            Some(value) => Some(SubjectRepoMapper::do_to_aggregate(value.clone())),
-            None => None,
-        };
-
-        Ok(aggregate)
+        Ok(result)
     }
 
     pub async fn is_exist(&self, id: &String) -> bool {
@@ -106,7 +98,7 @@ impl<'a> SubjectRepository<'a> {
     pub async fn save(&self, data: SubjectAggregate) -> surrealdb::Result<SubjectAggregate> {
         let belong_category = data.belong_category.clone();
 
-        let subject_do = SubjectRepoMapper::aggregate_to_do(data);
+        let subject_do: SubjectDO = data.into();
         let id: Thing = subject_do.id.clone();
 
         let is_new: bool = !self.is_exist(&id.to_string()).await;
@@ -150,7 +142,7 @@ impl<'a> SubjectRepository<'a> {
             .await?;
 
         let aggregate: Option<SubjectAggregate> = match result {
-            Some(value) => Some(SubjectRepoMapper::do_to_aggregate(value)),
+            Some(value) => Some(SubjectAggregate::from(value)),
             None => None,
         };
 

@@ -4,10 +4,8 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::{Thing, Datetime, thing};
 
-use crate::modules::common::infrastructure::IRepoMapper;
 use crate::modules::common::repository::{env, tablens};
 use crate::modules::category::domain::CategoryAggregate;
-use crate::modules::category::infrastructure::CategoryRepoMapper;
 
 pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::init(&env::DB);
 
@@ -54,14 +52,14 @@ impl<'a> CategoryRepository<'a> {
             .await?;
 
         let aggregate: Option<CategoryAggregate> = match result {
-            Some(value) => Some(CategoryRepoMapper::do_to_aggregate(value)),
+            Some(value) => Some(CategoryAggregate::from(value)),
             None => None,
         };
         Ok(aggregate)
     }
 
     pub async fn save(&self, data: CategoryAggregate) -> surrealdb::Result<CategoryAggregate> {
-        let category_do = CategoryRepoMapper::aggregate_to_do(data);
+        let category_do: CategoryDO = data.into();
         let id = category_do.id.clone();
 
         let is_new: bool = self.is_exist(&id.to_string()).await;
@@ -84,7 +82,7 @@ impl<'a> CategoryRepository<'a> {
             }
         };
         
-        let aggregate: CategoryAggregate = CategoryRepoMapper::do_to_aggregate(result.unwrap());
+        let aggregate = CategoryAggregate::from(result.unwrap());
 
         Ok(aggregate)
     }
@@ -96,7 +94,7 @@ impl<'a> CategoryRepository<'a> {
             .await?;
 
         let aggregate: Option<CategoryAggregate> = match result {
-            Some(value) => Some(CategoryRepoMapper::do_to_aggregate(value)),
+            Some(value) => Some(CategoryAggregate::from(value)),
             None => None,
         };
 

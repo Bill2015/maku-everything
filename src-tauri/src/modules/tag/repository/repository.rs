@@ -4,12 +4,11 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
-use crate::modules::common::infrastructure::{IRepoMapper, QueryBuilderResult};
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::env;
 use crate::modules::common::repository::tablens;
 use crate::modules::common::repository::{CommonRepository, COMMON_REPOSITORY};
 use crate::tag::domain::{TagAggregate, TagID};
-use crate::tag::infrastructure::TagRepoMapper;
 
 pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -56,7 +55,7 @@ impl<'a> TagRepository<'a> {
             .await?
             .take::<Vec<TagDO>>(0)?
             .into_iter()
-            .map(|val| { TagRepoMapper::do_to_aggregate(val) })
+            .map(|val| { TagAggregate::from(val) })
             .collect();
 
         Ok(result) 
@@ -71,18 +70,12 @@ impl<'a> TagRepository<'a> {
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
-        let result: Vec<TagDO> = response
-            .take(0)?;
+        let result: Option<TagAggregate> = response
+            .take::<Vec<TagDO>>(0)?
+            .pop()
+            .map(|val| TagAggregate::from(val));
 
-        let item = result
-            .first();
-
-        let aggregate = match item {
-            Some(value) => Some(TagRepoMapper::do_to_aggregate(value.clone())),
-            None => None,
-        };
-
-        Ok(aggregate)
+        Ok(result)
     }
 
     pub async fn is_exist(&self, id: &String) -> bool {
@@ -109,7 +102,7 @@ impl<'a> TagRepository<'a> {
         let belong_category = data.belong_category.clone();
         let belong_subject = data.belong_subject.clone();
 
-        let tag_do = TagRepoMapper::aggregate_to_do(data);
+        let tag_do: TagDO = data.into();
         let id: Thing = tag_do.id.clone();
 
         let is_new: bool = !self.is_exist(&id.to_string()).await;
@@ -157,7 +150,7 @@ impl<'a> TagRepository<'a> {
             .await?;
 
         let aggregate: Option<TagAggregate> = match result {
-            Some(value) => Some(TagRepoMapper::do_to_aggregate(value)),
+            Some(value) => Some(TagAggregate::from(value)),
             None => None,
         };
 

@@ -1,6 +1,5 @@
-#[path="./repo-mapper.rs"]
-mod repo;
-pub use repo::TagRepoMapper;
+mod domapper;
+pub use domapper::*;
 
 #[path ="./query-builder.rs"]
 mod builder;
