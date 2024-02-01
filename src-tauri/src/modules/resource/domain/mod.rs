@@ -1,8 +1,5 @@
-use std::ffi::OsStr;
-use std::path::Path;
 use chrono::NaiveDateTime;
 use chrono::{DateTime, Utc};
-use url::Url;
 use serde::Serialize;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::common::infrastructure::date;
@@ -17,87 +14,8 @@ pub use error::ResourceError;
 pub use error::ResourceGenericError;
 mod porting;
 pub use porting::PortingResourceObject;
-
-#[derive(Debug, Serialize)]
-pub struct ResourceFileAggregate {
-    pub uuid: String,
-    pub name: String,
-    pub path: String,
-    pub ext: String,
-}
-
-impl ResourceFileAggregate {
-    pub fn new(root_path: &String, file_path: String) -> Result<Self, ResourceGenericError> {
-        // If path already contain root path
-        // trim it and re-concat it
-        let main_path = file_path.trim_start_matches(root_path);
-        let full_path = format!("{}{}", root_path, main_path);
-
-        // concat with root path
-        let path = Path::new(full_path.as_str());
-
-        if path.exists() == false {
-            return Err(ResourceGenericError::FilePathNotExist());
-        }
-        
-        if path.file_name().is_none() {
-            return Err(ResourceGenericError::FileNameIsEmpty());
-        }
-
-        let ext = match path.is_file() {
-            true => path.extension().unwrap_or(OsStr::new("txt")),
-            false => OsStr::new("folder"),
-        };
-
-        Ok(
-            ResourceFileAggregate {
-                uuid: String::from("id"),
-                name: String::from(path.file_name().unwrap().to_str().unwrap()),
-                ext: String::from(ext.to_str().unwrap()),
-                path: String::from(main_path),
-            }
-        )
-    }
-
-    pub fn from_do(uuid: String, name: String, path: String, ext: String) -> Self {
-        ResourceFileAggregate {
-            uuid: uuid,
-            name: name,
-            path: path,
-            ext: ext,
-        }
-    } 
-}
-
-#[derive(Debug, Serialize)]
-pub struct ResourceUrlAggregate {
-    pub host: String,
-    pub full: String,
-}
-impl ResourceUrlAggregate {
-    pub fn new(url: String) -> Result<Self, ResourceGenericError> {
-        let url_obj = Url::parse(url.as_str())
-            .or(Err(ResourceGenericError::UrlParseFailed()))?;
-
-        if url_obj.host().is_none() {
-            return Err(ResourceGenericError::UrlEmptyHost());
-        }
-
-        Ok(
-            ResourceUrlAggregate {
-                host: url_obj.host().unwrap().to_string(),
-                full: url,
-            }
-        )
-    }
-
-    pub fn from_do(host: String, full: String) -> Self {
-        ResourceUrlAggregate {
-            host: host,
-            full: full,
-        }
-    }
-}
+pub mod valueobj;
+use valueobj::{ResourceFileVO, ResourceUrlVO};
 
 // =====================================================
 #[derive(Debug, Serialize)]
@@ -107,8 +25,8 @@ pub struct ResourceAggregate {
     pub description: String,
     pub belong_category: CategoryID,
     pub root_path: String,
-    pub file: Option<ResourceFileAggregate>,
-    pub url: Option<ResourceUrlAggregate>,
+    pub file: Option<ResourceFileVO>,
+    pub url: Option<ResourceUrlVO>,
     pub auth: bool,
     pub tags: Vec<TagID>,
     pub new_tags: Vec<TagID>,
@@ -128,12 +46,12 @@ impl ResourceAggregate {
         url: Option<String>
     ) -> Result<Self, ResourceGenericError> {
         let file = match file_path {
-            Some(path) if !path.is_empty() => Some(ResourceFileAggregate::new(&root_path, path)?),
+            Some(path) if !path.is_empty() => Some(ResourceFileVO::new(&root_path, path)?),
             _ => None,
         };
 
         let url = match url {
-            Some(url) if !url.is_empty() => Some(ResourceUrlAggregate::new(url)?),
+            Some(url) if !url.is_empty() => Some(ResourceUrlVO::new(url)?),
             _ => None,
         };
         
@@ -179,7 +97,7 @@ impl ResourceAggregate {
     }
 
     pub fn change_file(&mut self, file_path: String) -> Result<(), ResourceGenericError> {
-        self.file = Some(ResourceFileAggregate::new(&self.root_path, file_path)?);
+        self.file = Some(ResourceFileVO::new(&self.root_path, file_path)?);
         Ok(())
     }
 

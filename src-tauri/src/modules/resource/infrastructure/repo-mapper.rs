@@ -3,8 +3,7 @@ use surrealdb::sql::Thing;
 use surrealdb::sql::thing;
 
 use crate::modules::category::domain::CategoryID;
-use crate::modules::resource::domain::ResourceFileAggregate;
-use crate::modules::resource::domain::ResourceUrlAggregate;
+use crate::modules::resource::domain::valueobj::{ResourceFileVO, ResourceUrlVO};
 use crate::modules::resource::domain::{ResourceAggregate, ResourceID};
 use crate::modules::resource::repository::ResourceFileDo;
 use crate::modules::resource::repository::ResourceUrlDo;
@@ -23,7 +22,7 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
             .collect();
 
         let file = match resource_do.file {
-            Some(value) => Some(ResourceFileAggregate::from_do(
+            Some(value) => Some(ResourceFileVO::from_do(
                 value.uuid, 
                 value.name, 
                 value.path,
@@ -33,7 +32,7 @@ impl IRepoMapper<ResourceAggregate, ResourceDO> for ResourceRepoMapper {
         };
 
         let url = match resource_do.url {
-            Some(value) => Some(ResourceUrlAggregate::from_do(
+            Some(value) => Some(ResourceUrlVO::from_do(
                 value.host,
                 value.full,
             )),
