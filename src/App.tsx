@@ -1,7 +1,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { Notifications } from '@mantine/notifications';
-import { Box, MantineProvider, AppShell, Affix, Button } from '@mantine/core';
+import { Box, MantineProvider, AppShell } from '@mantine/core';
 
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -20,21 +20,11 @@ import '@mantine/core/styles.layer.css';
 import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
 import classes from './App.module.scss';
-import { useTranslation } from 'react-i18next';
-import { useToggle } from '@mantine/hooks';
 
 function App() {
     const routes = useRoutes(ROUTE_OBJECTS);
     const [theme, setTheme] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [lang, toggle] = useToggle(['enUS', 'zhTW']);
-    const { i18n } = useTranslation();
-
-    const changeLanguage = () => {
-        console.log(lang);
-        toggle();
-        i18n.changeLanguage(lang);
-    };
 
     useEffect(() => {
         if (isConnected === false) {
@@ -78,9 +68,6 @@ function App() {
                     <div>Hi</div>
                 </AppShell.Footer>
             </AppShell>
-            <Affix position={{ bottom: 20, left: 20 }}>
-                <Button onClick={changeLanguage}>Hi</Button>
-            </Affix>
             <Notifications classNames={{ notification: classes.notification }} />
             <CreateSubjectModal />
             <CreateTagModal />

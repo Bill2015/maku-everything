@@ -1,9 +1,13 @@
 import { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Divider, Group, Image, Menu, Tooltip, UnstyledButton } from '@mantine/core';
+import {
+    Button, Divider, Group, Image, Menu, Select, Tooltip, UnstyledButton,
+} from '@mantine/core';
 import { LuImport } from 'react-icons/lu';
 import { BsGear } from 'react-icons/bs';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
+import { MdLanguage } from 'react-icons/md';
+import { SupportLangs, defaultLang } from '@modules/i18next';
 import { useHomeNavigate } from '@router/navigateHook';
 import { useImportCategoryModal } from '@store/modal';
 
@@ -50,7 +54,7 @@ function HeaderMenuItem(props: PropsWithChildren) {
 }
 
 export function MainHeader() {
-    const { t } = useTranslation('common', { keyPrefix: 'Header.MainHeader' });
+    const { t, i18n } = useTranslation('common', { keyPrefix: 'Header.MainHeader' });
     const navigateToHome = useHomeNavigate();
     const [_, { open }] = useImportCategoryModal();
 
@@ -85,6 +89,26 @@ export function MainHeader() {
                     {t('settings')}
                 </MenuButton>
             </HeaderMenuItem>
+
+            <Select
+                variant="unstyled"
+                className={classes.langSelect}
+                classNames={{ input: classes.langInput }}
+                withCheckIcon={false}
+                allowDeselect={false}
+                leftSection={<MdLanguage />}
+                leftSectionPointerEvents="none"
+                rightSectionPointerEvents="none"
+                rightSectionWidth={0}
+                styles={{ dropdown: { maxHeight: 200, overflowY: 'auto' } }}
+                defaultValue={defaultLang.key}
+                data={Object.values(SupportLangs).map((val) => ({
+                    value:    val.key,
+                    label:    val.displayName,
+                    disabled: i18n.language === val.key,
+                }))}
+                onChange={(val) => i18n.changeLanguage(val!)}
+            />
         </Group>
     );
 }

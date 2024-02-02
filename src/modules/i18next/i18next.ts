@@ -16,15 +16,23 @@ import pageResourcelistZH_TW from '@assets/locales/pages/resource-list/zh-TW.jso
 
 export type SupportLangsType = 'enUS' | 'zhTW';
 
-export const defaultNS: SupportLangsType = 'enUS';
+export type Language = { key: SupportLangsType, displayName: string }
 
-export const SupportLangs: {[key in SupportLangsType]: SupportLangsType} = {
-    enUS: 'enUS',
-    zhTW: 'zhTW',
+export const SupportLangs: {[key in SupportLangsType]: Language} = {
+    enUS: {
+        key:         'enUS',
+        displayName: 'en-US (America)',
+    },
+    zhTW: {
+        key:         'zhTW',
+        displayName: 'zh-TW (台灣)',
+    },
 };
 
+export const defaultLang: Language = SupportLangs.enUS;
+
 export const resources = {
-    [SupportLangs.enUS]: {
+    [SupportLangs.enUS.key]: {
         common: commonEN_US,
         pages:  {
             Common:       pageCommonEN_US,
@@ -32,7 +40,7 @@ export const resources = {
             resourceList: pageResourcelistEN_US,
         },
     },
-    [SupportLangs.zhTW]: {
+    [SupportLangs.zhTW.key]: {
         common: commonZH_TW,
         pages:  {
             Common:       pageCommonZH_TW,
@@ -57,16 +65,17 @@ i18next
         // Namespace
         ns: [
             'common',
+            'pages',
         ],
         // default namespace
         defaultNS:     'common',
         // default language
-        lng:           SupportLangs.enUS,
-        fallbackLng:   SupportLangs.enUS,
+        lng:           SupportLangs.enUS.key,
+        fallbackLng:   SupportLangs.enUS.key,
         keySeparator:  '.',
         supportedLngs: [
-            SupportLangs.enUS,
-            SupportLangs.zhTW,
+            SupportLangs.enUS.key,
+            SupportLangs.zhTW.key,
         ],
         interpolation: { escapeValue: false },
     });

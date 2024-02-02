@@ -12,3 +12,25 @@
         background-color: rgba(72, 143, 213, 0.373)
     }
 }
+
+.langSelect {
+    border-bottom: rgba(125, 125, 125, 0.477) 1px solid;
+    position: absolute;
+    right: 20px;
+    max-width: 150px;
+    min-height: 0.75rem;
+    font-size: 0.75rem;
+    line-height: 0.75;
+    padding: 0;
+
+    .langInput {
+        line-height: 0.75;
+        min-height: 0.75rem;
+        height: 1.5rem;
+    }
+
+    svg {
+        width: 1.15rem;
+        height: 1.15rem;
+    }
+}
