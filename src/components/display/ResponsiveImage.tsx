@@ -3,6 +3,8 @@ import * as lodash from 'lodash';
 import { Image, ImageProps, Loader } from '@mantine/core';
 import { useState } from 'react';
 
+import { useBackGroundImage } from '@hooks/ui-hooks';
+
 import classes from './ResponsiveImage.module.scss';
 
 export interface ResponsiveImageProps extends ImageProps {
@@ -13,9 +15,9 @@ export interface ResponsiveImageProps extends ImageProps {
 
 export function ResponsiveImage(props: ResponsiveImageProps) {
     const { alt, src, useBackgoundImg = false, ...imgProps } = props;
-    const [isLoaded, setLoaded] = useState<boolean>(true);
+    const [isLoaded, setLoaded] = useState<boolean>(false);
 
-    const sourceProps = useBackgoundImg ? { style: { backgroundImage: `url("${src}")` } } : { src: src, alt: alt };
+    const sourceProps = useBackGroundImage(useBackgoundImg, isLoaded, { src, alt });
 
     return (
         <>

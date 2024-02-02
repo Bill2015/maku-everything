@@ -2,6 +2,7 @@
 import { CiImageOff } from 'react-icons/ci';
 import { Center, Image } from '@mantine/core';
 import { getYoutubeVideoId } from '@utils/urlParser';
+import { useBackGroundImage } from '@hooks/ui-hooks';
 
 import { useMemo, useRef, useState } from 'react';
 import { ResponsiveImageProps } from './ResponsiveImage';
@@ -53,7 +54,7 @@ export function YoutubeThumbnail(props: YoutubeThumbnailProps) {
         return createURL(videoId, 'max-resoultion');
     }, [url, isLoaded]);
 
-    const sourceProps = useBackgoundImg ? { style: { backgroundImage: `url(${imageURL})` } } : { src: imageURL, alt: alt };
+    const sourceProps = useBackGroundImage(useBackgoundImg, isLoaded, { src: imageURL, alt });
 
     if (!imageURL) {
         return (

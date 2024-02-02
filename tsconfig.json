@@ -25,6 +25,7 @@
 			"@assets/*": ["src/assets/*"],
 			"@api/*": ["src/api/*"],
 			"@store/*": ["src/store/*"],
+			"@hooks/*": ["src/hooks/*"],
 			"@declares/*": ["src/declares/*"],
 			"@utils/*": ["src/utils/*"],
 			"@modals/*": ["src/modals/*"],
