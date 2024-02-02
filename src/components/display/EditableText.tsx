@@ -1,5 +1,6 @@
-import { Badge, Box, BoxProps, Text } from '@mantine/core';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Badge, Box, BoxProps, Text } from '@mantine/core';
 
 import classes from './EditableText.module.scss';
 
@@ -24,6 +25,7 @@ export interface EditableTextProps extends BoxProps {
  * And textarea can input newline, which is unnecessary in some fields */
 export function EditableText(props: EditableTextProps) {
     const { value, name, onChange, ...boxProps } = props;
+    const { t } = useTranslation('common', { keyPrefix: 'Display.EditableText' });
     const [inEdited, setInEdited] = useState<boolean>(false);
     const [newValue, setNewValue] = useState<string>(value);
 
@@ -82,7 +84,7 @@ export function EditableText(props: EditableTextProps) {
                     {newValue}
                 </Box>
                 <Badge color="indigo" pos="absolute" right={0} variant="outline" style={{ zIndex: 99 }}>
-                    modifying
+                    {t('modifying')}
                 </Badge>
             </>
         );
@@ -92,8 +94,8 @@ export function EditableText(props: EditableTextProps) {
     if ((!value && !newValue) || ((value && !newValue))) {
         return (
             // eslint-disable-next-line react/jsx-props-no-spreading
-            <Text className={classes.text} title="double click to edit" onDoubleClick={handleClick} {...boxProps}>
-                {`no ${name} here...`}
+            <Text className={classes.text} title={t('double_click_to_edit')} onDoubleClick={handleClick} {...boxProps}>
+                {t('empty', { name })}
             </Text>
         );
     }

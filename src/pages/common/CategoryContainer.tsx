@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
     ActionIcon, Box, Button, Collapse, Flex, Stack, Tabs, Tooltip,
 } from '@mantine/core';
@@ -13,6 +14,7 @@ import { useCreateResourceModal, useCreateSubjectModal, useCreateTagModal } from
 
 export function CategoryContainer() {
     const { activeCategory } = useActiveCategoryRedux();
+    const { t } = useTranslation('pages', { keyPrefix: 'Common.CategoryContainer' });
 
     const [_subject, { open: openSubject }] = useCreateSubjectModal();
     const [_tag, { open: openTag }] = useCreateTagModal();
@@ -44,10 +46,10 @@ export function CategoryContainer() {
                     </ActionIcon>
                     <Tabs radius="md" defaultValue="tags">
                         <Tabs.List>
-                            <Tooltip label="tags" openDelay={500}>
+                            <Tooltip label={t('TagsPanel.title')} openDelay={500}>
                                 <Tabs.Tab value="tags" leftSection={<FaTags style={iconStyle} />} />
                             </Tooltip>
-                            <Tooltip label="display" openDelay={500}>
+                            <Tooltip label={t('DisplayPanel.title')} openDelay={500}>
                                 <Tabs.Tab value="display" leftSection={<RiFunctionLine style={iconStyle} />} />
                             </Tooltip>
                         </Tabs.List>
@@ -56,15 +58,15 @@ export function CategoryContainer() {
                             <Stack p={10}>
                                 <Button onClick={() => openSubject()}>
                                     <IoAdd />
-                                    Subject
+                                    {t('TagsPanel.subject')}
                                 </Button>
                                 <Button onClick={() => openTag()}>
                                     <IoAdd />
-                                    Tag
+                                    {t('TagsPanel.tag')}
                                 </Button>
                                 <Button onClick={() => openResource()}>
                                     <IoAdd />
-                                    Resources
+                                    {t('TagsPanel.resource')}
                                 </Button>
 
                             </Stack>

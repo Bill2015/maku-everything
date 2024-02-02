@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, Group, Text, Button, Tooltip, Accordion, Stack } from '@mantine/core';
 import { ResourceResDto } from '@api/resource';
 import { DateTimeDisplayer, LinkIcon, ResourceThumbnailDisplayer } from '@components/display';
@@ -12,6 +13,7 @@ export interface ResourceCardProps {
 
 export function ResourceCard(props: ResourceCardProps) {
     const { data, onDetailClick } = props;
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceList.ResourceCard' });
 
     return (
         <Card shadow="sm" padding="lg" radius="md" withBorder classNames={{ root: classes.cardroot }}>
@@ -39,11 +41,11 @@ export function ResourceCard(props: ResourceCardProps) {
                         <Text pt="xs">{data.description}</Text>
 
                         <Stack gap="xs">
-                            <DateTimeDisplayer label="Created At:" date={data.created_at} />
-                            <DateTimeDisplayer label="Updated At:" date={data.updated_at} />
+                            <DateTimeDisplayer label={t('created_at')} date={data.created_at} />
+                            <DateTimeDisplayer label={t('updated_at')} date={data.updated_at} />
 
                             <Group justify="flex-end">
-                                <Button onClick={() => onDetailClick(data)}>Detail</Button>
+                                <Button onClick={() => onDetailClick(data)}>{t('detail')}</Button>
                             </Group>
                         </Stack>
                     </Accordion.Panel>

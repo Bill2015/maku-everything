@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Card, Group, Text, Badge, Button, rem, Spoiler, Box, Title, Divider, Stack,
 } from '@mantine/core';
@@ -21,6 +22,7 @@ export interface CategoryCardProps {
 
 export function CategoryCard(props: CategoryCardProps) {
     const { data: categoryData } = props;
+    const { t } = useTranslation('pages', { keyPrefix: 'CategoryList.CategoryCard' });
     const { setActiveCategory } = useActiveCategoryRedux();
     const navigateCategoryTo = useCategoryNavigate();
     const exportCategory = CategoryMutation.useExport();
@@ -63,19 +65,19 @@ export function CategoryCard(props: CategoryCardProps) {
             </Title>
             <Divider orientation="horizontal" size={1} />
 
-            <Spoiler maxHeight={120} showLabel="Show more" hideLabel="Hide">
+            <Spoiler maxHeight={120} showLabel={t('show_more')} hideLabel="Hide">
                 <Box maw={300}>
                     <Text>{categoryData.description}</Text>
                 </Box>
             </Spoiler>
 
             <Stack mt="md" mb="xs" gap="xs">
-                <DateTimeDisplayer label="Created At:" date={categoryData.created_at} />
-                <DateTimeDisplayer label="Updated At:" date={categoryData.updated_at} />
+                <DateTimeDisplayer label={t('created_at')} date={categoryData.created_at} />
+                <DateTimeDisplayer label={t('updated_at')} date={categoryData.updated_at} />
             </Stack>
 
             <Group>
-                <Button onClick={handleLoadClick}>Load</Button>
+                <Button onClick={handleLoadClick}>{t('load')}</Button>
             </Group>
         </Card>
     );

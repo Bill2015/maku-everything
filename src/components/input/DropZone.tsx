@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Container, Center, Group, Text } from '@mantine/core';
 import { appWindow } from '@tauri-apps/api/window';
 import { UnlistenFn } from '@tauri-apps/api/event';
@@ -25,6 +26,7 @@ interface TauriDropZoneProps {
 
 export function TauriDropZone(props: TauriDropZoneProps) {
     const { onDropFiles } = props;
+    const { t } = useTranslation('common', { keyPrefix: 'Input.DropZone' });
     const dropListener = useRef<UnlistenFn>();
     const [isDragHover, setDragHover] = useState<boolean>(false);
 
@@ -61,10 +63,10 @@ export function TauriDropZone(props: TauriDropZoneProps) {
                 <Group>
                     <div>
                         <Text size="xl" inline>
-                            Drag File here or click to select files
+                            {t('title')}
                         </Text>
                         <Text size="sm" c="dimmed" inline mt={7}>
-                            Attach as many files as you like
+                            {t('sub_title')}
                         </Text>
                     </div>
                 </Group>

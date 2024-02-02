@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Divider, Group, Image, Menu, Tooltip, UnstyledButton } from '@mantine/core';
 import { LuImport } from 'react-icons/lu';
 import { BsGear } from 'react-icons/bs';
@@ -49,6 +50,7 @@ function HeaderMenuItem(props: PropsWithChildren) {
 }
 
 export function MainHeader() {
+    const { t } = useTranslation('common', { keyPrefix: 'Header.MainHeader' });
     const navigateToHome = useHomeNavigate();
     const [_, { open }] = useImportCategoryModal();
 
@@ -65,12 +67,12 @@ export function MainHeader() {
             <HeaderMenuItem>
                 <MenuButton>
                     <AiOutlineThunderbolt />
-                    Actions
+                    {t('actions')}
                 </MenuButton>
 
                 <MenuDropDown>
                     <Menu.Item fz="xs" pr={50} leftSection={<LuImport />} onClick={() => open()}>
-                        Import Category
+                        {t('import_category')}
                     </Menu.Item>
                 </MenuDropDown>
             </HeaderMenuItem>
@@ -80,7 +82,7 @@ export function MainHeader() {
             <HeaderMenuItem>
                 <MenuButton>
                     <BsGear />
-                    Settings
+                    {t('settings')}
                 </MenuButton>
             </HeaderMenuItem>
         </Group>

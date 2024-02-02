@@ -1,0 +1,13 @@
+{
+    "CategoryContainer": {
+        "TagsPanel": {
+            "title": "tags",
+            "subject": "Subject",
+            "tag": "Tag",
+            "resource": "resource"
+        },
+        "DisplayPanel": {
+            "title": "display"
+        }
+    }
+}

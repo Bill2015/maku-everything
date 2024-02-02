@@ -1,0 +1,55 @@
+{
+    "Display": {
+        "DateTimeDisplayer": {
+            "just_now": "現在",
+            "seconds_ago": "秒前",
+            "minutes_ago": "分鐘前",
+            "hours_ago": "小時前",
+            "days_ago": "天前",
+            "weeks_ago": "周前",
+            "months_ago": "月前",
+            "years_ago": "年前"
+        },
+        "EditableText": {
+            "modifying": "修改中",
+            "double_click_to_edit": "雙擊以修改內容",
+            "empty": "無{{name}}..."
+        }
+    },
+    "Header": {
+        "MainHeader": {
+            "actions": "動作",
+            "import_category": "匯入類別",
+            "settings": "設定"
+        }
+    },
+    "Input": {
+        "SubjectSelect": {
+            "placeholder": "輸入主題名稱...",
+            "not_found": "甚麼都沒有"
+        },
+        "DropZone": {
+            "title": "拖進來以上傳檔案",
+            "sub_title": "可以一性次上傳很多檔案"
+        },
+        "ComplexSearchInput": {
+            "Main": {
+                "placeholder": "在這裡搜尋資源...",
+                "not_found": "甚麼都沒有"
+            },
+            "Options": {
+                "op_include": "包含",
+                "op_exclude": "排除",
+                "op_group_bracket": "群組",
+                "op_attr_bracket": "屬性",
+                "func_url": "資源的 URL Path",
+                "func_file": "資源的檔案名稱",
+                "func_filext": "資源的副檔名",
+                "func_name": "資源的名稱",
+                "func_tagnum": "資源擁有的標籤數量",
+                "func_created": "資源建立的日期",
+                "func_updated": "資源更新的日期"
+            }
+        }
+    }
+}

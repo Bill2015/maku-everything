@@ -1,0 +1,55 @@
+{
+    "Display": {
+        "DateTimeDisplayer": {
+            "just_now": "jsut now",
+            "seconds_ago": "seconds ago",
+            "minutes_ago": "minutes ago",
+            "hours_ago": "hours ago",
+            "days_ago": "days ago",
+            "months_ago": "months ago",
+            "years_ago": "years ago",
+            "weeks_ago": "weeks ago"
+        },
+        "EditableText": {
+            "modifying": "modifying",
+            "double_click_to_edit": "double click to edit",
+            "empty": "no {{name}} here..."
+        }
+    },
+    "Header": {
+        "MainHeader": {
+            "actions": "Actions",
+            "import_category": "Import Category",
+            "settings": "Settings"
+        }
+    },
+    "Input": {
+        "SubjectSelect": {
+            "placeholder": "Enter subject name...",
+            "not_found": "Not found"
+        },
+        "DropZone": {
+            "title": "Drag File here to upload",
+            "sub_title": "Attach as many files as you like"
+        },
+        "ComplexSearchInput": {
+            "Main": {
+                "placeholder": "search resource here...",
+                "not_found": "Not found"
+            },
+            "Options": {
+                "op_include": "Include",
+                "op_exclude": "Exclude",
+                "op_group_bracket": "Group bracket",
+                "op_attr_bracket": "Attribute bracket",
+                "func_url": "Resource URL path",
+                "func_file": "Resource file name",
+                "func_filext": "Resource file extension",
+                "func_name": "Resource name",
+                "func_tagnum": "Number of tags owned by the resource",
+                "func_created": "Resource created date",
+                "func_updated": "Resource updated date"
+            }
+        }
+    }
+}

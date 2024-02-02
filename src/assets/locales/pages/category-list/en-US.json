@@ -1,0 +1,15 @@
+{
+    "title": "Category",
+    "create_category": "Create Category",
+    "CategoryCard": {
+        "load": "Load",
+        "show_more": "Show more",
+        "created_at": "Created At:",
+        "updated_at": "Updated At:"
+    },
+    "CategoryCardMenu": {
+        "settings": "Settings",
+        "pin": "Pin",
+        "export": "Export"
+    }
+}

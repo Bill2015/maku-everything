@@ -1,4 +1,5 @@
 import { MouseEvent, Ref, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Combobox, ComboboxItem, Group, InputBase, Text, useCombobox } from '@mantine/core';
 import { SubjectResDto } from '@api/subject';
 
@@ -39,6 +40,7 @@ export interface SubjectSelectProps {
 
 export function SubjectSelect(props: SubjectSelectProps) {
     const { inputRef, value, hidden, subjects, onItemSelect, onClickResult } = props;
+    const { t } = useTranslation('common', { keyPrefix: 'Input.SubjectSelect' });
 
     const [search, setSearch] = useState('');
 
@@ -76,7 +78,7 @@ export function SubjectSelect(props: SubjectSelectProps) {
                 <InputBase
                     autoFocus
                     pointer
-                    placeholder="Enter subject name..."
+                    placeholder={t('placeholder')}
                     rightSectionPointerEvents="none"
                     display={hidden ? 'none' : 'initial'}
                     ref={inputRef}
@@ -99,7 +101,7 @@ export function SubjectSelect(props: SubjectSelectProps) {
                     {
                         (options.length > 0)
                             ? options
-                            : <Combobox.Empty>Nothing found</Combobox.Empty>
+                            : <Combobox.Empty>{t('not_found')}</Combobox.Empty>
                     }
                 </Combobox.Options>
             </Combobox.Dropdown>

@@ -1,0 +1,13 @@
+{
+    "CategoryContainer": {
+        "TagsPanel": {
+            "title": "標籤",
+            "subject": "標籤主題",
+            "tag": "標籤",
+            "resource": "資源"
+        },
+        "DisplayPanel": {
+            "title": "顯示"
+        }
+    }
+}

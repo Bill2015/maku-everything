@@ -5,6 +5,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 
 import { store } from '@store/store';
+import '@modules/i18next';
 
 import App from './App';
 // import './styles.css';

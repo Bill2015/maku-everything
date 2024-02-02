@@ -1,5 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { Combobox, ComboboxOptionProps, Stack, Text } from '@mantine/core';
 import { System } from '@declares/variables';
+import { normalizeKey } from '@modules/i18next';
 
 import { InputSymbol } from './enums';
 import classses from './InputOption.module.scss';
@@ -26,6 +28,8 @@ export type InputOptionType = {
     attributeType: AttributeType;
 
     suffix?: string;
+
+    i18nextDescription?: boolean;
 }
 
 export interface InputOptionProps extends InputOptionType, Omit<ComboboxOptionProps, 'key'> { }
@@ -33,7 +37,8 @@ export interface InputOptionProps extends InputOptionType, Omit<ComboboxOptionPr
 /**
  * Display the input options */
 export function InputOption(props: InputOptionProps) {
-    const { description, name, groupName, suffix, attributeType: _, ...optionProps } = props;
+    const { description, name, groupName, suffix, i18nextDescription = false, attributeType: _, ...optionProps } = props;
+    const { t } = useTranslation('common', { keyPrefix: 'Input.ComplexSearchInput.Options' });
 
     return (
         <Combobox.Option
@@ -52,7 +57,7 @@ export function InputOption(props: InputOptionProps) {
                     {name}
                     <Text component="span" className={classses.suffix}>{suffix}</Text>
                     <Text component="span" className={classses.description}>
-                        {description}
+                        {i18nextDescription ? t(normalizeKey(description)) : description}
                     </Text>
                 </Text>
             </Stack>
@@ -65,22 +70,23 @@ type Operators = { [key in InputSymbol]?: InputOptionType };
 /**
  * Selectable Operators */
 InputOption.Operators = [
-    { name: InputSymbol.Include, description: 'include tag' },
-    { name: InputSymbol.Exclude, description: 'exclude tag' },
-    { name: InputSymbol.LeftGroupBracket, description: 'bracket' },
-    { name: InputSymbol.RightGroupBracket, description: 'bracket' },
-    { name: InputSymbol.LeftAttrBracket, description: 'bracket' },
-    { name: InputSymbol.RightAttrBracket, description: 'bracket' },
+    { name: InputSymbol.Include, description: 'op_include' },
+    { name: InputSymbol.Exclude, description: 'op_exclude' },
+    { name: InputSymbol.LeftGroupBracket, description: 'op_group_bracket' },
+    { name: InputSymbol.RightGroupBracket, description: 'op_group_bracket' },
+    { name: InputSymbol.LeftAttrBracket, description: 'op_attr_bracket' },
+    { name: InputSymbol.RightAttrBracket, description: 'op_attr_bracket' },
 ].reduce<Operators>((prev, current) => ({
     ...prev,
     [current.name]: {
-        groupName:     'Operator',
-        key:           current.name,
-        itemID:        current.name,
-        name:          current.name,
-        value:         current.name,
-        description:   current.description,
-        attributeType: 'none',
+        groupName:          'Operator',
+        key:                current.name,
+        itemID:             current.name,
+        name:               current.name,
+        value:              current.name,
+        description:        current.description,
+        i18nextDescription: true,
+        attributeType:      'none',
     } as InputOptionType,
 }), {});
 
@@ -88,33 +94,34 @@ InputOption.Operators = [
  * Functional tag */
 InputOption.FunctionalTags = ([
     {
-        name: 'url', description: 'Resource url path', attributeType: 'option-text',
+        name: 'url', description: 'func_url', attributeType: 'option-text',
     },
     {
-        name: 'file', description: 'Resource file name', attributeType: 'option-text',
+        name: 'file', description: 'func_file', attributeType: 'option-text',
     },
     {
-        name: 'filext', description: 'Resource file extension', attributeType: 'text',
+        name: 'filext', description: 'func_filext', attributeType: 'text',
     },
     {
-        name: 'name', description: 'Resource name', attributeType: 'text',
+        name: 'name', description: 'func_name', attributeType: 'text',
     },
     {
-        name: 'tagnum', description: 'Resource tag num', attributeType: 'range-number',
+        name: 'tagnum', description: 'func_tagnum', attributeType: 'range-number',
     },
     {
-        name: 'created', description: 'Resource create date', attributeType: 'range-date',
+        name: 'created', description: 'func_created', attributeType: 'range-date',
     },
     {
-        name: 'updated', description: 'Resource update date', attributeType: 'range-date',
+        name: 'updated', description: 'func_updated', attributeType: 'range-date',
     },
 ] as { name: string, description: string, attributeType: AttributeType }[])
     .map<InputOptionType>((item) => ({
-        groupName:     System.Namesapce,
-        key:           item.name,
-        itemID:        item.name,
-        name:          item.name,
-        value:         `${System.Namesapce}:${item.name}`,
-        description:   item.description,
-        attributeType: item.attributeType,
+        groupName:          System.Namesapce,
+        key:                item.name,
+        itemID:             item.name,
+        name:               item.name,
+        value:              `${System.Namesapce}:${item.name}`,
+        description:        item.description,
+        attributeType:      item.attributeType,
+        i18nextDescription: true,
     }));

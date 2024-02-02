@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActionIcon, Combobox, ComboboxOptionProps, Flex, Group, Input, useCombobox } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import { FaSearch } from 'react-icons/fa';
@@ -22,6 +23,8 @@ export interface ComplexSearchInputProps {
 
 export function ComplexSearchInput(props: ComplexSearchInputProps) {
     const { tags, onSubmitSearch, onClearSearch } = props;
+    const { t } = useTranslation('common', { keyPrefix: 'Input.ComplexSearchInput.Main' });
+
     const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
     const [searchText, setSearchText] = useState<string>('');
     const { options, displayNode, rawText, backspaceInputSearch, forwardInputSearch, clearSearch } = useComplexSearch(tags, searchText);
@@ -67,7 +70,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                         {displayNode.map((val) => <QueryingNode key={randomId()} {...val} />) }
                         <Input
                             value={searchText}
-                            placeholder="search here..."
+                            placeholder={t('placeholder')}
                             classNames={{ wrapper: classes.inputWrapper, input: classes.input }}
                             onChange={(e) => {
                                 setSearchText(e.currentTarget.value);
@@ -109,7 +112,7 @@ export function ComplexSearchInput(props: ComplexSearchInputProps) {
                     {
                         (options.length > 0)
                             ? options.map((val) => <InputOption {...val} />)
-                            : <Combobox.Empty>Nothing found</Combobox.Empty>
+                            : <Combobox.Empty>{t('not_found')}</Combobox.Empty>
                     }
                 </Combobox.Options>
             </Combobox.Dropdown>

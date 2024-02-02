@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ActionIcon, Menu } from '@mantine/core';
 import { MdOutlineMoreVert } from 'react-icons/md';
 import { CgExport } from 'react-icons/cg';
@@ -14,6 +15,7 @@ export interface CategoryCardMenuProps {
 
 export function CategoryCardMenu(props: CategoryCardMenuProps) {
     const { name, onExportclick } = props;
+    const { t } = useTranslation('pages', { keyPrefix: 'CategoryList.CategoryCardMenu' });
     return (
         <Menu
             shadow="md"
@@ -34,13 +36,13 @@ export function CategoryCardMenu(props: CategoryCardMenuProps) {
                     {name}
                 </Menu.Label>
                 <Menu.Item leftSection={<IoSettingsOutline />}>
-                    Settings
+                    {t('settings')}
                 </Menu.Item>
                 <Menu.Item leftSection={<LuPin />}>
-                    Pin
+                    {t('pin')}
                 </Menu.Item>
                 <Menu.Item leftSection={<CgExport />} onClick={onExportclick}>
-                    Export
+                    {t('export')}
                 </Menu.Item>
             </Menu.Dropdown>
         </Menu>

@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDisclosure } from '@mantine/hooks';
 import { Grid, Stack, Skeleton, Title, Button, ScrollArea } from '@mantine/core';
 
@@ -8,6 +9,7 @@ import { CategoryCreateDto, CategoryMutation, CategoryQuery } from '@api/categor
 import { CategoryCard, CreateCategoryModal } from './components';
 
 export default function CategoryListPage() {
+    const { t } = useTranslation('pages', { keyPrefix: 'CategoryList' });
     const { data: categories, isLoading: isCategoriesLoading, refetch: categoriesRefetch } = CategoryQuery.useGetAll();
     const createCategory = CategoryMutation.useCreate();
 
@@ -28,10 +30,10 @@ export default function CategoryListPage() {
             <Stack>
                 <Grid>
                     <Grid.Col span={6}>
-                        <Title order={3}>Category</Title>
+                        <Title order={3}>{t('title')}</Title>
                     </Grid.Col>
                     <Grid.Col span={6} style={{ textAlign: 'end' }}>
-                        <Button onClick={open}>Create Category</Button>
+                        <Button onClick={open}>{t('create_category')}</Button>
                     </Grid.Col>
                 </Grid>
                 <ScrollArea.Autosize type="auto">

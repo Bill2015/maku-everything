@@ -1,0 +1,7 @@
+{
+    "ResourceCard": {
+        "detail": "Detail",
+        "created_at": "Created At:",
+        "updated_at": "Updated At:"
+    }
+}

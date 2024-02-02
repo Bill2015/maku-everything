@@ -23,6 +23,7 @@ export default defineConfig(async () => ({
             '@utils':      path.resolve(__dirname, './src/utils'),
             '@router':     path.resolve(__dirname, './src/router'),
             '@modals':     path.resolve(__dirname, './src/modals'),
+            '@modules':    path.resolve(__dirname, './src/modules'),
             '@api':        path.resolve(__dirname, './src/api'),
             '@pages':      path.resolve(__dirname, './src/pages'),
             '@components': path.resolve(__dirname, './src/components'),
