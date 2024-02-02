@@ -1,8 +1,8 @@
 [package]
 name = "maku"
 version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Tagging System"
+authors = ["Bill2015"]
 license = ""
 repository = ""
 edition = "2021"
