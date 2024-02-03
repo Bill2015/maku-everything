@@ -27,7 +27,7 @@ module.exports = {
         '\\.(svg)$':                                                                       '<rootDir>/src/__test__/mocks/svgMock.tsx',
         '\\.(css|less|scss)$':                                                             '<rootDir>/src/__test__/mocks/styleMock.js',
         // '^lodash-es$':                                                                     'lodash',
-        ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/src/' }),
+        ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
     },
     /**
      * An array of regexp pattern strings that are matched against all test paths before executing

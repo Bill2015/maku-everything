@@ -25,7 +25,8 @@ export function getYoutubeVideoId(url: string) {
         youtubeId = (paramIndex > 0) ? youtubeId.slice(0, paramIndex) : youtubeId;
         const queryIndex = youtubeId.indexOf('?');
         youtubeId = (queryIndex > 0) ? youtubeId.slice(0, queryIndex) : youtubeId;
+        return youtubeId;
     }
 
-    return youtubeId;
+    return null;
 }
