@@ -35,9 +35,17 @@
 			"@components/*": ["src/components/*"]
 		}
 	},
+	"types": [
+        "@types/jest", 
+        "node"
+    ],
 	"include": [
-		"src"
+		"src/**/*"
 	],
+	"exclude": [
+        "node_modules", 
+		"src/*.test.ts"
+    ],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"
