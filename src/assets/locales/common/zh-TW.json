@@ -2,13 +2,13 @@
     "Display": {
         "DateTimeDisplayer": {
             "just_now": "現在",
-            "seconds_ago": "秒前",
-            "minutes_ago": "分鐘前",
-            "hours_ago": "小時前",
-            "days_ago": "天前",
-            "weeks_ago": "周前",
-            "months_ago": "月前",
-            "years_ago": "年前"
+            "seconds": "秒前",
+            "minutes": "分鐘前",
+            "hours": "小時前",
+            "days": "天前",
+            "weeks": "周前",
+            "months": "月前",
+            "years": "年前"
         },
         "EditableText": {
             "modifying": "修改中",

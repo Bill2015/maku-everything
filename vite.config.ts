@@ -28,6 +28,7 @@ export default defineConfig(async () => ({
             '@api':        path.resolve(__dirname, './src/api'),
             '@pages':      path.resolve(__dirname, './src/pages'),
             '@components': path.resolve(__dirname, './src/components'),
+            '@__test__':   path.resolve(__dirname, './src/__test__'),
         },
     },
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`

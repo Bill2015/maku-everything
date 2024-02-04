@@ -32,7 +32,8 @@
 			"@modules/*": ["src/modules/*"],
 			"@pages/*": ["src/pages/*"],
 			"@router/*": ["src/router/*"],
-			"@components/*": ["src/components/*"]
+			"@components/*": ["src/components/*"],
+			"@__test__/*": ["src/__test__/*"]
 		}
 	},
 	"types": [

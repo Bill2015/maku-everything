@@ -1,3 +1,4 @@
+/* eslint-disable quote-props */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-import-module-exports */
 /* eslint-disable import/extensions */
@@ -8,7 +9,11 @@ import { compilerOptions } from './tsconfig.json';
 module.exports = {
     preset:             'ts-jest',
     testEnvironment:    'jsdom',
-    setupFilesAfterEnv: ['<rootDir>/jest-setup.tsx'],
+    setupFilesAfterEnv: [
+        '<rootDir>/jest-setup.tsx',
+        '<rootDir>/src/__test__/setups/matchMedia.js',
+        '<rootDir>/src/__test__/setups/i18next.ts',
+    ],
     /**
      * Default: null
      * A map from regular expressions to module names or to arrays of module names that allow to
@@ -20,12 +25,13 @@ module.exports = {
      * Use <rootDir> string token to refer to rootDir value if you want to use file paths.
      * Additionally, you can substitute captured regex groups using numbered backreferences.
      */
-    moduleNameMapper:   {
+    moduleNameMapper: {
         '\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/src/__test__/mocks/fileMock.js',
         // https://github.com/gregberge/svgr/issues/83#issuecomment-785996587
         // SVG Mock
         '\\.(svg)$':                                                                       '<rootDir>/src/__test__/mocks/svgMock.tsx',
         '\\.(css|less|scss)$':                                                             '<rootDir>/src/__test__/mocks/styleMock.js',
+        // 'i18next':                                                                         '<rootDir>/src/__test__/mocks/i18nextMocks.ts',
         // '^lodash-es$':                                                                     'lodash',
         ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
     },
@@ -38,5 +44,10 @@ module.exports = {
         '(.*)index.ts$',
         '(.*)testcase.ts$',
         '/src-tauri/',
+    ],
+    collectCoverageFrom: [
+        '<rootDir>/src/**/*.{ts,tsx}',
+        '!<rootDir>/src/__test__/**',
+        '!(.*)index.ts$',
     ],
 };

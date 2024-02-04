@@ -2,13 +2,13 @@
     "Display": {
         "DateTimeDisplayer": {
             "just_now": "jsut now",
-            "seconds_ago": "seconds ago",
-            "minutes_ago": "minutes ago",
-            "hours_ago": "hours ago",
-            "days_ago": "days ago",
-            "months_ago": "months ago",
-            "years_ago": "years ago",
-            "weeks_ago": "weeks ago"
+            "seconds": "seconds ago",
+            "minutes": "minutes ago",
+            "hours": "hours ago",
+            "days": "days ago",
+            "months": "months ago",
+            "years": "years ago",
+            "weeks": "weeks ago"
         },
         "EditableText": {
             "modifying": "modifying",

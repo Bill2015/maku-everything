@@ -11,13 +11,13 @@ export interface DateTimeDisplayerProps extends TextProps {
 }
 
 const DATETIME_DISPLAYER_MAPPER: Record<DateTimeUnit, string> = {
-    seconds: 'seconds_ago',
-    minutes: 'minutes_ago',
-    hours:   'hours_ago',
-    days:    'days_ago',
-    weeks:   'weeks_ago',
-    months:  'months_ago',
-    years:   'years_ago',
+    seconds: 'seconds',
+    minutes: 'minutes',
+    hours:   'hours',
+    days:    'days',
+    weeks:   'weeks',
+    months:  'months',
+    years:   'years',
 };
 
 export function DateTimeDisplayer(props: DateTimeDisplayerProps) {

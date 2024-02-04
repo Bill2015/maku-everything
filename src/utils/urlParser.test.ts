@@ -11,6 +11,10 @@ describe('getYoutubeVideoId', () => {
             inputURL: 'https://www.youtube.com/watch?v=uWxGMzSdX0c&list=RDuWxGMzSdX0c&start_radio=1',
             expectId: 'uWxGMzSdX0c',
         },
+        {
+            inputURL: 'https://www.youtube.com/watch?v=uWxGMzSdX0c?list=RDuWxGMzSdX0c',
+            expectId: 'uWxGMzSdX0c',
+        },
         // shorts
         {
             inputURL: 'https://www.youtube.com/shorts/7IxS5Y2eMw0',
