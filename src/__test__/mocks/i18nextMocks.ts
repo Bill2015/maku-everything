@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function replaceBetween(startIndex: number, endIndex: number, original: string, insertion: string) {
     const result = original.substring(0, startIndex) + insertion + original.substring(endIndex);
     return result;

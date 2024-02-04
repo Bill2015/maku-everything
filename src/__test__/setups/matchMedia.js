@@ -1,3 +1,6 @@
+/**
+ * Mantine with jest
+ * @ref https://mantine.dev/guides/jest/#mock-web-apis */
 const { getComputedStyle } = window;
 window.getComputedStyle = (elt) => getComputedStyle(elt);
 

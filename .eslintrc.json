@@ -29,11 +29,13 @@
         "react"
     ],
     "ignorePatterns": [
-        "**/*.css", 
-        "**/*.scss", 
-        "configs/**",
+        "**/*.css",
+        "**/*.scss",
         "dist/**",
-        "src-tauri/**"
+        "coverage/**",
+        "src-tauri/**",
+        "node_modules/**",
+        "*.config.ts"
     ],
     "rules": {
         "react/react-in-jsx-scope": "off",
@@ -111,8 +113,7 @@
     "overrides": [
         {
             "files": [
-                "**/__test__/**/*.js",
-                "**/__test__/**/*.ts",
+                "**/__test__/**/*.{js,ts,tsx}",
                 "*.test.ts",
                 "*.test.tsx",
                 "jest-setup.tsx"
@@ -122,6 +123,7 @@
             },
             "rules": {
                 "class-methods-use-this": "off",
+                "import/no-extraneous-dependencies": "off",
                 "object-curly-newline": ["error", {
                     "multiline": true,
                     "minProperties": 8 

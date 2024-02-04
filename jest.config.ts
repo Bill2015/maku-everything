@@ -29,10 +29,9 @@ module.exports = {
         '\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/src/__test__/mocks/fileMock.js',
         // https://github.com/gregberge/svgr/issues/83#issuecomment-785996587
         // SVG Mock
-        '\\.(svg)$':                                                                       '<rootDir>/src/__test__/mocks/svgMock.tsx',
-        '\\.(css|less|scss)$':                                                             '<rootDir>/src/__test__/mocks/styleMock.js',
-        // 'i18next':                                                                         '<rootDir>/src/__test__/mocks/i18nextMocks.ts',
-        // '^lodash-es$':                                                                     'lodash',
+        '\\.(svg)$': '<rootDir>/src/__test__/mocks/svgMock.tsx',
+        '\\.(css|less|scss)$': '<rootDir>/src/__test__/mocks/styleMock.js',
+        // '^lodash-es$': 'lodash',
         ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
     },
     /**
