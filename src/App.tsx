@@ -9,7 +9,7 @@ import { MainNavbar } from '@components/navbar';
 import { CreateSubjectModal } from '@modals/subject';
 import { CreateTagModal } from '@modals/tag';
 import { CreateResourceModal } from '@modals/resource';
-import { ImportCategoryModal } from '@modals/category';
+import { ImportCategoryModal, CreateCategoryModal } from '@modals/category';
 import { MainHeader } from '@components/header';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
@@ -72,6 +72,7 @@ function App() {
             <CreateSubjectModal />
             <CreateTagModal />
             <CreateResourceModal />
+            <CreateCategoryModal />
             <ImportCategoryModal />
         </MantineProvider>
     );

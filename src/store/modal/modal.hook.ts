@@ -65,6 +65,10 @@ export function useImportCategoryModal() {
     return useBaseModalHook(ModalName.importCategory);
 }
 
+export function useCreateCategoryModal() {
+    return useBaseModalHook(ModalName.CreateCategory);
+}
+
 export function useCreateSubjectModal() {
     return useBaseModalHook(ModalName.CreateSubject);
 }
