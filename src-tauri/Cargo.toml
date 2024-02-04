@@ -12,6 +12,12 @@ edition = "2021"
 [build-dependencies]
 tauri-build = { version = "1.5.1", features = [] }
 
+[dev-dependencies]
+test-case = "3.3.1"
+pretty_assertions = "1.4.0"
+cargo-nextest = "0.9.67"
+cargo-tarpaulin = "0.27.3"
+
 [dependencies]
 tauri = { version = "1.5.4", features = ["dialog-all", "process-command-api", "protocol-asset", "path-all", "fs-all", "shell-open", "devtools"] }
 serde = { version = "1.0.195", features = ["derive"] }
@@ -31,6 +37,7 @@ pretty_env_logger = "0.5.0"
 log = "0.4.20"
 regex = "1.10.3"
 paste = "1.0.14"
+cargo-tarpaulin = "0.27.3"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

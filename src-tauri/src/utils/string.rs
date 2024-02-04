@@ -43,3 +43,38 @@ impl StringUtils for str {
         self.substring(start, len)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use test_case::test_case;
+    use pretty_assertions::assert_eq;
+    use super::StringUtils;
+
+    #[test_case(0, 4, "abcd" ; "len with in the string length")]
+    #[test_case(0, 999, "abcdefghijk" ; "len large than string length")]
+    #[test_case(6, 1, "g" ; "start large than len")]
+    #[test_case(6, 0, "" ; "len equal zero")]
+    #[test_case(0, 0, "" ; "start and len equal")]
+    fn substring_with_normal_charater(start: usize, end: usize, expected: &str) {
+        // Arrange
+
+        // Act
+        let result = "abcdefghijk".substring(start, end);
+
+        // Assert
+        assert_eq!(result, expected);
+    }
+
+    #[test_case(0, 4, "abcd" ; "len with in the string length")]
+    #[test_case(0, 999, "abcdefghijk" ; "len large than string length")]
+    #[test_case(0, 0, "" ; "start and len equal")]
+    fn slice_with_normal_charater(start: usize, end: usize, expected: &str) {
+        // Arrange
+
+        // Act
+        let result = "abcdefghijk".slice(start..end);
+
+        // Assert
+        assert_eq!(result, expected);
+    }
+}
