@@ -6,6 +6,7 @@ import { useCreateResourceModal } from '@store/modal';
 import { ErrorResBody } from '@api/common';
 import { showNotification } from '@components/notification';
 import { BaseModal } from '@components/modal';
+import { PathInput } from '@components/input';
 
 export function CreateResourceModal() {
     const { activeCategory } = useActiveCategoryRedux();
@@ -61,7 +62,7 @@ export function CreateResourceModal() {
                     File Path
                 </Grid.Col>
                 <Grid.Col span={12}>
-                    <Input placeholder="resource file path" value={filePath} onChange={(e) => setFilePath(e.target.value)} />
+                    <PathInput placeholder="resource file path" value={filePath} onChange={(e) => setFilePath(e)} />
                 </Grid.Col>
                 <Grid.Col span={12}>
                     URL Path

@@ -5,6 +5,7 @@ import { CategoryMutation } from '@api/category';
 import { showNotification } from '@components/notification';
 import { ErrorResBody } from '@api/common';
 import { BaseModal } from '@components/modal';
+import { PathInput } from '@components/input';
 
 export function ImportCategoryModal() {
     const [opened, { close, confirmClose, cancelClose }] = useImportCategoryModal();
@@ -40,10 +41,10 @@ export function ImportCategoryModal() {
         <BaseModal opened={opened} onClose={close} title="Import New Category">
             <Stack>
                 <Input.Wrapper required label="Root path">
-                    <Input
+                    <PathInput
                         placeholder="enter path here..."
                         value={rootPath}
-                        onChange={(e) => setRootPath(e.currentTarget.value)}
+                        onChange={(val) => setRootPath(val)}
                     />
                 </Input.Wrapper>
 

@@ -50,6 +50,9 @@
                 "func_created": "Resource created date",
                 "func_updated": "Resource updated date"
             }
+        },
+        "PathInput": {
+            "file_button": "select local path"
         }
     }
 }

@@ -50,6 +50,9 @@
                 "func_created": "資源建立的日期",
                 "func_updated": "資源更新的日期"
             }
+        },
+        "PathInput": {
+            "file_button": "選擇本地路徑"
         }
     }
 }
