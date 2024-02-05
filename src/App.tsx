@@ -12,6 +12,7 @@ import { CreateTagModal } from '@modals/tag';
 import { CreateResourceModal } from '@modals/resource';
 import { ImportCategoryModal, CreateCategoryModal } from '@modals/category';
 import { MainHeader } from '@components/header';
+import { useViewportSize } from '@mantine/hooks';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
 
@@ -29,6 +30,7 @@ function App() {
     const routes = useRoutes(ROUTE_OBJECTS);
     const [theme, setTheme] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
+    const { height, width } = useViewportSize();
 
     useEffect(() => {
         if (isConnected === false) {
@@ -63,7 +65,7 @@ function App() {
                         <MainNavbar />
                     </AppShell.Navbar>
 
-                    <AppShell.Main pos="relative" display="flex">
+                    <AppShell.Main w={width - 20} h={height}>
                         <Suspense fallback={<Box>FallBack</Box>}>
                             {routes}
                         </Suspense>

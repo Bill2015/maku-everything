@@ -27,7 +27,7 @@ export function CategoryContainer() {
     const [isCollapse, setIsCollapse] = useState<boolean>(true);
 
     return (
-        <Flex>
+        <Flex h="100%">
             <Box style={{ flexGrow: 1 }} display="grid">
                 <Outlet />
             </Box>
