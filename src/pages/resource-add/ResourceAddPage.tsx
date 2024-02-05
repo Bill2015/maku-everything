@@ -1,48 +1,58 @@
 import { useState } from 'react';
-import { Divider, Grid, ScrollArea, Stack } from '@mantine/core';
+import { Box, Grid, Text } from '@mantine/core';
 import { ResourceDisplay } from '@pages/resource-detail/components/ResourceDisplay';
-import { TagQuery } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
-import { useTagComboSelectValue } from '@components/input';
-import { PathTypography, TextItem } from './components';
-import { TextTagMapperProvider, useTextTagMapperContext } from './hooks';
+import { AddPageFunctionSide } from './components';
+import { TextTagMapperProvider } from './hooks';
+import { Carousel } from '@mantine/carousel';
+import { ResourceThumbnailDisplayer } from '@components/display';
+
+import '@mantine/carousel/styles.css';
+import classes from './ResourceAddPage.module.scss';
+
+type Resource = {
+    path: string;
+}
+
+
+const mockResource: Resource[] = [
+    {
+        path: 'D:\\GithubRepo\\maku everything\\dataset\\hololive\\irys-[hololive]-holoen-thumb-anime-girl-gif-69930183607745831126993018360774583112',
+    },
+    {
+        path: 'D:\\GithubRepo\\maku-everything\\src\\pages',
+    },
+];
 
 export function ResourceAddPageContent() {
     const { activeCategory } = useActiveCategoryRedux();
-    const [text, setText] = useState<string>('D:\\GithubRepo\\maku everything\\dataset\\hololive\\irys-[hololive]-holoen-thumb-anime-girl-gif-69930183607745831126993018360774583112');
+    const [text, setText] = useState<string>(mockResource[0].path);
 
-    const { textMap, highlightText } = useTextTagMapperContext();
-
-    const { data: tagData } = TagQuery.useGetByCategory(activeCategory.id);
-    const tagOptionValues = useTagComboSelectValue(tagData);
+    const handleSlideChange = (index: number) => {
+        setText(mockResource[index].path);
+    }
 
     return (
-        <Grid>
-            <Grid.Col p={0} span={{ lg: 6, sm: 12 }} mah="100%" ta="center" display="flex" style={{ justifyContent: 'center' }}>
-                <ResourceDisplay name="Hi" />
+        <Grid classNames={{ inner: classes.innerGrid }} miw={0} mih={0}>
+            <Grid.Col p={0} span={{ lg: 6, sm: 12 }} mah="100%" ta="center" display="flex">
+                <Carousel
+                    slideGap="lg"
+                    loop
+                    withIndicators
+                    classNames={{ root: classes.carouselRoot, slide: classes.carouselSlide }}
+                    onSlideChange={handleSlideChange}
+                >
+                    {
+                        mockResource.map((val) => (
+                            <Carousel.Slide>
+                                <Text>{val.path}</Text>
+                            </Carousel.Slide>
+                        ))
+                    }
+                </Carousel>
             </Grid.Col>
-            <Grid.Col span={{ lg: 6, sm: 12 }} h="100%">
-                <Stack>
-                    <PathTypography text={text} highlight={highlightText} />
-                    <ScrollArea.Autosize mah="670px" type="hover">
-                        <Grid gutter="xs" pr={20}>
-                            <Grid.Col span={4} display="flex" style={{ alignItems: 'center' }}>
-                                Target Text
-                            </Grid.Col>
-                            <Grid.Col span={8}>
-                                Appended Tag
-                            </Grid.Col>
-                            <Grid.Col span={12}>
-                                <Divider />
-                            </Grid.Col>
-                            {
-                                Array.from(textMap.keys()).map((val) => (
-                                    <TextItem key={val} text={val} tagValues={tagOptionValues} />
-                                ))
-                            }
-                        </Grid>
-                    </ScrollArea.Autosize>
-                </Stack>
+            <Grid.Col span={{ lg: 6, sm: 12 }} mah="100%">
+                <AddPageFunctionSide text={text} />
             </Grid.Col>
         </Grid>
     );

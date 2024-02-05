@@ -28,7 +28,7 @@ export function CategoryContainer() {
 
     return (
         <Flex h="100%">
-            <Box style={{ flexGrow: 1 }} display="grid">
+            <Box style={{ flexGrow: 1 }} display="grid" w="100%" miw={0}>
                 <Outlet />
             </Box>
             <Collapse
