@@ -43,6 +43,7 @@ export function ImportCategoryModal() {
                 <Input.Wrapper required label="Root path">
                     <PathInput
                         placeholder="enter path here..."
+                        directory
                         value={rootPath}
                         onChange={(val) => setRootPath(val)}
                     />
