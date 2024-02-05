@@ -11,10 +11,12 @@ import { IoAdd } from 'react-icons/io5';
 
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateResourceModal, useCreateSubjectModal, useCreateTagModal } from '@store/modal';
+import { useResourceAddNavigate } from '@router/navigateHook';
 
 export function CategoryContainer() {
     const { activeCategory } = useActiveCategoryRedux();
     const { t } = useTranslation('pages', { keyPrefix: 'Common.CategoryContainer' });
+    const navigateToAdd = useResourceAddNavigate();
 
     const [_subject, { open: openSubject }] = useCreateSubjectModal();
     const [_tag, { open: openTag }] = useCreateTagModal();
@@ -69,6 +71,9 @@ export function CategoryContainer() {
                                     {t('TagsPanel.resource')}
                                 </Button>
 
+                                <Button onClick={() => navigateToAdd(activeCategory.name)}>
+                                    To Add
+                                </Button>
                             </Stack>
                         </Tabs.Panel>
 

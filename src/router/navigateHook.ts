@@ -32,3 +32,15 @@ export function useHomeNavigate() {
 
     return jumpFn;
 }
+
+export function useResourceAddNavigate() {
+    const navigate = useNavigate();
+
+    const jumpFn = useCallback((belongCategoryName: string | null) => {
+        if (belongCategoryName) {
+            navigate('resource/add');
+        }
+    }, [navigate]);
+
+    return jumpFn;
+}

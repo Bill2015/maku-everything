@@ -25,6 +25,7 @@
 		"dayjs": "^1.11.10",
 		"embla-carousel-react": "^7.1.0",
 		"i18next": "^23.8.2",
+		"immutable": "^5.0.0-beta.5",
 		"lodash": "^4.17.21",
 		"millify": "^6.1.0",
 		"react": "^18.2.0",
