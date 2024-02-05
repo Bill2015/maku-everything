@@ -2,6 +2,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { Notifications } from '@mantine/notifications';
 import { Box, MantineProvider, AppShell } from '@mantine/core';
+import { ContextMenuProvider } from 'mantine-contextmenu';
 
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -16,9 +17,12 @@ import { ROUTE_OBJECTS } from './router/RoutingTable';
 
 // https://mantine.dev/styles/mantine-styles/#css-layers
 import '@mantine/core/styles.layer.css';
+import 'mantine-contextmenu/styles.layer.css';
 
 import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
+import './styles.css';
+
 import classes from './App.module.scss';
 
 function App() {
@@ -40,40 +44,42 @@ function App() {
 
     return (
         <MantineProvider defaultColorScheme="dark">
-            <AppShell
-                classNames={{ main: classes.main }}
-                header={{ height: 40 }}
-                navbar={{
-                    width:      70,
-                    breakpoint: 'sm',
-                    collapsed:  { mobile: true },
-                }}
-                padding="md"
-            >
-                <AppShell.Header display="flex" style={{ alignItems: 'center' }}>
-                    <MainHeader />
-                </AppShell.Header>
+            <ContextMenuProvider>
+                <AppShell
+                    classNames={{ main: classes.main }}
+                    header={{ height: 40 }}
+                    navbar={{
+                        width:      70,
+                        breakpoint: 'sm',
+                        collapsed:  { mobile: true },
+                    }}
+                    padding="md"
+                >
+                    <AppShell.Header display="flex" style={{ alignItems: 'center' }}>
+                        <MainHeader />
+                    </AppShell.Header>
 
-                <AppShell.Navbar p="sm">
-                    <MainNavbar />
-                </AppShell.Navbar>
+                    <AppShell.Navbar p="sm">
+                        <MainNavbar />
+                    </AppShell.Navbar>
 
-                <AppShell.Main pos="relative" display="flex">
-                    <Suspense fallback={<Box>FallBack</Box>}>
-                        {routes}
-                    </Suspense>
-                </AppShell.Main>
+                    <AppShell.Main pos="relative" display="flex">
+                        <Suspense fallback={<Box>FallBack</Box>}>
+                            {routes}
+                        </Suspense>
+                    </AppShell.Main>
 
-                <AppShell.Footer h={20}>
-                    <div>Hi</div>
-                </AppShell.Footer>
-            </AppShell>
-            <Notifications classNames={{ notification: classes.notification }} />
-            <CreateSubjectModal />
-            <CreateTagModal />
-            <CreateResourceModal />
-            <CreateCategoryModal />
-            <ImportCategoryModal />
+                    <AppShell.Footer h={20}>
+                        <div>Hi</div>
+                    </AppShell.Footer>
+                </AppShell>
+                <Notifications classNames={{ notification: classes.notification }} />
+                <CreateSubjectModal />
+                <CreateTagModal />
+                <CreateResourceModal />
+                <CreateCategoryModal />
+                <ImportCategoryModal />
+            </ContextMenuProvider>
         </MantineProvider>
     );
 }

@@ -1,22 +1,9 @@
-/* .logo.vite:hover {
-    filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafb);
-}
-
-.mantine-AppShell-main {
-    max-height: 1px;
-} */
-
 .main {
     max-height: 100dvh;
     & > * {
         width: 100%;
     }
 }
-
 
 .notification {
     --notification-color: var(--mantine-color-body) !important;

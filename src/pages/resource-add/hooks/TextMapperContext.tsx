@@ -4,8 +4,8 @@ import React, { PropsWithChildren, useContext, useState } from 'react';
 type TextTagMapperContextType = {
     highlightText: string;
     setHighlightText: (val: string) => void;
-    textMap: ImmutableMap<string, string>;
-    textMapInsert: (key: string, val: string) => void;
+    textMap: ImmutableMap<string, string | null>;
+    textMapInsert: (key: string, val: string | null) => void;
     textMapDelete: (key: string) => void;
 }
 
@@ -28,7 +28,7 @@ export function TextTagMapperProvider(props: PropsWithChildren) {
         setState((prev) => ({ ...prev, highlightText: val }));
     };
 
-    const textMapInsert = (key: string, val: string) => {
+    const textMapInsert = (key: string, val: string | null) => {
         setState((prev) => ({ ...prev, textMap: prev.textMap.set(key, val) }));
     };
     const textMapDelete = (key: string) => {

@@ -1,19 +1,17 @@
 import { useState } from 'react';
-import { Grid, Highlight, ScrollArea, Stack } from '@mantine/core';
+import { Divider, Grid, ScrollArea, Stack } from '@mantine/core';
 import { ResourceDisplay } from '@pages/resource-detail/components/ResourceDisplay';
 import { TagQuery } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
 import { useTagComboSelectValue } from '@components/input';
-import { SeparatorInput, TextItem } from './components';
-import { TextTagMapperProvider, useSeparatorText, useTextTagMapperContext } from './hooks';
+import { PathTypography, TextItem } from './components';
+import { TextTagMapperProvider, useTextTagMapperContext } from './hooks';
 
 export function ResourceAddPageContent() {
     const { activeCategory } = useActiveCategoryRedux();
     const [text, setText] = useState<string>('D:\\GithubRepo\\maku everything\\dataset\\hololive\\irys-[hololive]-holoen-thumb-anime-girl-gif-69930183607745831126993018360774583112');
 
-    const { separators, setSeparators, separateResult, reset } = useSeparatorText(text);
-
-    const { highlightText } = useTextTagMapperContext();
+    const { textMap, highlightText } = useTextTagMapperContext();
 
     const { data: tagData } = TagQuery.useGetByCategory(activeCategory.id);
     const tagOptionValues = useTagComboSelectValue(tagData);
@@ -25,12 +23,20 @@ export function ResourceAddPageContent() {
             </Grid.Col>
             <Grid.Col span={{ lg: 6, sm: 12 }} h="100%">
                 <Stack>
-                    <Highlight highlight={highlightText}>{text}</Highlight>
-                    <SeparatorInput value={separators} onChange={setSeparators} onReset={reset} />
-                    <ScrollArea.Autosize mx="auto" mah="470px" type="hover">
+                    <PathTypography text={text} highlight={highlightText} />
+                    <ScrollArea.Autosize mah="670px" type="hover">
                         <Grid gutter="xs" pr={20}>
+                            <Grid.Col span={4} display="flex" style={{ alignItems: 'center' }}>
+                                Target Text
+                            </Grid.Col>
+                            <Grid.Col span={8}>
+                                Appended Tag
+                            </Grid.Col>
+                            <Grid.Col span={12}>
+                                <Divider />
+                            </Grid.Col>
                             {
-                                separateResult.map((val) => (
+                                Array.from(textMap.keys()).map((val) => (
                                     <TextItem key={val} text={val} tagValues={tagOptionValues} />
                                 ))
                             }

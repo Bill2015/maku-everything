@@ -36,15 +36,12 @@ export function TextItem(props: TextItemProps) {
                     selectedTagData
                         ? (
                             <Group justify="space-between">
-                                <TagTypography
-                                    name={selectedTagData.name}
-                                    subjectName={selectedTagData.subjectName}
-                                />
+                                <TagTypography name={selectedTagData.name} subjectName={selectedTagData.subjectName} />
                                 <Box>
                                     <ActionIcon
                                         variant="transparent"
                                         onClick={() => {
-                                            textMapDelete(text);
+                                            textMapInsert(text, null);
                                             setTimeout(() => comboSelectRef.current!.getInputRef()!.focus(), 10);
                                         }}
                                     >
@@ -57,19 +54,24 @@ export function TextItem(props: TextItemProps) {
                             </Group>
                         )
                         : (
-                            <TagComboSelect
-                                ref={comboSelectRef}
-                                data={tagValues}
-                                defaultValue={selectedTagData}
-                                onSubmitOptions={(option) => {
-                                    if (option) {
-                                        textMapInsert(text, option.id);
-                                    }
-                                    else {
-                                        textMapDelete(text);
-                                    }
-                                }}
-                            />
+                            <Group>
+                                <TagComboSelect
+                                    ref={comboSelectRef}
+                                    data={tagValues}
+                                    defaultValue={selectedTagData}
+                                    onSubmitOptions={(option) => {
+                                        if (option) {
+                                            textMapInsert(text, option.id);
+                                        }
+                                        else {
+                                            textMapDelete(text);
+                                        }
+                                    }}
+                                />
+                                <ActionIcon variant="transparent" c="red" onClick={() => textMapDelete(text)}>
+                                    <RxCross1 />
+                                </ActionIcon>
+                            </Group>
                         )
                 }
             </Grid.Col>

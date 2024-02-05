@@ -8,7 +8,6 @@ import { store } from '@store/store';
 import '@modules/i18next';
 
 import App from './App';
-// import './styles.css';
 
 const queryClient = new QueryClient();
 
