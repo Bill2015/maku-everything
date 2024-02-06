@@ -4,6 +4,7 @@ import { ResourceThumbnailDisplayer } from '@components/display';
 
 import '@mantine/carousel/styles.css';
 import classes from './AddPagePreviewSide.module.scss';
+import { ResourcePreviewType } from '../hooks';
 
 const carouselClasses = {
     root:      classes.carouselRoot,
@@ -11,14 +12,6 @@ const carouselClasses = {
     viewport:  classes.carouselViewPort,
     container: classes.carouselContainer,
 };
-
-export type ResourcePreviewType = {
-    local?: string;
-
-    url?: string;
-
-    index: number;
-}
 
 export interface AddPagePreviewSideProps {
     data: ResourcePreviewType[];
@@ -32,6 +25,7 @@ export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
 
     const sizeObserver = useRef<ResizeObserver>(new ResizeObserver(() => {}));
 
+    // when data changed, scroll to the end
     useEffect(() => {
         if (embla) {
             embla.scrollTo(data.length - 1, false);

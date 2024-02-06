@@ -8,11 +8,13 @@ import { TextItem } from './TextItem';
 import { useTextTagMapperContext } from '../hooks';
 
 export interface AddPageFunctionSideProps {
+    rootPath: string;
+
     text: string;
 }
 
 export function AddPageFunctionSide(props: AddPageFunctionSideProps) {
-    const { text } = props;
+    const { rootPath, text } = props;
     const { activeCategory } = useActiveCategoryRedux();
     const { textMap, highlightText } = useTextTagMapperContext();
     const { data: tagData } = TagQuery.useGetByCategory(activeCategory.id);
@@ -20,7 +22,7 @@ export function AddPageFunctionSide(props: AddPageFunctionSideProps) {
 
     return (
         <Stack mah="100%">
-            <PathTypography text={text} highlight={highlightText} />
+            <PathTypography rootPath={rootPath} text={text} highlight={highlightText} />
             <Stack mih={0}>
                 <Group>
                     <Text flex="0 0 30%">Target Text</Text>

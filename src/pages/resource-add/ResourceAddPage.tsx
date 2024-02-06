@@ -2,12 +2,10 @@ import { useCallback, useState } from 'react';
 import { Grid } from '@mantine/core';
 import { useActiveCategoryRedux } from '@store/global';
 import { CategoryQuery } from '@api/category';
-import { showNotification } from '@components/notification';
 import { TauriDropZone } from '@components/input';
-import { useStateRef } from '@hooks/life-hooks';
 
-import { TextTagMapperProvider } from './hooks';
-import { AddPageFunctionSide, AddPagePreviewSide, ResourcePreviewType } from './components';
+import { TextTagMapperProvider, useAddResouces } from './hooks';
+import { AddPageFunctionSide, AddPagePreviewSide } from './components';
 
 import '@mantine/carousel/styles.css';
 import classes from './ResourceAddPage.module.scss';
@@ -15,30 +13,8 @@ import classes from './ResourceAddPage.module.scss';
 export function ResourceAddPageContent() {
     const { activeCategory } = useActiveCategoryRedux();
     const [activePath, setActivePath] = useState<string>('');
-    const [resourceValues, setResourceValues, getResourceValuesRef] = useStateRef<ResourcePreviewType[]>([]);
     const { data: category } = CategoryQuery.useGetById(activeCategory.id);
-
-    // drop file to upload
-    const onDropFiles = useCallback(async (filePaths: string[]) => {
-        if (!category) {
-            return;
-        }
-
-        const valueSet = new Set(resourceValues.map((val) => val.local));
-        for (const filePath of filePaths) {
-            if (!filePath.startsWith(category.root_path)) {
-                showNotification('Invalid Resource', filePath, 'error');
-                break;
-            }
-            if (valueSet.has(filePath)) {
-                showNotification('Invalid Resource', `${filePath} already added`, 'error');
-                break;
-            }
-
-            resourceValues.push({ local: filePath, index: 0 });
-        }
-        setResourceValues([...resourceValues]);
-    }, [category, resourceValues, setResourceValues]);
+    const { onDropFiles, resourceValues, getResourceValuesRef } = useAddResouces(category);
 
     // unknown bug, the resoure values have closure problem, i don't know why
     const handleSlideChange = useCallback((index: number) => {
@@ -54,7 +30,7 @@ export function ResourceAddPageContent() {
                 <AddPagePreviewSide data={resourceValues} onSlideChange={handleSlideChange} />
             </Grid.Col>
             <Grid.Col span={{ lg: 6, sm: 12 }} mah="100%">
-                <AddPageFunctionSide text={activePath} />
+                <AddPageFunctionSide rootPath={category?.root_path || ''} text={activePath} />
             </Grid.Col>
             <TauriDropZone onDropFiles={onDropFiles} />
         </Grid>
