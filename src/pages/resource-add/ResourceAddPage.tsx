@@ -1,11 +1,8 @@
 import { useState } from 'react';
-import { Box, Grid, Text } from '@mantine/core';
-import { ResourceDisplay } from '@pages/resource-detail/components/ResourceDisplay';
+import { Grid } from '@mantine/core';
 import { useActiveCategoryRedux } from '@store/global';
-import { AddPageFunctionSide } from './components';
+import { AddPageFunctionSide, AddPagePreviewSide } from './components';
 import { TextTagMapperProvider } from './hooks';
-import { Carousel } from '@mantine/carousel';
-import { ResourceThumbnailDisplayer } from '@components/display';
 
 import '@mantine/carousel/styles.css';
 import classes from './ResourceAddPage.module.scss';
@@ -14,7 +11,6 @@ type Resource = {
     path: string;
 }
 
-
 const mockResource: Resource[] = [
     {
         path: 'D:\\GithubRepo\\maku everything\\dataset\\hololive\\irys-[hololive]-holoen-thumb-anime-girl-gif-69930183607745831126993018360774583112',
@@ -22,6 +18,15 @@ const mockResource: Resource[] = [
     {
         path: 'D:\\GithubRepo\\maku-everything\\src\\pages',
     },
+    {
+        path: 'https://www.youtube.com/watch?v=WwAhs9SqBfM',
+    },
+    {
+        path: 'https://www.youtube.com/watch?v=1otZy9RgJFQ&t=4479s',
+    },
+    {
+        path: 'https://www.youtube.com/watch?v=eETFCBmC_JY',
+    }
 ];
 
 export function ResourceAddPageContent() {
@@ -35,21 +40,7 @@ export function ResourceAddPageContent() {
     return (
         <Grid classNames={{ inner: classes.innerGrid }} miw={0} mih={0}>
             <Grid.Col p={0} span={{ lg: 6, sm: 12 }} mah="100%" ta="center" display="flex">
-                <Carousel
-                    slideGap="lg"
-                    loop
-                    withIndicators
-                    classNames={{ root: classes.carouselRoot, slide: classes.carouselSlide }}
-                    onSlideChange={handleSlideChange}
-                >
-                    {
-                        mockResource.map((val) => (
-                            <Carousel.Slide>
-                                <Text>{val.path}</Text>
-                            </Carousel.Slide>
-                        ))
-                    }
-                </Carousel>
+                <AddPagePreviewSide data={mockResource.map((val) => val.path)} onSlideChange={handleSlideChange} />
             </Grid.Col>
             <Grid.Col span={{ lg: 6, sm: 12 }} mah="100%">
                 <AddPageFunctionSide text={text} />

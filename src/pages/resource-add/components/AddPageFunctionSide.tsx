@@ -22,18 +22,21 @@ export function AddPageFunctionSide(props: AddPageFunctionSideProps) {
             <PathTypography text={text} highlight={highlightText} />
             <Stack mih={0}>
                 <Group>
-                    <Text>Target Text</Text>
+                    <Text flex="0 0 30%">Target Text</Text>
                     <Text>Appended Tag</Text>
                 </Group>
+                <Divider />
                 <ScrollArea.Autosize h="100%" style={{ textAlign: 'start' }}>
                     <Stack gap={10} pr={20}>
                         {
-                            Array.from(textMap.keys()).map((val) => (
-                                <>
-                                    <TextItem key={val} text={val} tagValues={tagOptionValues} />
-                                    <Divider opacity={0.25} />
-                                </>
-                            ))
+                            Array.from(textMap.keys())
+                                .filter((val) => text.toLowerCase().includes(val.toLowerCase()))
+                                .map((val) => (
+                                    <>
+                                        <TextItem key={val} text={val} tagValues={tagOptionValues} />
+                                        <Divider opacity={0.25} />
+                                    </>
+                                ))
                         }
                     </Stack>
                 </ScrollArea.Autosize>

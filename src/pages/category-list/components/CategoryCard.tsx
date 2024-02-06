@@ -50,7 +50,15 @@ export function CategoryCard(props: CategoryCardProps) {
             <Card.Section>
                 <ImagePreviewFlex>
                     {
-                        resourceData.map((data) => <ResourceThumbnailDisplayer key={data.id} data={data} useBackgoundImg />)
+                        resourceData.map((data) => (
+                            <ResourceThumbnailDisplayer
+                                key={data.id}
+                                url={data.url?.full}
+                                filePath={`${data.root_path}${data.file?.path}`}
+                                alt={data.name}
+                                useBackgoundImg
+                            />
+                        ))
                     }
                 </ImagePreviewFlex>
             </Card.Section>

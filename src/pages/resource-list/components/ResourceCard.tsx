@@ -28,7 +28,7 @@ export function ResourceCard(props: ResourceCardProps) {
                         />
                     )
                 }
-                <ResourceThumbnailDisplayer data={data} />
+                <ResourceThumbnailDisplayer url={data.url?.full} filePath={`${data.root_path}${data.file?.path}`} alt={data.name} />
             </Card.Section>
             <Accordion defaultValue="" classNames={{ content: classes.acccontent }}>
                 <Accordion.Item value={data.name}>
