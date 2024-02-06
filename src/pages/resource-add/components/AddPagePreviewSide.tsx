@@ -5,8 +5,23 @@ import { ResourceThumbnailDisplayer } from '@components/display';
 import '@mantine/carousel/styles.css';
 import classes from './AddPagePreviewSide.module.scss';
 
+const carouselClasses = {
+    root:      classes.carouselRoot,
+    slide:     classes.carouselSlide,
+    viewport:  classes.carouselViewPort,
+    container: classes.carouselContainer,
+};
+
+export type ResourcePreviewType = {
+    local?: string;
+
+    url?: string;
+
+    index: number;
+}
+
 export interface AddPagePreviewSideProps {
-    data: string[];
+    data: ResourcePreviewType[];
 
     onSlideChange: (index: number) => void;
 }
@@ -16,6 +31,12 @@ export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
     const [embla, setEmbla] = useState<Embla | null>(null);
 
     const sizeObserver = useRef<ResizeObserver>(new ResizeObserver(() => {}));
+
+    useEffect(() => {
+        if (embla) {
+            embla.scrollTo(data.length - 1, false);
+        }
+    }, [data, embla]);
 
     // if Carousel size re-init it to calculated right width
     useEffect(() => {
@@ -56,14 +77,14 @@ export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
             slideGap="lg"
             loop
             withIndicators
-            classNames={{ root: classes.carouselRoot, slide: classes.carouselSlide }}
+            classNames={carouselClasses}
             onSlideChange={onSlideChange}
             getEmblaApi={setEmbla}
         >
             {
                 data.map((val) => (
-                    <Carousel.Slide>
-                        <ResourceThumbnailDisplayer url={val} alt={val} />
+                    <Carousel.Slide key={`${val.local}${val.url}`}>
+                        <ResourceThumbnailDisplayer filePath={val.local} url={val.url} alt="" />
                     </Carousel.Slide>
                 ))
             }

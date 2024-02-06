@@ -40,7 +40,7 @@ impl<'a> CategoryQueryRepository<'a> {
 
         let mut response = self.db
             .query(sql)
-            .bind(("id", thing(id.as_str())))
+            .bind(("id", thing(id.as_str()).unwrap()))
             .bind(("table", &tablens::CATEGORY))
             .await?;
 

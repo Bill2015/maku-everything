@@ -7,8 +7,8 @@ export namespace CategoryAPI {
         return invoke<CategoryResDto[]>('get_all_category');
     }
 
-    export function getById() {
-        return invoke<CategoryResDto>('get_category_by_id');
+    export function getById(id: string) {
+        return invoke<CategoryResDto>('get_category_by_id', { id });
     }
 
     export function create(data: CategoryCreateDto) {

@@ -43,6 +43,7 @@ export function PathTypography(props: PathTypographyProps) {
         <Highlight
             highlight={highlight}
             onContextMenu={showContextMenu(contextmenu, contextmenuOption)}
+            style={{ wordBreak: 'break-all' }}
         >
             {text}
         </Highlight>

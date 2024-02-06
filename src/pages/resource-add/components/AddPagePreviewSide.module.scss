@@ -3,6 +3,12 @@
     width: 100%;
     display: flex;
     align-items: center;
+
+
+}
+
+.carouselViewPort, .carouselContainer {
+    height: 100%;
 }
 
 .carouselSlide {

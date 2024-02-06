@@ -27,35 +27,33 @@ interface TauriDropZoneProps {
 export function TauriDropZone(props: TauriDropZoneProps) {
     const { onDropFiles } = props;
     const { t } = useTranslation('common', { keyPrefix: 'Input.DropZone' });
-    const dropListener = useRef<UnlistenFn>();
+    const dropListener = useRef<Promise<UnlistenFn>>();
     const [isDragHover, setDragHover] = useState<boolean>(false);
 
     useEffect(() => {
-        async function dropEventRegister() {
-            dropListener.current = await appWindow.onFileDropEvent((event) => {
-                if (event.payload.type === 'hover' && event.payload.paths.length > 0) {
-                    setDragHover(true);
-                }
-                else if (event.payload.type === 'cancel') {
-                    setDragHover(false);
-                }
-                else {
-                    setDragHover(false);
-                    onDropFiles(event.payload.paths);
-                }
-            });
+        if (dropListener && dropListener.current) {
+            dropListener.current.then((fn) => fn());
         }
-        dropEventRegister();
+        dropListener.current = appWindow.onFileDropEvent((event) => {
+            if (event.payload.type === 'hover' && event.payload.paths.length > 0) {
+                setDragHover(true);
+            }
+            else if (event.payload.type === 'cancel') {
+                setDragHover(false);
+            }
+            else {
+                setDragHover(false);
+                onDropFiles(event.payload.paths);
+            }
+        });
 
         // cleaned up
         return () => {
             if (dropListener && dropListener.current) {
-                dropListener.current();
+                dropListener.current.then((fn) => fn());
             }
         };
-    // prevent rebinding the drop event
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [onDropFiles]);
 
     return (
         <Center className={classes.dropzone} display={isDragHover ? 'flex' : 'none'}>

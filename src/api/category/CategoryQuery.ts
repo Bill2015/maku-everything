@@ -13,4 +13,16 @@ export namespace CategoryQuery {
             initialData:     [],
         });
     }
+
+    export function useGetById(id: string) {
+        const queryfn = () => CategoryAPI.getById(id);
+
+        return useQuery({
+            queryKey:        ['categories', id],
+            queryFn:         queryfn,
+            enabled:         !!id,
+            placeholderData: null,
+            initialData:     null,
+        });
+    }
 }

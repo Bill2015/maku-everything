@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Divider, Group, ScrollArea, Stack, Text } from '@mantine/core';
 import { TagQuery } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
@@ -32,10 +33,10 @@ export function AddPageFunctionSide(props: AddPageFunctionSideProps) {
                             Array.from(textMap.keys())
                                 .filter((val) => text.toLowerCase().includes(val.toLowerCase()))
                                 .map((val) => (
-                                    <>
+                                    <Fragment key={val}>
                                         <TextItem key={val} text={val} tagValues={tagOptionValues} />
                                         <Divider opacity={0.25} />
-                                    </>
+                                    </Fragment>
                                 ))
                         }
                     </Stack>
