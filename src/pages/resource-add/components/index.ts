@@ -1,5 +1,5 @@
 export * from './SeparatorInput';
-export * from './TextItem';
+export * from './TagMapperItem';
 export * from './PathTypography';
 export * from './AddPageFunctionSide';
 export * from './AddPagePreviewSide';

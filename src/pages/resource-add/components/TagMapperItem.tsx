@@ -7,13 +7,13 @@ import { RxCross1 } from 'react-icons/rx';
 import { TagTypography } from '@components/display';
 import { useTextTagMapperContext } from '../hooks';
 
-export interface TextItemProps {
+export interface TagMapperItemProps {
     text: string;
 
     tagValues: TagSelectOptionValue[];
 }
 
-export function TextItem(props: TextItemProps) {
+export function TagMapperItem(props: TagMapperItemProps) {
     const { text, tagValues } = props;
     const { textMap, textMapInsert, textMapDelete, setHighlightText } = useTextTagMapperContext();
     const comboSelectRef = useRef<TagComboSelectRef>(null);
