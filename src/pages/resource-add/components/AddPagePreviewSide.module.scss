@@ -3,8 +3,6 @@
     width: 100%;
     display: flex;
     align-items: center;
-
-
 }
 
 .carouselViewPort, .carouselContainer {
@@ -15,4 +13,23 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.deleteIcon {
+    position: absolute;
+    border: none;
+    border-radius: 100%;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.25rem;
+    top: 10px;
+    right: 20px;
+    z-index: 9999;
+    opacity: 0.65;
+    background-color: var(--mantine-color-red-4);
+    color: var(--mantine-color-body);
+
+    @include hover {
+        opacity: 1;
+    }
 }

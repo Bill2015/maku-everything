@@ -14,7 +14,7 @@ export function ResourceAddPageContent() {
     const { activeCategory } = useActiveCategoryRedux();
     const [activePath, setActivePath] = useState<string>('');
     const { data: category } = CategoryQuery.useGetById(activeCategory.id);
-    const { onDropFiles, resourceValues, getResourceValuesRef } = useAddResouces(category);
+    const { handleDropFiles, resourceValues, getResourceValuesRef, handleDelete } = useAddResouces(category);
 
     // unknown bug, the resoure values have closure problem, i don't know why
     const handleSlideChange = useCallback((index: number) => {
@@ -26,13 +26,13 @@ export function ResourceAddPageContent() {
 
     return (
         <Grid classNames={{ inner: classes.innerGrid }} miw={0} mih={0}>
-            <Grid.Col p={0} span={{ lg: 6, sm: 12 }} mah="100%" ta="center" display="flex">
-                <AddPagePreviewSide data={resourceValues} onSlideChange={handleSlideChange} />
+            <Grid.Col p={0} span={{ lg: 6, sm: 12 }} mah="100%" ta="center" display="flex" pos="relative" style={{ justifyContent: 'center' }}>
+                <AddPagePreviewSide data={resourceValues} onSlideChange={handleSlideChange} onDelete={handleDelete} />
             </Grid.Col>
             <Grid.Col span={{ lg: 6, sm: 12 }} mah="100%">
                 <AddPageFunctionSide rootPath={category?.root_path || ''} text={activePath} />
             </Grid.Col>
-            <TauriDropZone onDropFiles={onDropFiles} />
+            <TauriDropZone onDropFiles={handleDropFiles} />
         </Grid>
     );
 }

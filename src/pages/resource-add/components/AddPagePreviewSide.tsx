@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Carousel, Embla } from '@mantine/carousel';
+import { ActionIcon, Kbd, Stack, Text } from '@mantine/core';
+import { FaRegTrashCan } from 'react-icons/fa6';
 import { ResourceThumbnailDisplayer } from '@components/display';
 
 import '@mantine/carousel/styles.css';
@@ -17,10 +19,12 @@ export interface AddPagePreviewSideProps {
     data: ResourcePreviewType[];
 
     onSlideChange: (index: number) => void;
+
+    onDelete: (index: number) => void;
 }
 
 export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
-    const { data, onSlideChange } = props;
+    const { data, onSlideChange, onDelete } = props;
     const [embla, setEmbla] = useState<Embla | null>(null);
 
     const sizeObserver = useRef<ResizeObserver>(new ResizeObserver(() => {}));
@@ -66,22 +70,56 @@ export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
         return () => controller.abort();
     }, [embla]);
 
+    if (data.length <= 0) {
+        return (
+            <Stack justify="center">
+                <Text fz="xl">
+                    Drag file into the App
+                </Text>
+                <Text fz="xl">
+                    Or Use
+                    {' '}
+                    <Kbd>Ctrl</Kbd>
+                    {' '}
+                    +
+                    {' '}
+                    <Kbd>V</Kbd>
+                    {' '}
+                    to paste the URL in the App
+                </Text>
+            </Stack>
+        );
+    }
+
     return (
-        <Carousel
-            slideGap="lg"
-            loop
-            withIndicators
-            classNames={carouselClasses}
-            onSlideChange={onSlideChange}
-            getEmblaApi={setEmbla}
-        >
-            {
-                data.map((val) => (
-                    <Carousel.Slide key={`${val.local}${val.url}`}>
-                        <ResourceThumbnailDisplayer filePath={val.local} url={val.url} alt="" />
-                    </Carousel.Slide>
-                ))
-            }
-        </Carousel>
+        <>
+            <ActionIcon
+                variant="outline"
+                className={classes.deleteIcon}
+                onClick={() => {
+                    if (embla) {
+                        onDelete(embla.selectedScrollSnap());
+                    }
+                }}
+            >
+                <FaRegTrashCan />
+            </ActionIcon>
+            <Carousel
+                slideGap="lg"
+                loop
+                withIndicators
+                classNames={carouselClasses}
+                onSlideChange={onSlideChange}
+                getEmblaApi={setEmbla}
+            >
+                {
+                    data.map((val) => (
+                        <Carousel.Slide key={`${val.local}${val.url}`}>
+                            <ResourceThumbnailDisplayer filePath={val.local} url={val.url} alt="" />
+                        </Carousel.Slide>
+                    ))
+                }
+            </Carousel>
+        </>
     );
 }

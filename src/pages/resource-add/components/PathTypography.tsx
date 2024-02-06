@@ -43,7 +43,11 @@ export function PathTypography(props: PathTypographyProps) {
 
     return (
         <Group gap={5} align="baseline">
-            { text.startsWith(rootPath) && <Text title={rootPath} opacity={0.5} fz="xs">root:\\</Text> }
+            {
+                text.startsWith(rootPath)
+                    ? <Text title={rootPath} opacity={0.5} fz="xs">local:\\</Text>
+                    : <Text opacity={0.5} fz="xs">url:\\</Text>
+            }
             <Highlight
                 highlight={highlight}
                 onContextMenu={showContextMenu(contextmenu, contextmenuOption)}

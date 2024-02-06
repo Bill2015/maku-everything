@@ -22,30 +22,32 @@ export function useAddResouces(category: CategoryResDto | null) {
         if (!text) {
             return;
         }
-        const newValues = [...resourceValues];
+        let newValue: ResourcePreviewType | null = null;
         const valueSet = new Set(resourceValues.map((val) => val.url));
         if (valueSet.has(text)) {
             showNotification('Invalid Resource', `${text} already added`, 'error');
         }
         else if (text.startsWith(category.root_path)) {
-            newValues.push({ local: text });
+            newValue = { local: text };
         }
         else if (text.startsWith('http')) {
-            newValues.push({ url: text });
+            newValue = { url: text };
         }
         else {
             showNotification('Invalid Resource', text, 'error');
         }
-        setResourceValues(newValues);
+        if (newValue) {
+            setResourceValues((prev) => [...prev, newValue!]);
+        }
     }, [category, resourceValues, setResourceValues])]]);
 
     // drop file to upload
-    const onDropFiles = useCallback(async (filePaths: string[]) => {
+    const handleDropFiles = useCallback(async (filePaths: string[]) => {
         if (!category) {
             return;
         }
 
-        const newValues = [...resourceValues];
+        const newValues: ResourcePreviewType[] = [];
         const valueSet = new Set(resourceValues.map((val) => val.local));
         for (const filePath of filePaths) {
             if (!filePath.startsWith(category.root_path)) {
@@ -59,10 +61,21 @@ export function useAddResouces(category: CategoryResDto | null) {
 
             newValues.push({ local: filePath });
         }
-        setResourceValues(newValues);
+        if (newValues.length > 0) {
+            setResourceValues((prev) => [...prev, ...newValues]);
+        }
     }, [category, resourceValues, setResourceValues]);
 
+    const handleDelete = useCallback((index: number) => {
+        const newValues = [...resourceValues];
+        newValues.splice(index, 1);
+        setResourceValues(newValues);
+    }, [resourceValues, setResourceValues]);
+
     return {
-        onDropFiles, resourceValues, getResourceValuesRef,
+        handleDropFiles,
+        resourceValues,
+        getResourceValuesRef,
+        handleDelete,
     };
 }
