@@ -1,19 +1,19 @@
-import { Grid } from '@mantine/core';
+import { Grid, Skeleton } from '@mantine/core';
 import { useHotkeys } from '@mantine/hooks';
 import { useActiveCategoryRedux } from '@store/global';
 import { CategoryQuery } from '@api/category';
 import { TauriDropZone } from '@components/input';
 
-import { TextTagMapperProvider, useAddResourceContext } from './hooks';
+import { AddResourceProvider, useAddResourceContext } from './stores';
+import { useAddResoucesAction, TextTagMapperProvider } from './hooks';
 import { AddPageFunctionSide, AddPagePreviewSide } from './components';
 
 import '@mantine/carousel/styles.css';
 import classes from './ResourceAddPage.module.scss';
 
 export function ResourceAddPageContent() {
-    const { activeCategory } = useActiveCategoryRedux();
-    const { data: category } = CategoryQuery.useGetById(activeCategory.id);
-    const { addFromFiles, addFromClipboard, resources, deleteResource, setActiveResource, activeResource } = useAddResourceContext(category);
+    const { addFromFiles, addFromClipboard } = useAddResoucesAction();
+    const { category, resources, deleteResource, setActiveResource, activeResource } = useAddResourceContext();
 
     // on pasted the text
     useHotkeys([['ctrl+V', addFromClipboard]]);
@@ -37,9 +37,20 @@ export function ResourceAddPageContent() {
 }
 
 export default function ResourceAddPage() {
+    const { activeCategory } = useActiveCategoryRedux();
+    const { data: category } = CategoryQuery.useGetById(activeCategory.id);
+
+    if (!category) {
+        return (
+            <Skeleton height="100%" mb="xl" />
+        );
+    }
+
     return (
-        <TextTagMapperProvider>
-            <ResourceAddPageContent />
-        </TextTagMapperProvider>
+        <AddResourceProvider category={category}>
+            <TextTagMapperProvider>
+                <ResourceAddPageContent />
+            </TextTagMapperProvider>
+        </AddResourceProvider>
     );
 }

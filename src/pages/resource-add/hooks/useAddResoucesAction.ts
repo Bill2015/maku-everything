@@ -1,44 +1,11 @@
-import { useCallback, useState } from 'react';
-import { CategoryResDto } from '@api/category';
+import { useCallback } from 'react';
 import { showNotification } from '@components/notification';
 import { ResourceCreateDto } from '@api/resource';
 import { getNameAndExtFromPath, stringNormalize } from '@utils/urlParser';
-import { List } from 'immutable';
-import { useStateRef } from '@hooks/life-hooks';
+import { useAddResourceContext } from '../stores';
 
-export type ActiveResourceType = { data: ResourceCreateDto, index: number } | null;
-
-export function useAddResourceContext(category: CategoryResDto | null) {
-    const [resources, setResource, getResourcesRef] = useStateRef<List<ResourceCreateDto>>(List());
-    const [activeResource, setActiveResource] = useState<ActiveResourceType>(null);
-
-    // ------------------------------------------------
-    /** Set Current Resource */
-    const setActiveResourceFn = useCallback((index: number) => {
-        const data = getResourcesRef().get(index);
-        setActiveResource(data ? { data: data, index: index } : null);
-    }, [getResourcesRef]);
-
-    // ------------------------------------------------
-    /** Add Resources */
-    const addResource = useCallback((data: ResourceCreateDto | ResourceCreateDto[]) => {
-        if (Array.isArray(data)) {
-            setResource((prev) => prev.concat(data));
-        }
-        else {
-            setResource((prev) => prev.push(data));
-        }
-        setActiveResourceFn(getResourcesRef().size - 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [getResourcesRef]);
-
-    // ------------------------------------------------
-    /** Delete Resources */
-    const deleteResource = useCallback((index: number) => {
-        setResource((prev) => prev.delete(index));
-        setActiveResourceFn(activeResource!.index - 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeResource]);
+export function useAddResoucesAction() {
+    const { category, resources, addResource } = useAddResourceContext();
 
     // ------------------------------------------------
     /** drop file to upload */
@@ -117,13 +84,7 @@ export function useAddResourceContext(category: CategoryResDto | null) {
     }, [category, resources, addResource]);
 
     return {
-        category,
-        resources:         resources.toArray(),
-        activeResource,
-        addResource,
         addFromFiles,
         addFromClipboard,
-        deleteResource,
-        setActiveResource: setActiveResourceFn,
     };
 }

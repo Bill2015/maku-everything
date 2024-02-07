@@ -7,7 +7,7 @@ import { ResourceThumbnailDisplayer } from '@components/display';
 
 import '@mantine/carousel/styles.css';
 import classes from './AddPagePreviewSide.module.scss';
-import { ActiveResourceType } from '../hooks';
+import { ActiveResourceType } from '../stores';
 
 const carouselClasses = {
     root:      classes.carouselRoot,

@@ -1,3 +1,3 @@
 export * from './useSeparatorText';
 export * from './TextMapperContext';
-export * from './useAddResouces';
+export * from './useAddResoucesAction';
