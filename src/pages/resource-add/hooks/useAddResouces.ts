@@ -1,16 +1,80 @@
-import { useCallback } from 'react';
-import { useHotkeys } from '@mantine/hooks';
+import { useCallback, useState } from 'react';
 import { CategoryResDto } from '@api/category';
 import { showNotification } from '@components/notification';
-import { useStateRef } from '@hooks/life-hooks';
 import { ResourceCreateDto } from '@api/resource';
 import { getNameAndExtFromPath, stringNormalize } from '@utils/urlParser';
+import { List } from 'immutable';
+import { useStateRef } from '@hooks/life-hooks';
 
-export function useAddResouces(category: CategoryResDto | null) {
-    const [resourceValues, setResourceValues, getResourceValuesRef] = useStateRef<ResourceCreateDto[]>([]);
+export type ActiveResourceType = { data: ResourceCreateDto, index: number } | null;
 
-    // on pasted the text
-    useHotkeys([['ctrl+V', useCallback(async () => {
+export function useAddResourceContext(category: CategoryResDto | null) {
+    const [resources, setResource, getResourcesRef] = useStateRef<List<ResourceCreateDto>>(List());
+    const [activeResource, setActiveResource] = useState<ActiveResourceType>(null);
+
+    // ------------------------------------------------
+    /** Set Current Resource */
+    const setActiveResourceFn = useCallback((index: number) => {
+        const data = getResourcesRef().get(index);
+        setActiveResource(data ? { data: data, index: index } : null);
+    }, [getResourcesRef]);
+
+    // ------------------------------------------------
+    /** Add Resources */
+    const addResource = useCallback((data: ResourceCreateDto | ResourceCreateDto[]) => {
+        if (Array.isArray(data)) {
+            setResource((prev) => prev.concat(data));
+        }
+        else {
+            setResource((prev) => prev.push(data));
+        }
+        setActiveResourceFn(getResourcesRef().size - 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [getResourcesRef]);
+
+    // ------------------------------------------------
+    /** Delete Resources */
+    const deleteResource = useCallback((index: number) => {
+        setResource((prev) => prev.delete(index));
+        setActiveResourceFn(activeResource!.index - 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeResource]);
+
+    // ------------------------------------------------
+    /** drop file to upload */
+    const addFromFiles = useCallback(async (filePaths: string[]) => {
+        if (!category) {
+            return;
+        }
+
+        const newValues: ResourceCreateDto[] = [];
+        const valueSet = new Set(resources.map((val) => val.file_path));
+        for (const filePath of filePaths) {
+            if (!filePath.startsWith(category.root_path)) {
+                showNotification('Invalid Resource', filePath, 'error');
+                break;
+            }
+            if (valueSet.has(filePath)) {
+                showNotification('Invalid Resource', `${filePath} already added`, 'error');
+                break;
+            }
+
+            const [fileName, _] = getNameAndExtFromPath(filePath);
+            newValues.push({
+                name:            fileName,
+                belong_category: category.id,
+                description:     '',
+                file_path:       filePath,
+            });
+        }
+        if (newValues.length > 0) {
+            addResource(newValues);
+        }
+    }, [category, resources, addResource]);
+
+    // ------------------------------------------------
+    /** Add Resource from clipboard */
+    const addFromClipboard = useCallback(async () => {
         if (!category) {
             return;
         }
@@ -18,10 +82,11 @@ export function useAddResouces(category: CategoryResDto | null) {
         if (!text) {
             return;
         }
+
         let newValue: ResourceCreateDto | null = null;
         const valueSet = new Set([
-            ...resourceValues.map((val) => val.file_path),
-            ...resourceValues.map((val) => val.url_path),
+            ...resources.map((val) => val.file_path),
+            ...resources.map((val) => val.url_path),
         ]);
         if (valueSet.has(text)) {
             showNotification('Invalid Resource', `${text} already added`, 'error');
@@ -47,51 +112,18 @@ export function useAddResouces(category: CategoryResDto | null) {
             showNotification('Invalid Resource', text, 'error');
         }
         if (newValue) {
-            setResourceValues((prev) => [...prev, newValue!]);
+            addResource(newValue);
         }
-    }, [category, resourceValues, setResourceValues])]]);
-
-    // drop file to upload
-    const handleDropFiles = useCallback(async (filePaths: string[]) => {
-        if (!category) {
-            return;
-        }
-
-        const newValues: ResourceCreateDto[] = [];
-        const valueSet = new Set(resourceValues.map((val) => val.file_path));
-        for (const filePath of filePaths) {
-            if (!filePath.startsWith(category.root_path)) {
-                showNotification('Invalid Resource', filePath, 'error');
-                break;
-            }
-            if (valueSet.has(filePath)) {
-                showNotification('Invalid Resource', `${filePath} already added`, 'error');
-                break;
-            }
-
-            const [fileName, _] = getNameAndExtFromPath(filePath);
-            newValues.push({
-                name:            fileName,
-                belong_category: category.id,
-                description:     '',
-                file_path:       filePath,
-            });
-        }
-        if (newValues.length > 0) {
-            setResourceValues((prev) => [...prev, ...newValues]);
-        }
-    }, [category, resourceValues, setResourceValues]);
-
-    const handleDelete = useCallback((index: number) => {
-        const newValues = [...resourceValues];
-        newValues.splice(index, 1);
-        setResourceValues(newValues);
-    }, [resourceValues, setResourceValues]);
+    }, [category, resources, addResource]);
 
     return {
-        handleDropFiles,
-        resourceValues,
-        getResourceValuesRef,
-        handleDelete,
+        category,
+        resources:         resources.toArray(),
+        activeResource,
+        addResource,
+        addFromFiles,
+        addFromClipboard,
+        deleteResource,
+        setActiveResource: setActiveResourceFn,
     };
 }

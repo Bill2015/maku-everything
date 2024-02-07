@@ -7,6 +7,7 @@ import { ResourceThumbnailDisplayer } from '@components/display';
 
 import '@mantine/carousel/styles.css';
 import classes from './AddPagePreviewSide.module.scss';
+import { ActiveResourceType } from '../hooks';
 
 const carouselClasses = {
     root:      classes.carouselRoot,
@@ -18,23 +19,25 @@ const carouselClasses = {
 export interface AddPagePreviewSideProps {
     data: ResourceCreateDto[];
 
+    activeResource: ActiveResourceType;
+
     onSlideChange: (index: number) => void;
 
     onDelete: (index: number) => void;
 }
 
 export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
-    const { data, onSlideChange, onDelete } = props;
+    const { data, activeResource, onSlideChange, onDelete } = props;
     const [embla, setEmbla] = useState<Embla | null>(null);
 
     const sizeObserver = useRef<ResizeObserver>(new ResizeObserver(() => {}));
 
     // when data changed, scroll to the end
     useEffect(() => {
-        if (embla) {
-            embla.scrollTo(data.length - 1, false);
+        if (embla && activeResource) {
+            embla.scrollTo(activeResource.index, false);
         }
-    }, [data, embla]);
+    }, [activeResource, embla]);
 
     // if Carousel size re-init it to calculated right width
     useEffect(() => {
@@ -109,8 +112,8 @@ export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
                 loop
                 withIndicators
                 classNames={carouselClasses}
-                onSlideChange={onSlideChange}
                 getEmblaApi={setEmbla}
+                onSlideChange={onSlideChange}
             >
                 {
                     data.map((val) => (
