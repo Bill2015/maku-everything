@@ -3,25 +3,21 @@ import { useDisclosure } from '@mantine/hooks';
 import { IoIosArrowForward } from 'react-icons/io';
 import { BsGear } from 'react-icons/bs';
 import { LiaMapSignsSolid } from 'react-icons/lia';
-import { LuTableProperties } from 'react-icons/lu';
+import { BiDetail } from 'react-icons/bi';
 
 import { TagQuery } from '@api/tag';
 import { useTagComboSelectValue } from '@components/input';
-import { CategoryResDto } from '@api/category';
 import { PathTypography } from './PathTypography';
-import { ActiveResourceType, useTextTagMapperContext } from '../hooks';
+import { useTextTagMapperContext } from '../hooks';
 import { TagMapperDisplayer } from './TagMapperDisplayer';
 
 import classes from './AddPageFunctionSide.module.scss';
+import { useAddResourceContext } from '../stores';
+import { AttributePanel } from './AttributePanel';
 
-export interface AddPageFunctionSideProps {
-    category: CategoryResDto | null;
+export function AddPageFunctionSide() {
+    const { category, activeResource } = useAddResourceContext();
 
-    activeResource: ActiveResourceType;
-}
-
-export function AddPageFunctionSide(props: AddPageFunctionSideProps) {
-    const { category, activeResource } = props;
     const { textMap, highlightText } = useTextTagMapperContext();
     const { data: tagData } = TagQuery.useGetByCategory(category?.id || '');
     const tagValues = useTagComboSelectValue(tagData);
@@ -60,8 +56,8 @@ export function AddPageFunctionSide(props: AddPageFunctionSideProps) {
                     <Tabs.Tab value="tag" leftSection={<LiaMapSignsSolid />}>
                         Tag
                     </Tabs.Tab>
-                    <Tabs.Tab value="attr" leftSection={<LuTableProperties />}>
-                        Attr
+                    <Tabs.Tab value="attr" leftSection={<BiDetail />}>
+                        Attrs
                     </Tabs.Tab>
                     <Tabs.Tab value="settings" ml="auto" leftSection={<BsGear />}>
                         Settings
@@ -73,6 +69,10 @@ export function AddPageFunctionSide(props: AddPageFunctionSideProps) {
                         texts={Array.from(textMap.keys()).filter((val) => text.toLowerCase().includes(val.toLowerCase()))}
                         tagValues={tagValues}
                     />
+                </Tabs.Panel>
+
+                <Tabs.Panel value="attr">
+                    <AttributePanel />
                 </Tabs.Panel>
 
                 <Tabs.Panel value="settings" p={10}>

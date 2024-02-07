@@ -4,7 +4,7 @@ import { useActiveCategoryRedux } from '@store/global';
 import { CategoryQuery } from '@api/category';
 import { TauriDropZone } from '@components/input';
 
-import { AddResourceProvider, useAddResourceContext } from './stores';
+import { AddResourceProvider } from './stores';
 import { useAddResoucesAction, TextTagMapperProvider } from './hooks';
 import { AddPageFunctionSide, AddPagePreviewSide } from './components';
 
@@ -13,7 +13,6 @@ import classes from './ResourceAddPage.module.scss';
 
 export function ResourceAddPageContent() {
     const { addFromFiles, addFromClipboard } = useAddResoucesAction();
-    const { category, resources, deleteResource, setActiveResource, activeResource } = useAddResourceContext();
 
     // on pasted the text
     useHotkeys([['ctrl+V', addFromClipboard]]);
@@ -21,15 +20,10 @@ export function ResourceAddPageContent() {
     return (
         <Grid classNames={{ inner: classes.innerGrid }} miw={0} mih={0}>
             <Grid.Col p={0} span={{ lg: 6, sm: 12 }} mah="100%" ta="center" display="flex" pos="relative" style={{ justifyContent: 'center' }}>
-                <AddPagePreviewSide
-                    data={resources}
-                    activeResource={activeResource}
-                    onSlideChange={setActiveResource}
-                    onDelete={deleteResource}
-                />
+                <AddPagePreviewSide />
             </Grid.Col>
             <Grid.Col span={{ lg: 6, sm: 12 }} mah="100%">
-                <AddPageFunctionSide category={category} activeResource={activeResource} />
+                <AddPageFunctionSide />
             </Grid.Col>
             <TauriDropZone onDropFiles={addFromFiles} />
         </Grid>

@@ -13,6 +13,7 @@ type AddResourceState = {
 type AddResourceActions = {
     setActiveResource: (index: number) => void;
     addResource: (data: ResourceCreateDto | ResourceCreateDto[]) => void;
+    updateResource: (index: number, newData: ResourceCreateDto) => void;
     deleteResource: (index: number) => void;
 }
 
@@ -45,6 +46,11 @@ export const createAddResourceStore = (category: CategoryResDto | null) => {
                 resources:      newList,
                 activeResource: { data: newList.at(-1)!, index: newList.length - 1 },
             };
+        }),
+        updateResource: (index: number, newData: ResourceCreateDto) => set((state) => {
+            const newList = [...state.resources];
+            newList.splice(index, 1, newData);
+            return { resources: newList };
         }),
         deleteResource: (index: number) => set((state) => {
             const newList = [...state.resources];

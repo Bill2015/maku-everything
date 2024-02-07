@@ -44,7 +44,7 @@ export function EditableText(props: EditableTextProps) {
 
     if (inEdited) {
         return (
-            <>
+            <Box pos="relative">
                 <Box
                     contentEditable
                     className={classes.input}
@@ -86,7 +86,7 @@ export function EditableText(props: EditableTextProps) {
                 <Badge color="indigo" pos="absolute" right={0} variant="outline" style={{ zIndex: 99 }}>
                     {t('modifying')}
                 </Badge>
-            </>
+            </Box>
         );
     }
 
