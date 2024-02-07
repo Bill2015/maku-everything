@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Carousel, Embla } from '@mantine/carousel';
 import { ActionIcon, Kbd, Stack, Text } from '@mantine/core';
 import { FaRegTrashCan } from 'react-icons/fa6';
+import { ResourceCreateDto } from '@api/resource';
 import { ResourceThumbnailDisplayer } from '@components/display';
 
 import '@mantine/carousel/styles.css';
 import classes from './AddPagePreviewSide.module.scss';
-import { ResourcePreviewType } from '../hooks';
 
 const carouselClasses = {
     root:      classes.carouselRoot,
@@ -16,7 +16,7 @@ const carouselClasses = {
 };
 
 export interface AddPagePreviewSideProps {
-    data: ResourcePreviewType[];
+    data: ResourceCreateDto[];
 
     onSlideChange: (index: number) => void;
 
@@ -114,8 +114,8 @@ export function AddPagePreviewSide(props: AddPagePreviewSideProps) {
             >
                 {
                     data.map((val) => (
-                        <Carousel.Slide key={`${val.local}${val.url}`}>
-                            <ResourceThumbnailDisplayer filePath={val.local} url={val.url} alt="" />
+                        <Carousel.Slide key={`${val.file_path}${val.url_path}`}>
+                            <ResourceThumbnailDisplayer filePath={val.file_path} url={val.url_path} alt="" />
                         </Carousel.Slide>
                     ))
                 }

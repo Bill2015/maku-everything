@@ -3,15 +3,11 @@ import { useHotkeys } from '@mantine/hooks';
 import { CategoryResDto } from '@api/category';
 import { showNotification } from '@components/notification';
 import { useStateRef } from '@hooks/life-hooks';
-
-export type ResourcePreviewType = {
-    local?: string;
-
-    url?: string;
-}
+import { ResourceCreateDto } from '@api/resource';
+import { getNameAndExtFromPath, stringNormalize } from '@utils/urlParser';
 
 export function useAddResouces(category: CategoryResDto | null) {
-    const [resourceValues, setResourceValues, getResourceValuesRef] = useStateRef<ResourcePreviewType[]>([]);
+    const [resourceValues, setResourceValues, getResourceValuesRef] = useStateRef<ResourceCreateDto[]>([]);
 
     // on pasted the text
     useHotkeys([['ctrl+V', useCallback(async () => {
@@ -22,16 +18,30 @@ export function useAddResouces(category: CategoryResDto | null) {
         if (!text) {
             return;
         }
-        let newValue: ResourcePreviewType | null = null;
-        const valueSet = new Set(resourceValues.map((val) => val.url));
+        let newValue: ResourceCreateDto | null = null;
+        const valueSet = new Set([
+            ...resourceValues.map((val) => val.file_path),
+            ...resourceValues.map((val) => val.url_path),
+        ]);
         if (valueSet.has(text)) {
             showNotification('Invalid Resource', `${text} already added`, 'error');
         }
         else if (text.startsWith(category.root_path)) {
-            newValue = { local: text };
+            const [fileName, _] = getNameAndExtFromPath(text);
+            newValue = {
+                name:            fileName,
+                belong_category: category.id,
+                description:     '',
+                file_path:       text,
+            };
         }
         else if (text.startsWith('http')) {
-            newValue = { url: text };
+            newValue = {
+                name:            stringNormalize(text),
+                belong_category: category.id,
+                description:     '',
+                url_path:        text,
+            };
         }
         else {
             showNotification('Invalid Resource', text, 'error');
@@ -47,8 +57,8 @@ export function useAddResouces(category: CategoryResDto | null) {
             return;
         }
 
-        const newValues: ResourcePreviewType[] = [];
-        const valueSet = new Set(resourceValues.map((val) => val.local));
+        const newValues: ResourceCreateDto[] = [];
+        const valueSet = new Set(resourceValues.map((val) => val.file_path));
         for (const filePath of filePaths) {
             if (!filePath.startsWith(category.root_path)) {
                 showNotification('Invalid Resource', filePath, 'error');
@@ -59,7 +69,13 @@ export function useAddResouces(category: CategoryResDto | null) {
                 break;
             }
 
-            newValues.push({ local: filePath });
+            const [fileName, _] = getNameAndExtFromPath(filePath);
+            newValues.push({
+                name:            fileName,
+                belong_category: category.id,
+                description:     '',
+                file_path:       filePath,
+            });
         }
         if (newValues.length > 0) {
             setResourceValues((prev) => [...prev, ...newValues]);

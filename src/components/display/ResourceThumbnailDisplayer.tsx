@@ -5,9 +5,9 @@ import { YoutubeThumbnail } from './YoutubeThunbnail';
 import { ResponsiveImage, ResponsiveImageProps } from './ResponsiveImage';
 
 interface ResourceThumbnailDisplayerProps extends ResponsiveImageProps {
-    url?: string | undefined;
+    url?: string | undefined | null;
 
-    filePath?: string | undefined;
+    filePath?: string | undefined | null;
 }
 
 export function ResourceThumbnailDisplayer(props: ResourceThumbnailDisplayerProps) {

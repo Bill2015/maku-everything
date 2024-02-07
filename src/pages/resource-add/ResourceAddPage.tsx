@@ -20,7 +20,7 @@ export function ResourceAddPageContent() {
     const handleSlideChange = useCallback((index: number) => {
         const value = getResourceValuesRef()[index];
         if (value) {
-            setActivePath(value.local || value.url || '');
+            setActivePath(value.file_path || value.url_path || '');
         }
     }, [getResourceValuesRef]);
 

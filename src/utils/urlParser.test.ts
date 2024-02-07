@@ -1,4 +1,4 @@
-import { getYoutubeVideoId } from './urlParser';
+import { getNameAndExtFromPath, getYoutubeVideoId, stringNormalize } from './urlParser';
 
 describe('getYoutubeVideoId', () => {
     it.each([
@@ -50,5 +50,67 @@ describe('getYoutubeVideoId', () => {
 
         // Assert
         expect(result).toBeNull();
+    });
+});
+
+describe('getFileNameFromPath', () => {
+    it.each([
+        {
+            inputPath: 'D:\\Repo\\maku-everything\\dataset\\test.png',
+            expected:  ['test', 'png'],
+        },
+        {
+            inputPath: 'D:/Repo/maku-everything/dataset/test.png',
+            expected:  ['test', 'png'],
+        },
+        {
+            inputPath: 'test.png',
+            expected:  ['test', 'png'],
+        },
+        {
+            inputPath: 'D:/Repo/maku-everything/dataset/test.ext1.ext2.ext3',
+            expected:  ['test.ext1.ext2', 'ext3'],
+        },
+        {
+            inputPath: 'D:/Repo/maku-everything/dataset/test',
+            expected:  ['test', ''],
+        },
+        {
+            inputPath: 'test',
+            expected:  ['test', ''],
+        },
+    ])('Should get "$expected" result when input FilePath: "$inputPath"', ({ inputPath, expected }) => {
+        // Arrange
+
+        // Act
+        const result = getNameAndExtFromPath(inputPath);
+
+        // Assert
+        expect(result).toEqual(expected);
+    });
+});
+
+describe('stringNormalize', () => {
+    it.each([
+        {
+            inputStr: "abc's test#s",
+            expected: 'abcstests',
+        },
+        {
+            inputStr: "abc's<test#s>",
+            expected: 'abcstests',
+        },
+        {
+            inputStr: "abc's 你好test#s",
+            expected: 'abcs你好tests',
+        },
+    ])('Should get "$expected" result when input String: "$inputStr"', ({ inputStr, expected }) => {
+        // Arrange
+
+        // Act
+        const result = stringNormalize(inputStr);
+
+        // Assert
+        expect(result).toEqual(expected);
     });
 });

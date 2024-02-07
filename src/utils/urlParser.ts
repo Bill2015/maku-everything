@@ -30,3 +30,39 @@ export function getYoutubeVideoId(url: string) {
 
     return null;
 }
+
+/**
+ * Get Name and Extension from path
+ * For example:
+ * ```typescript
+ * // It will output `[test, png]`
+ * getYoutubeVideoId('D:/Repo/maku-everything/dataset/test.png');
+ * ```
+ * @param path File Path
+ * @returns [`FileName`, `Extension`] */
+export function getNameAndExtFromPath(path: string): [string, string] {
+    const str = path.split(/[\\/]/gi);
+
+    const getNameAndExt = (fileName: string): [string, string] => {
+        const index = fileName.lastIndexOf('.');
+        if (index >= 0) {
+            return [fileName.substring(0, index), fileName.substring(index + 1)];
+        }
+        return [fileName, ''];
+    };
+
+    if (str.length <= 0) {
+        return getNameAndExt(path);
+    }
+
+    const lastElement = str.pop()!;
+    return getNameAndExt(lastElement);
+}
+
+/**
+ * Normalize the string, prevent special character in string
+ * @param str string
+ * @returns pure string (including Unicode character) */
+export function stringNormalize(str: string) {
+    return str.replace(/[&\\/\\#,+()$~%.'":*?<>{}\s]/g, '');
+}
