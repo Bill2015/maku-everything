@@ -5,7 +5,7 @@ import { FaRegEdit } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
 
 import { TagTypography } from '@components/display';
-import { useTextTagMapperContext } from '../hooks';
+import { useTextTagMapperContext } from '../stores';
 
 export interface TagMapperItemProps {
     text: string;

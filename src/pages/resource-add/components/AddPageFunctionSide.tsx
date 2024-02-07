@@ -7,13 +7,12 @@ import { BiDetail } from 'react-icons/bi';
 
 import { TagQuery } from '@api/tag';
 import { useTagComboSelectValue } from '@components/input';
+import { useAddResourceContext, useTextTagMapperContext } from '../stores';
 import { PathTypography } from './PathTypography';
-import { useTextTagMapperContext } from '../hooks';
 import { TagMapperDisplayer } from './TagMapperDisplayer';
+import { AttributePanel } from './AttributePanel';
 
 import classes from './AddPageFunctionSide.module.scss';
-import { useAddResourceContext } from '../stores';
-import { AttributePanel } from './AttributePanel';
 
 export function AddPageFunctionSide() {
     const { category, activeResource } = useAddResourceContext();

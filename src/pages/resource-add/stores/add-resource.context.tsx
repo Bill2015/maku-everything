@@ -7,7 +7,7 @@ const AddResourceContext = createContext<AddResourceStore | null>(null);
 
 export function useAddResourceContext() {
     const store = useContext(AddResourceContext);
-    if (!store) throw new Error('Missing BearContext.Provider in the tree');
+    if (!store) throw new Error('Missing AddResourceContext.Provider in the tree');
 
     return useStore(store, (state) => state);
 }

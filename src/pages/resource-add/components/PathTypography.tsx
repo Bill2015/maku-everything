@@ -1,8 +1,11 @@
-import { Button, Group, Highlight, Stack, Text } from '@mantine/core';
+import { useEffect, useRef } from 'react';
+import { Blockquote, Button, Group, Highlight, Popover, Stack, Text } from '@mantine/core';
 import { useContextMenu } from 'mantine-contextmenu';
+import { useDisclosure, useTextSelection } from '@mantine/hooks';
 import { IoAddOutline } from 'react-icons/io5';
-import { useTextSelection } from '@mantine/hooks';
-import { useTextTagMapperContext } from '../hooks';
+import { FaRegLightbulb } from 'react-icons/fa';
+
+import { useTextTagMapperContext } from '../stores';
 
 import classes from './PathTypography.module.scss';
 
@@ -18,9 +21,19 @@ export interface PathTypographyProps {
 
 export function PathTypography(props: PathTypographyProps) {
     const { rootPath, text, highlight } = props;
+    const textRef = useRef<HTMLDivElement>(null);
     const { showContextMenu } = useContextMenu();
     const { textMap, textMapInsert } = useTextTagMapperContext();
+    const [hintOpened, { close: closeHint, open: openHint }] = useDisclosure(false);
     const selection = useTextSelection();
+
+    useEffect(() => {
+        setTimeout(() => openHint(), 500);
+        setTimeout(() => {
+            closeHint();
+        }, 4000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const contextmenu = (close: () => void) => (
         <Stack gap={0}>
@@ -29,6 +42,10 @@ export function PathTypography(props: PathTypographyProps) {
                 leftSection={<IoAddOutline />}
                 onClick={() => {
                     close();
+                    // prevent select other elements text
+                    if (selection?.getRangeAt(0).commonAncestorContainer.nodeType !== Node.TEXT_NODE) {
+                        return;
+                    }
                     const selectionText = selection?.toString();
                     if (!selectionText || textMap.has(selectionText)) {
                         return;
@@ -48,13 +65,27 @@ export function PathTypography(props: PathTypographyProps) {
                     ? <Text title={rootPath} opacity={0.5} fz="xs">local:\\</Text>
                     : <Text opacity={0.5} fz="xs">url:\\</Text>
             }
-            <Highlight
-                highlight={highlight}
-                onContextMenu={showContextMenu(contextmenu, contextmenuOption)}
-                style={{ wordBreak: 'break-all' }}
-            >
-                {text.replace(rootPath, '')}
-            </Highlight>
+            <Popover width="50%" opened={hintOpened} position="bottom" withArrow shadow="md">
+                <Popover.Target>
+                    <Highlight
+                        ref={textRef}
+                        highlight={highlight}
+                        onContextMenu={showContextMenu(contextmenu, contextmenuOption)}
+                        style={{ wordBreak: 'break-all' }}
+                    >
+                        {text.replace(rootPath, '')}
+                    </Highlight>
+                </Popover.Target>
+
+                <Popover.Dropdown>
+                    <Blockquote color="blue" p={0} pl={40} iconSize={30} icon={<FaRegLightbulb />}>
+                        You can select those text and
+                        <strong> Rigth Click </strong>
+                        to add tag rules
+                    </Blockquote>
+                </Popover.Dropdown>
+            </Popover>
+
         </Group>
     );
 }

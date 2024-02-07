@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Divider, Group, ScrollArea, Stack, Text } from '@mantine/core';
+import { Divider, Group, ScrollArea, Space, Stack, Text } from '@mantine/core';
 import { TagSelectOptionValue } from '@components/input';
 import { TagMapperItem } from './TagMapperItem';
 
@@ -29,6 +29,7 @@ export function TagMapperDisplayer(props: TagMapperDisplayerProps) {
                             </Fragment>
                         ))
                     }
+                    <Space />
                 </Stack>
             </ScrollArea.Autosize>
         </Stack>

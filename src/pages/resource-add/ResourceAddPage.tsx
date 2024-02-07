@@ -4,8 +4,8 @@ import { useActiveCategoryRedux } from '@store/global';
 import { CategoryQuery } from '@api/category';
 import { TauriDropZone } from '@components/input';
 
-import { AddResourceProvider } from './stores';
-import { useAddResoucesAction, TextTagMapperProvider } from './hooks';
+import { AddResourceProvider, TextTagMapperProvider } from './stores';
+import { useAddResoucesAction } from './hooks';
 import { AddPageFunctionSide, AddPagePreviewSide } from './components';
 
 import '@mantine/carousel/styles.css';

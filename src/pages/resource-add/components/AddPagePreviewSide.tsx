@@ -3,10 +3,10 @@ import { Carousel, Embla } from '@mantine/carousel';
 import { ActionIcon, Kbd, Stack, Text } from '@mantine/core';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { ResourceThumbnailDisplayer } from '@components/display';
+import { useAddResourceContext } from '../stores';
 
 import '@mantine/carousel/styles.css';
 import classes from './AddPagePreviewSide.module.scss';
-import { useAddResourceContext } from '../stores';
 
 const carouselClasses = {
     root:      classes.carouselRoot,
