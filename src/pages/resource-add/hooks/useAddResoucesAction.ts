@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { showNotification } from '@components/notification';
-import { ResourceCreateDto } from '@api/resource';
 import { getNameAndExtFromPath, stringNormalize } from '@utils/urlParser';
 import { useAddResourceContext } from '../stores';
+import { ResourceCreateItem } from '../stores/add-resource.store';
 
 export function useAddResoucesAction() {
     const { category, resources, addResource } = useAddResourceContext();
@@ -14,7 +14,7 @@ export function useAddResoucesAction() {
             return;
         }
 
-        const newValues: ResourceCreateDto[] = [];
+        const newValues: ResourceCreateItem[] = [];
         const valueSet = new Set(resources.map((val) => val.file_path));
         for (const filePath of filePaths) {
             if (!filePath.startsWith(category.root_path)) {
@@ -31,6 +31,7 @@ export function useAddResoucesAction() {
                 name:            fileName,
                 belong_category: category.id,
                 description:     '',
+                tags:            [],
                 file_path:       filePath,
             });
         }
@@ -50,7 +51,7 @@ export function useAddResoucesAction() {
             return;
         }
 
-        let newValue: ResourceCreateDto | null = null;
+        let newValue: ResourceCreateItem | null = null;
         const valueSet = new Set([
             ...resources.map((val) => val.file_path),
             ...resources.map((val) => val.url_path),
@@ -64,6 +65,7 @@ export function useAddResoucesAction() {
                 name:            fileName,
                 belong_category: category.id,
                 description:     '',
+                tags:            [],
                 file_path:       text,
             };
         }
@@ -72,6 +74,7 @@ export function useAddResoucesAction() {
                 name:            stringNormalize(text),
                 belong_category: category.id,
                 description:     '',
+                tags:            [],
                 url_path:        text,
             };
         }

@@ -49,7 +49,7 @@ impl<'a> ResourceService<'a> {
     pub async fn create_resource(&self, data: CreateResourceDto) -> Result<ResourceID, ResourceError> {
         let command = CreateResourceCommand::from(data);
 
-        let result = CreateResourceHandler::register(self.resource_repository, self.category_repository)
+        let result = CreateResourceHandler::register(self.resource_repository, self.category_repository, self.tag_respository)
             .execute(command)
             .await
             .map_err(|err| ResourceError::Create(anyhow!(err)))?;

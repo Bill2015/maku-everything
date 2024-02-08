@@ -8,6 +8,8 @@ pub struct CreateResourceDto {
 
     pub belong_category: String,
 
+    pub tags: Option<Vec<String>>,
+
     pub file_path: Option<String>,
 
     pub url_path: Option<String>,

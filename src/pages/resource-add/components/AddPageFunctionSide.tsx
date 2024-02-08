@@ -71,7 +71,7 @@ export function AddPageFunctionSide() {
                 </Tabs.Panel>
 
                 <Tabs.Panel value="attr">
-                    <AttributePanel />
+                    <AttributePanel tagValues={tagValues} />
                 </Tabs.Panel>
 
                 <Tabs.Panel value="settings" p={10}>

@@ -64,6 +64,8 @@ export interface TagComboSelectProps {
 
 export interface TagComboSelectRef {
     getInputRef: () => HTMLInputElement | null;
+
+    clearInput: () => void;
 }
 
 export const TagComboSelect = forwardRef<TagComboSelectRef, TagComboSelectProps>((props, ref) => {
@@ -87,7 +89,13 @@ export const TagComboSelect = forwardRef<TagComboSelectRef, TagComboSelectProps>
         onSubmitOptions(result);
     };
 
-    useImperativeHandle(ref, () => ({ getInputRef: () => inputRef.current }));
+    useImperativeHandle(ref, () => ({
+        getInputRef: () => inputRef.current,
+        clearInput:  () => {
+            setSelectedValue(null);
+            setSearchText('');
+        },
+    }));
 
     const showedValue = selectedValue || defaultValue;
 

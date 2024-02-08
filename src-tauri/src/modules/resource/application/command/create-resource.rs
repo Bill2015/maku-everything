@@ -8,6 +8,8 @@ use crate::modules::resource::application::dto::CreateResourceDto;
 use crate::modules::resource::domain::{ResourceAggregate, ResourceGenericError, ResourceID};
 use crate::modules::resource::repository::ResourceRepository;
 use crate::modules::common::application::ICommandHandler;
+use crate::modules::tag::domain::TagID;
+use crate::modules::tag::repository::TagRepository;
 
 #[derive(Deserialize)]
 pub struct CreateResourceCommand {
@@ -16,6 +18,8 @@ pub struct CreateResourceCommand {
     pub description: String,
 
     pub belong_category: String,
+
+    pub tags: Option<Vec<String>>,
 
     pub file_path: Option<String>,
 
@@ -27,11 +31,16 @@ command_from_dto!(CreateResourceCommand, CreateResourceDto);
 pub struct CreateResourceHandler<'a> {
     resource_repo: &'a ResourceRepository<'a>,
     category_repo: &'a CategoryRepository<'a>,
+    tag_repo: &'a TagRepository<'a>,
 }
 
 impl<'a> CreateResourceHandler<'a> {
-    pub fn register(resource_repo: &'a ResourceRepository, category_repo: &'a CategoryRepository<'a>) -> Self {
-        Self { resource_repo, category_repo }
+    pub fn register(
+        resource_repo: &'a ResourceRepository<'a>, 
+        category_repo: &'a CategoryRepository<'a>,
+        tag_repo: &'a TagRepository<'a>
+    ) -> Self {
+        Self { resource_repo, category_repo, tag_repo }
     }
 }
 
@@ -48,7 +57,8 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
         let CreateResourceCommand { 
             name,
             description,
-            belong_category, 
+            belong_category,
+            tags,
             file_path,
             url_path,
         } = command;
@@ -61,7 +71,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
 
 
         // create new resource
-        let new_resource = ResourceAggregate::new(
+        let mut new_resource = ResourceAggregate::new(
             name,
             description,
             &category.id,
@@ -69,6 +79,18 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
             file_path,
             url_path
         )?;
+
+        if let Some(tags) = tags {
+            for tag in tags {
+                let tag_id = self.tag_repo
+                    .is_exist(&tag)
+                    .await
+                    .then(|| TagID::from(tag))
+                    .ok_or(ResourceGenericError::TagNotExists())?;
+
+                new_resource.get_mut_tagging().add_tag(&tag_id)?;
+            }
+        } 
         
         // save
         let result = self.resource_repo
