@@ -26,7 +26,7 @@
 		"dayjs": "^1.11.10",
 		"embla-carousel-react": "^7.1.0",
 		"i18next": "^23.8.2",
-		"immutable": "^5.0.0-beta.5",
+		"immer": "^10.0.3",
 		"lodash": "^4.17.21",
 		"mantine-contextmenu": "^7.5.0",
 		"millify": "^6.1.0",

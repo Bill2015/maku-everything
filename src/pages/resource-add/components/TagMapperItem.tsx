@@ -5,7 +5,6 @@ import { FaRegEdit } from 'react-icons/fa';
 import { RxCross1 } from 'react-icons/rx';
 
 import { TagTypography } from '@components/display';
-import { useTextTagMapperContext } from '../stores';
 
 import classes from './TagMapperItem.module.scss';
 
@@ -13,53 +12,58 @@ export interface TagMapperItemProps {
     text: string;
 
     tagValues: TagSelectOptionValue[];
+
+    defaultTagValue: TagSelectOptionValue | null;
+
+    onMouseEnter: () => void;
+
+    onMouseLeave: () => void;
+
+    onOptionSubmit: (option: TagSelectOptionValue | null) => void;
+
+    onEdit: () => void;
+
+    onDelete: () => void;
 }
 
 export function TagMapperItem(props: TagMapperItemProps) {
-    const { text, tagValues } = props;
-    const { textMap, textMapInsert, textMapDelete, setHighlightText } = useTextTagMapperContext();
+    const {
+        text, tagValues, defaultTagValue,
+        onMouseEnter, onMouseLeave, onOptionSubmit, onEdit, onDelete,
+    } = props;
     const comboSelectRef = useRef<TagComboSelectRef>(null);
-
-    const selectedTagData = tagValues.find((val) => val.id === textMap.get(text));
 
     return (
         <Flex
             gap={20}
             className={classes.root}
-            onMouseEnter={() => setHighlightText(text)}
-            onMouseLeave={() => setHighlightText('')}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
         >
             <Text flex="0 0 30%" style={{ wordBreak: 'break-all' }}>
                 {text}
             </Text>
             <Group justify="space-between" flex="1">
-                {selectedTagData && <TagTypography name={selectedTagData.name} subjectName={selectedTagData.subjectName} />}
-                {!selectedTagData && (
+                {defaultTagValue && <TagTypography name={defaultTagValue.name} subjectName={defaultTagValue.subjectName} />}
+                {!defaultTagValue && (
                     <TagComboSelect
                         ref={comboSelectRef}
                         data={tagValues}
-                        defaultValue={selectedTagData}
-                        onSubmitOptions={(option) => {
-                            if (option) {
-                                textMapInsert(text, option.id);
-                            }
-                            else {
-                                textMapDelete(text);
-                            }
-                        }}
+                        defaultValue={defaultTagValue!}
+                        onSubmitOptions={onOptionSubmit}
                     />
                 )}
                 <Box>
                     <ActionIcon
                         variant="transparent"
                         onClick={() => {
-                            textMapInsert(text, null);
+                            onEdit();
                             setTimeout(() => comboSelectRef.current!.getInputRef()!.focus(), 10);
                         }}
                     >
                         <FaRegEdit />
                     </ActionIcon>
-                    <ActionIcon variant="transparent" c="red" onClick={() => textMapDelete(text)}>
+                    <ActionIcon variant="transparent" c="red" onClick={onDelete}>
                         <RxCross1 />
                     </ActionIcon>
                 </Box>

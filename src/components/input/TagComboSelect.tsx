@@ -21,7 +21,7 @@ export type TagSelectOptionValue = {
 
     name: string;
 
-    description: string;
+    description?: string;
 
     subjectName: string;
 }
@@ -75,7 +75,7 @@ export const TagComboSelect = forwardRef<TagComboSelectRef, TagComboSelectProps>
     const [searchText, setSearchText] = useState<string>('');
     const [selectedValue, setSelectedValue] = useState<TagSelectOptionValue | null>(null);
 
-    const options = useMemo(() => data.filter((val) => val.value.includes(searchText)), [data, searchText]);
+    const options = useMemo(() => data.filter((val) => val.value.includes(searchText.toLowerCase())), [data, searchText]);
 
     const hanldeOptionSubmit = (val: string, option: ComboboxOptionProps & Partial<CustomOptionProps>) => {
         const result: TagSelectOptionValue = {

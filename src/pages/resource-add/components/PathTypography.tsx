@@ -1,11 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Blockquote, Button, Group, Highlight, Popover, Stack, Text } from '@mantine/core';
 import { useContextMenu } from 'mantine-contextmenu';
-import { useDisclosure, useTextSelection } from '@mantine/hooks';
+import { useDisclosure } from '@mantine/hooks';
 import { IoAddOutline } from 'react-icons/io5';
 import { FaRegLightbulb } from 'react-icons/fa';
-
-import { useTextTagMapperContext } from '../stores';
 
 import classes from './PathTypography.module.scss';
 
@@ -17,15 +15,15 @@ export interface PathTypographyProps {
     text: string;
 
     highlight: string;
+
+    onClickAddRule: () => void;
 }
 
 export function PathTypography(props: PathTypographyProps) {
-    const { rootPath, text, highlight } = props;
+    const { rootPath, text, highlight, onClickAddRule } = props;
     const textRef = useRef<HTMLDivElement>(null);
     const { showContextMenu } = useContextMenu();
-    const { textMap, textMapInsert } = useTextTagMapperContext();
     const [hintOpened, { close: closeHint, open: openHint }] = useDisclosure(false);
-    const selection = useTextSelection();
 
     useEffect(() => {
         setTimeout(() => openHint(), 500);
@@ -42,15 +40,7 @@ export function PathTypography(props: PathTypographyProps) {
                 leftSection={<IoAddOutline />}
                 onClick={() => {
                     close();
-                    // prevent select other elements text
-                    if (selection?.getRangeAt(0).commonAncestorContainer.nodeType !== Node.TEXT_NODE) {
-                        return;
-                    }
-                    const selectionText = selection?.toString();
-                    if (!selectionText || textMap.has(selectionText)) {
-                        return;
-                    }
-                    textMapInsert(selectionText, null);
+                    onClickAddRule();
                 }}
             >
                 Add To Rule

@@ -1,5 +1,5 @@
 import { Button, Collapse, Stack, Tabs, Title } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useTextSelection } from '@mantine/hooks';
 import { IoIosArrowForward } from 'react-icons/io';
 import { BsGear } from 'react-icons/bs';
 import { LiaMapSignsSolid } from 'react-icons/lia';
@@ -17,11 +17,12 @@ import classes from './AddPageFunctionSide.module.scss';
 export function AddPageFunctionSide() {
     const { category, activeResource } = useAddResourceContext();
 
-    const { textMap, highlightText } = useTextTagMapperContext();
+    const { highlightText, checkTextExist, textMapInsert } = useTextTagMapperContext();
     const { data: tagData } = TagQuery.useGetByCategory(category?.id || '');
     const tagValues = useTagComboSelectValue(tagData);
 
     const [opened, { toggle }] = useDisclosure(false);
+    const selection = useTextSelection();
 
     if (!activeResource) {
         return (
@@ -32,10 +33,7 @@ export function AddPageFunctionSide() {
                     Global Defined Tag Map
                 </Button>
                 <Collapse in={opened} display="grid" mih={0}>
-                    <TagMapperDisplayer
-                        texts={Array.from(textMap.keys())}
-                        tagValues={tagValues}
-                    />
+                    <TagMapperDisplayer global tagValues={tagValues} />
                 </Collapse>
             </Stack>
         );
@@ -49,6 +47,17 @@ export function AddPageFunctionSide() {
                 rootPath={category?.root_path || ''}
                 text={text}
                 highlight={highlightText}
+                onClickAddRule={() => {
+                    // prevent select other elements text
+                    if (selection?.getRangeAt(0).commonAncestorContainer.nodeType !== Node.TEXT_NODE) {
+                        return;
+                    }
+                    const selectionText = selection?.toString();
+                    if (!selectionText || checkTextExist(selectionText)) {
+                        return;
+                    }
+                    textMapInsert(selectionText, null);
+                }}
             />
             <Tabs defaultValue="tag" classNames={{ root: classes.tabRoot, panel: classes.tabPanel }}>
                 <Tabs.List>
@@ -64,10 +73,7 @@ export function AddPageFunctionSide() {
                 </Tabs.List>
 
                 <Tabs.Panel value="tag">
-                    <TagMapperDisplayer
-                        texts={Array.from(textMap.keys()).filter((val) => text.toLowerCase().includes(val.toLowerCase()))}
-                        tagValues={tagValues}
-                    />
+                    <TagMapperDisplayer targetText={text} tagValues={tagValues} />
                 </Tabs.Panel>
 
                 <Tabs.Panel value="attr">
@@ -80,10 +86,7 @@ export function AddPageFunctionSide() {
                         Global Defined Tag Map
                     </Title>
                     <Collapse in={opened} display="grid" mih={0}>
-                        <TagMapperDisplayer
-                            texts={Array.from(textMap.keys())}
-                            tagValues={tagValues}
-                        />
+                        <TagMapperDisplayer global tagValues={tagValues} />
                     </Collapse>
                 </Tabs.Panel>
             </Tabs>

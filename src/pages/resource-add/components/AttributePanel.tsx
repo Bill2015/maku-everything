@@ -7,6 +7,7 @@ import { ResourceCreateDto } from '@api/resource';
 import { useAddResourceContext, useTextTagMapperContext } from '../stores';
 
 import classes from './AttributePanel.module.scss';
+import { TextTagValue } from '../stores/text-tag-mapper.store';
 
 export interface AttributePanelProps {
     tagValues: TagSelectOptionValue[];
@@ -15,7 +16,7 @@ export interface AttributePanelProps {
 export function AttributePanel(props: AttributePanelProps) {
     const { tagValues } = props;
     const { activeResource, updateResource, updateResourceTag } = useAddResourceContext();
-    const { textMap } = useTextTagMapperContext();
+    const { textMapperList } = useTextTagMapperContext();
     const tagComboRef = useRef<TagComboSelectRef>(null);
 
     const handleUpdate = useCallback((fieldName: keyof ResourceCreateDto, newValue: string) => {
@@ -46,12 +47,16 @@ export function AttributePanel(props: AttributePanelProps) {
         if (!activeResource) {
             return [];
         }
-        return Array.from(textMap
-            .filter((val, key) => (
-                !activeResource.data.ignoreText.contains(key) && activeResource.data.name.toLowerCase().includes(key.toLowerCase())))
-            .values())
-            .map((tagId) => tagValues.find((val) => val.id === tagId)!);
-    }, [activeResource, textMap, tagValues]);
+        const { data: resource } = activeResource;
+        const map: Map<string, (TextTagValue & { ignored: boolean })> = new Map();
+        for (const { key, value } of textMapperList) {
+            if (value && resource.name.toLowerCase().includes(key.toLowerCase())) {
+                const ignored = resource.ignoreText.has(key);
+                map.set(key, { ...value, ignored: ignored });
+            }
+        }
+        return map;
+    }, [activeResource, textMapperList]);
 
     if (!activeResource) {
         return <>Empty</>;
@@ -92,7 +97,7 @@ export function AttributePanel(props: AttributePanelProps) {
             <Text c="dimmed" fw="bolder">Auto Generate Tags</Text>
             <Flex gap={10} wrap="wrap">
                 {
-                    autoTagValue.map((value) => (
+                    Array.from(autoTagValue.values()).map((value) => (
                         <Group component="span" key={value.id} gap={0} className={classes.tagpill}>
                             <TagTypography name={value.name} subjectName={value.subjectName} fontSize={0.8} />
                             <UnstyledButton onClick={() => handleDeleteTag(value.id)}>

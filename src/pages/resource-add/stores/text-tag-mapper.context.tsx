@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useContext, useMemo, useRef } from 'react';
 import { useStore } from 'zustand';
-import { TextTagMapperStore, createTextTagMapperStore } from './text-tag-mapper.store';
+import { TextTagMapperStore, TextTagValue, createTextTagMapperStore } from './text-tag-mapper.store';
 
 const TextTagMapperContext = createContext<TextTagMapperStore | null>(null);
 
@@ -9,12 +9,21 @@ export function useTextTagMapperContext() {
     if (!store) throw new Error('Missing TextTagMapperContext.Provider in the tree');
     const { textMap: oldTextMap, ...states } = useStore(store, (state) => state);
 
-    const textMap = useMemo(() => oldTextMap.sortBy((val) => val.indexId).map((val) => val.tagId), [oldTextMap]);
+    const checkTextExist = (text: string) => oldTextMap.has(text);
 
-    return { textMap, ...states };
+    const textMapperList = useMemo(
+        () => Array.from(oldTextMap.entries())
+            .sort((a, b) => a[1].indexId - b[1].indexId)
+            .map((val) => val[1]),
+        [oldTextMap],
+    );
+
+    return {
+        textMapperList, checkTextExist, ...states,
+    };
 }
 
-export function TextTagMapperProvider(props: PropsWithChildren & { defaultTextMap: Record<string, string> }) {
+export function TextTagMapperProvider(props: PropsWithChildren & { defaultTextMap: Record<string, TextTagValue> }) {
     const { children, defaultTextMap } = props;
 
     const storeRef = useRef<TextTagMapperStore>();
