@@ -1,10 +1,15 @@
 import { CategoryResDto } from '@api/category';
 import { ResourceCreateDto, ResourceTagDto } from '@api/resource';
+import { Set } from 'immutable';
 import { createStore } from 'zustand';
 
 export type ResourceCreateTagItem = Pick<ResourceTagDto, 'id' | 'name' | 'subject_name'>;
 
-export type ResourceCreateItem = Omit<ResourceCreateDto, 'tags'> & { tags: ResourceCreateTagItem[] }
+export type ResourceCreateItem = Omit<ResourceCreateDto, 'tags'> & {
+    tags: ResourceCreateTagItem[];
+
+    ignoreText: Set<string>;
+}
 
 export type ActiveResourceType = { data: ResourceCreateItem, index: number } | null;
 
@@ -18,7 +23,16 @@ type AddResourceActions = {
     setActiveResource: (index: number) => void;
     addResource: (data: ResourceCreateItem | ResourceCreateItem[]) => void;
     updateResource: (index: number, newData: ResourceCreateItem) => void;
-    updateResourceTag: <A extends 'add' | 'delete'>(index: number, action: A, value: A extends 'add' ? ResourceCreateTagItem : string) => void;
+    updateResourceTag: <A extends 'add' | 'delete'>(
+        index: number,
+        action: A,
+        value: A extends 'add' ? ResourceCreateTagItem : string
+    ) => void;
+    updateResourceIgnoreText: (
+        index: number,
+        action: 'add' | 'delete',
+        text: string,
+    ) => void;
     deleteResource: (index: number) => void;
 }
 
@@ -52,7 +66,11 @@ export const createAddResourceStore = (category: CategoryResDto | null) => {
                 activeResource: { data: newList.at(-1)!, index: newList.length - 1 },
             };
         }),
-        updateResourceTag: <A extends 'add' | 'delete'>(index: number, action: A, value: A extends 'add' ? ResourceCreateTagItem : string) => set((state) => {
+        updateResourceTag: <A extends 'add' | 'delete'>(
+            index: number,
+            action: A,
+            value: A extends 'add' ? ResourceCreateTagItem : string,
+        ) => set((state) => {
             const targetRes = state.resources.at(index);
             if (!targetRes) {
                 return {};
@@ -99,6 +117,30 @@ export const createAddResourceStore = (category: CategoryResDto | null) => {
                 resources:      newList,
                 activeResource: newList.at(index - 1) ? { data: newList.at(index - 1)!, index: (index - 1) } : null,
             };
+        }),
+        updateResourceIgnoreText: (index: number, action: 'add' | 'delete', text: string) => set((state) => {
+            const targetRes = state.resources.at(index);
+            if (!targetRes) {
+                return {};
+            }
+            switch (action) {
+            case 'add':
+                targetRes.ignoreText.add(text);
+                break;
+            case 'delete':
+                targetRes.ignoreText.delete(text);
+                break;
+            default:
+                break;
+            }
+
+            if (state.activeResource?.index === index) {
+                return {
+                    resources:      [...state.resources],
+                    activeResource: { data: targetRes, index },
+                };
+            }
+            return { resources: [...state.resources] };
         }),
     }));
 };

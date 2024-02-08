@@ -34,6 +34,12 @@ export default function ResourceAddPage() {
     const { activeCategory } = useActiveCategoryRedux();
     const { data: category } = CategoryQuery.useGetById(activeCategory.id);
 
+    const defaultTextMap = {
+        Irys:  'tag:55oqcfng13eep21ddvza',
+        Muemi: 'tag:pr1mo3jqagtw1yxj8hcy',
+        fauna: 'tag:s90vlb4iw3gcsekv3wvy',
+    };
+
     if (!category) {
         return (
             <Skeleton height="100%" mb="xl" />
@@ -42,7 +48,7 @@ export default function ResourceAddPage() {
 
     return (
         <AddResourceProvider category={category}>
-            <TextTagMapperProvider>
+            <TextTagMapperProvider defaultTextMap={defaultTextMap}>
                 <ResourceAddPageContent />
             </TextTagMapperProvider>
         </AddResourceProvider>

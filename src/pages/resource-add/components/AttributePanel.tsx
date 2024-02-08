@@ -4,7 +4,7 @@ import { RxCross2 } from 'react-icons/rx';
 import { TagComboSelect, TagComboSelectRef, TagSelectOptionValue } from '@components/input';
 import { EditableText, TagTypography } from '@components/display';
 import { ResourceCreateDto } from '@api/resource';
-import { useAddResourceContext } from '../stores';
+import { useAddResourceContext, useTextTagMapperContext } from '../stores';
 
 import classes from './AttributePanel.module.scss';
 
@@ -15,6 +15,7 @@ export interface AttributePanelProps {
 export function AttributePanel(props: AttributePanelProps) {
     const { tagValues } = props;
     const { activeResource, updateResource, updateResourceTag } = useAddResourceContext();
+    const { textMap } = useTextTagMapperContext();
     const tagComboRef = useRef<TagComboSelectRef>(null);
 
     const handleUpdate = useCallback((fieldName: keyof ResourceCreateDto, newValue: string) => {
@@ -39,6 +40,18 @@ export function AttributePanel(props: AttributePanelProps) {
         const tagSet = new Set(activeResource!.data.tags.map((val) => val.id));
         return tagValues.filter((val) => !tagSet.has(val.id));
     }, [activeResource, tagValues]);
+
+    // auto generate tags
+    const autoTagValue = useMemo(() => {
+        if (!activeResource) {
+            return [];
+        }
+        return Array.from(textMap
+            .filter((val, key) => (
+                !activeResource.data.ignoreText.contains(key) && activeResource.data.name.toLowerCase().includes(key.toLowerCase())))
+            .values())
+            .map((tagId) => tagValues.find((val) => val.id === tagId)!);
+    }, [activeResource, textMap, tagValues]);
 
     if (!activeResource) {
         return <>Empty</>;
@@ -68,6 +81,20 @@ export function AttributePanel(props: AttributePanelProps) {
                     activeResource.data.tags.map((value) => (
                         <Group component="span" key={value.id} gap={0} className={classes.tagpill}>
                             <TagTypography name={value.name} subjectName={value.subject_name} fontSize={0.8} />
+                            <UnstyledButton onClick={() => handleDeleteTag(value.id)}>
+                                <RxCross2 />
+                            </UnstyledButton>
+                        </Group>
+                    ))
+                }
+            </Flex>
+            <Space h="lg" />
+            <Text c="dimmed" fw="bolder">Auto Generate Tags</Text>
+            <Flex gap={10} wrap="wrap">
+                {
+                    autoTagValue.map((value) => (
+                        <Group component="span" key={value.id} gap={0} className={classes.tagpill}>
+                            <TagTypography name={value.name} subjectName={value.subjectName} fontSize={0.8} />
                             <UnstyledButton onClick={() => handleDeleteTag(value.id)}>
                                 <RxCross2 />
                             </UnstyledButton>

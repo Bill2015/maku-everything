@@ -15,12 +15,17 @@ type TextTagMapperActions = {
 }
 
 // eslint-disable-next-line arrow-body-style
-export const createTextTagMapperStore = () => {
+export const createTextTagMapperStore = (defaultTextMap: Record<string, string>) => {
     // for add order sorting
     let indexId = 0;
+    const defaultMap = ImmutableMap(defaultTextMap)
+        .map<TextTagValueType>((val) => {
+            indexId += 1;
+            return { tagId: val, indexId };
+        });
     return createStore<TextTagMapperState & TextTagMapperActions>((set) => ({
         highlightText:    '',
-        textMap:          ImmutableMap(),
+        textMap:          defaultMap,
         setHighlightText: (value: string) => set(() => ({ highlightText: value })),
         textMapInsert:    (key: string, val: string | null) => set((state) => {
             if (state.textMap.has(key)) {

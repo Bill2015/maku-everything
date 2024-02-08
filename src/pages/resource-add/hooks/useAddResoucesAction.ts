@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { showNotification } from '@components/notification';
+import { Set as ImmutableSet } from 'immutable';
 import { getNameAndExtFromPath, stringNormalize } from '@utils/urlParser';
 import { useAddResourceContext } from '../stores';
 import { ResourceCreateItem } from '../stores/add-resource.store';
@@ -32,6 +33,7 @@ export function useAddResoucesAction() {
                 belong_category: category.id,
                 description:     '',
                 tags:            [],
+                ignoreText:      ImmutableSet(),
                 file_path:       filePath,
             });
         }
@@ -66,6 +68,7 @@ export function useAddResoucesAction() {
                 belong_category: category.id,
                 description:     '',
                 tags:            [],
+                ignoreText:      ImmutableSet(),
                 file_path:       text,
             };
         }
@@ -75,6 +78,7 @@ export function useAddResoucesAction() {
                 belong_category: category.id,
                 description:     '',
                 tags:            [],
+                ignoreText:      ImmutableSet(),
                 url_path:        text,
             };
         }

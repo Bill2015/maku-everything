@@ -14,12 +14,12 @@ export function useTextTagMapperContext() {
     return { textMap, ...states };
 }
 
-export function TextTagMapperProvider(props: PropsWithChildren) {
-    const { children } = props;
+export function TextTagMapperProvider(props: PropsWithChildren & { defaultTextMap: Record<string, string> }) {
+    const { children, defaultTextMap } = props;
 
     const storeRef = useRef<TextTagMapperStore>();
     if (!storeRef.current) {
-        storeRef.current = createTextTagMapperStore();
+        storeRef.current = createTextTagMapperStore(defaultTextMap);
     }
 
     return (

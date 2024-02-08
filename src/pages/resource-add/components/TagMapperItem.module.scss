@@ -1,0 +1,8 @@
+.root {
+    padding: 0.15rem 0.35rem 0.35rem;
+    border-radius: 0.25rem;
+
+    @include hover {
+        background-color: var(--mantine-color-dark-6);
+    }
+}

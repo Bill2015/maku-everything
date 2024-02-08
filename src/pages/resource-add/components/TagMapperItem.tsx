@@ -7,6 +7,8 @@ import { RxCross1 } from 'react-icons/rx';
 import { TagTypography } from '@components/display';
 import { useTextTagMapperContext } from '../stores';
 
+import classes from './TagMapperItem.module.scss';
+
 export interface TagMapperItemProps {
     text: string;
 
@@ -21,13 +23,13 @@ export function TagMapperItem(props: TagMapperItemProps) {
     const selectedTagData = tagValues.find((val) => val.id === textMap.get(text));
 
     return (
-        <Flex gap={20}>
-            <Text
-                flex="0 0 30%"
-                style={{ wordBreak: 'break-all' }}
-                onMouseEnter={() => setHighlightText(text)}
-                onMouseLeave={() => setHighlightText('')}
-            >
+        <Flex
+            gap={20}
+            className={classes.root}
+            onMouseEnter={() => setHighlightText(text)}
+            onMouseLeave={() => setHighlightText('')}
+        >
+            <Text flex="0 0 30%" style={{ wordBreak: 'break-all' }}>
                 {text}
             </Text>
             <Group justify="space-between" flex="1">
