@@ -15,7 +15,7 @@ export interface AttributePanelProps {
 
 export function AttributePanel(props: AttributePanelProps) {
     const { tagValues } = props;
-    const { activeResource, updateResource, updateResourceTag } = useAddResourceContext();
+    const { activeResource, updateResource, updateResourceTag, updateResourceIgnoreText } = useAddResourceContext();
     const { textMapperList } = useTextTagMapperContext();
     const tagComboRef = useRef<TagComboSelectRef>(null);
 
@@ -27,11 +27,16 @@ export function AttributePanel(props: AttributePanelProps) {
     }, [updateResource, activeResource]);
 
     const handleDeleteTag = useCallback((tagId: string) => {
-        if (!activeResource) {
+        updateResourceTag(activeResource!.index, 'delete', tagId);
+    }, [activeResource, updateResourceTag]);
+
+    const hanldeIgnored = useCallback((text: string) => {
+        if (activeResource!.data.ignoreText.has(text)) {
+            updateResourceIgnoreText(activeResource!.index, 'delete', text);
             return;
         }
-        updateResourceTag(activeResource.index, 'delete', tagId);
-    }, [activeResource, updateResourceTag]);
+        updateResourceIgnoreText(activeResource!.index, 'add', text);
+    }, [activeResource, updateResourceIgnoreText]);
 
     // prevent already added tag appear in tag combobox select
     const filteredTagValue = useMemo(() => {
@@ -44,11 +49,12 @@ export function AttributePanel(props: AttributePanelProps) {
 
     // auto generate tags
     const autoTagValue = useMemo(() => {
+        const map: Map<string, (TextTagValue & { ignored: boolean })> = new Map();
+
         if (!activeResource) {
-            return [];
+            return map;
         }
         const { data: resource } = activeResource;
-        const map: Map<string, (TextTagValue & { ignored: boolean })> = new Map();
         for (const { key, value } of textMapperList) {
             if (value && resource.name.toLowerCase().includes(key.toLowerCase())) {
                 const ignored = resource.ignoreText.has(key);
@@ -97,10 +103,15 @@ export function AttributePanel(props: AttributePanelProps) {
             <Text c="dimmed" fw="bolder">Auto Generate Tags</Text>
             <Flex gap={10} wrap="wrap">
                 {
-                    Array.from(autoTagValue.values()).map((value) => (
-                        <Group component="span" key={value.id} gap={0} className={classes.tagpill}>
-                            <TagTypography name={value.name} subjectName={value.subjectName} fontSize={0.8} />
-                            <UnstyledButton onClick={() => handleDeleteTag(value.id)}>
+                    Array.from(autoTagValue.entries()).map(([text, value]) => (
+                        <Group component="span" key={value.id} gap={0} className={classes.tagpill} opacity={value.ignored ? '0.5' : '1.0'}>
+                            <TagTypography
+                                name={value.name}
+                                subjectName={value.subjectName}
+                                fontSize={0.8}
+                                styles={{ main: { textDecoration: value.ignored ? 'line-through Crimson 2px' : 'none' } }}
+                            />
+                            <UnstyledButton onClick={() => hanldeIgnored(text)}>
                                 <RxCross2 />
                             </UnstyledButton>
                         </Group>
