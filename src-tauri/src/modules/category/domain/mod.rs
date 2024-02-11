@@ -6,6 +6,12 @@ use chrono::{DateTime, Utc};
 use crate::modules::common::domain::ID;
 use crate::modules::common::infrastructure::dateutils;
 
+mod entities;
+pub use entities::RuleTableEntity;
+
+mod valueobj;
+pub use valueobj::RuleItemVO;
+
 mod error;
 pub use error::CategoryGenericError;
 pub use error::CategoryError;
@@ -23,6 +29,7 @@ pub struct CategoryAggregate {
     pub description: String,
     pub root_path: String,
     pub auth: bool,
+    pub rule_table: RuleTableEntity,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -66,6 +73,7 @@ impl CategoryAggregate {
                 description: description,
                 root_path: new_path,
                 auth: false,
+                rule_table: RuleTableEntity::new(Vec::new()),
                 created_at: Utc::now(),
                 updated_at: Utc::now(),
             }
@@ -106,5 +114,13 @@ impl CategoryAggregate {
 
     pub fn change_auth(&mut self, new_auth: bool) {
         self.auth = new_auth;
+    }
+
+    pub fn get_rule_table(&self) -> &RuleTableEntity {
+        &self.rule_table
+    }
+
+    pub fn get_mut_rule_table(&mut self) -> &mut RuleTableEntity {
+        &mut self.rule_table
     }
 }

@@ -1,6 +1,6 @@
 #[path ="./query-repository.rs"]
 mod query;
-pub use query::{CATEGORY_QUERY_REPOSITORY, CategoryQueryRepository};
+pub use query::*;
 
 mod repository;
-pub use repository::{CATEGORY_REPOSITORY, CategoryRepository, CategoryDO};
+pub use repository::*;

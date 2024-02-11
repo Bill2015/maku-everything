@@ -9,6 +9,13 @@ use crate::modules::category::domain::CategoryAggregate;
 
 pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::init(&env::DB);
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct RuleItemDo {
+    pub text: String,
+    pub tag_id: Thing,
+}
+
+
 /**
  * Category Data Object */
 #[derive(Debug, Serialize, Deserialize)]
@@ -18,6 +25,7 @@ pub struct CategoryDO {
     pub description: String,
     pub auth: bool,
     pub root_path: String,
+    pub rules: Vec<RuleItemDo>,
     pub created_at: Datetime,
     pub updated_at: Datetime,
 }

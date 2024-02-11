@@ -67,8 +67,8 @@ pub enum CategoryGenericError {
     #[error("Id is not exists")]
     IdNotFounded(),
 
-    #[error("Import category id not exists")]
-    ImportCategoryIdNotExists(),
+    #[error("The resource add rule text are duplicated")]
+    DuplicatedRuleText(),
 
     #[error("Import subject id not exists")]
     ImportSubjectIdNotExists(),
