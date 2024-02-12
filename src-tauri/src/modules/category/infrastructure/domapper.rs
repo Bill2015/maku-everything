@@ -45,7 +45,7 @@ impl Into<CategoryDO> for CategoryAggregate {
         let rules: Vec<RuleItemDo> = self.rule_table
             .get_rules()
             .into_iter()
-            .map(|x| (*x.to_owned()).into() )
+            .map(|x| x.to_owned().into() )
             .collect();
 
         CategoryDO {

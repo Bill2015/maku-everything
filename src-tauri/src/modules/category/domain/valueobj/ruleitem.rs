@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::modules::tag::domain::TagID;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct RuleItemVO {
     pub text: String,
     pub tag_id: TagID,

@@ -20,7 +20,7 @@ mod id;
 pub use id::CategoryID;
 
 mod porting;
-pub use porting::PortingCategoryObject;
+pub use porting::{PortingCategoryObject, PortingRuleItemObject};
 
 #[derive(Debug, Serialize)]
 pub struct CategoryAggregate {

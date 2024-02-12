@@ -55,6 +55,7 @@ impl<'a> ImportCategoryHandler<'a> {
 
     pub fn check_relation(
         &self,
+        category: &PortingCategoryObject,
         subjects: &Vec<PortingSubjectObject>,
         tags: &Vec<PortingTagObject>,
         resources: &Vec<PortingResourceObject>,
@@ -68,6 +69,16 @@ impl<'a> ImportCategoryHandler<'a> {
             .iter()
             .map(|val| val.id.to_string())
             .collect();
+
+        // check category import rules is exists
+        category.rule_table
+            .iter()
+            .try_for_each(|val| {
+                match tag_id_set.contains(&val.tag_id.to_string()) {
+                    true => Ok(()),
+                    false => Err(CategoryGenericError::ImportTagIdNotExists())
+                }
+            })?;
 
         // check tag's belong subject is exists
         tags.iter().try_for_each(|val| {
@@ -188,7 +199,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
         } = serde_json::from_str(&str)?;
 
         // check relation is valid
-        self.check_relation(&subjects, &tags, &resources)?;
+        self.check_relation(&category, &subjects, &tags, &resources)?;
 
         // create entity
         let (new_category, new_subjects, new_tags, new_resources) = Self::create(new_root_path, category, subjects, tags, resources)?;
