@@ -28,6 +28,14 @@ export interface CategoryUpdateDto extends Partial<CategoryCreateDto> {
     id: string;
 }
 
+export interface UpdateCategoryAddRuleDto {
+    id: string,
+    rules: {
+        text: string,
+        tag_id: string,
+    }[]
+}
+
 export interface ExportCategoryDto {
     id: string;
 }

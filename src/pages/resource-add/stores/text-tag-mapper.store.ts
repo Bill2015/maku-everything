@@ -53,14 +53,15 @@ export const createTextTagMapperStore = (defaultTextMap: CategoryAddRuleItemResD
                 if (state.textMap.has(key)) {
                     // eslint-disable-next-line no-param-reassign
                     state.textMap.get(key)!.value = newValue;
-                    return;
                 }
-                indexId += 1;
-                state.textMap.set(key, {
-                    value: newValue,
-                    key,
-                    indexId,
-                });
+                else {
+                    indexId += 1;
+                    state.textMap.set(key, {
+                        value: newValue,
+                        key,
+                        indexId,
+                    });
+                }
                 state.modified = true;
             }),
             textMapDelete: (key: string) => set((state) => {

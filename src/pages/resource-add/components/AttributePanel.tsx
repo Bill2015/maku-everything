@@ -107,7 +107,7 @@ export function AttributePanel(props: AttributePanelProps) {
                         <Group component="span" key={value.id} gap={0} className={classes.tagpill} opacity={value.ignored ? '0.5' : '1.0'}>
                             <TagTypography
                                 name={value.name}
-                                subjectName={value.subjectName}
+                                subjectName={value.subject_name}
                                 fontSize={0.8}
                                 styles={{ main: { textDecoration: value.ignored ? 'line-through Crimson 2px' : 'none' } }}
                             />

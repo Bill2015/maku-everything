@@ -69,9 +69,10 @@ impl<'a> CategoryRepository<'a> {
 
     pub async fn save(&self, data: Category) -> surrealdb::Result<Category> {
         let category_do: CategoryDO = Self::entity_to_model(data);
+
         let id = category_do.id.clone();
 
-        let is_new: bool = self.is_exist(&id.to_string()).await;
+        let is_new: bool = !self.is_exist(&id.to_string()).await;
 
         // save data
         let result: Option<CategoryDO> = match is_new {
