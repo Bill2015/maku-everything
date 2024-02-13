@@ -5,14 +5,13 @@ use chrono::{DateTime, Utc};
 
 use crate::base_aggregate;
 use crate::modules::common::domain::ToPlainObject;
-use crate::modules::common::domain::ID;
 use crate::modules::common::infrastructure::dateutils;
 
 mod entities;
-pub use entities::RuleTableEntity;
+pub use entities::CategoryAddRuleEntity;
 
 mod valueobj;
-pub use valueobj::RuleItemVO;
+pub use valueobj::CategoryAddRuleItemVO;
 
 mod error;
 pub use error::CategoryGenericError;
@@ -33,12 +32,16 @@ base_aggregate!(Category {
     description: String,
     root_path: String,
     auth: bool,
-    rule_table: RuleTableEntity,
+    rule_table: CategoryAddRuleEntity,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
 });
 
 impl Category {
+    pub fn take_id(self) -> CategoryID {
+        self.id
+    }
+
     pub fn relove_path(path: String) -> Result<String, CategoryGenericError> {
         // path can't be empty
         if path.is_empty() {
@@ -97,7 +100,7 @@ impl Category {
         self.auth = new_auth;
     }
 
-    pub fn get_mut_rule_table(&mut self) -> &mut RuleTableEntity {
+    pub fn get_mut_rule_table(&mut self) -> &mut CategoryAddRuleEntity {
         &mut self.rule_table
     }
 }

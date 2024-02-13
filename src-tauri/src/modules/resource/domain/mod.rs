@@ -38,6 +38,10 @@ base_aggregate!(Resource {
 });
 
 impl Resource {
+    pub fn take_id(self) -> ResourceID {
+        self.id
+    }
+
     pub fn change_name(&mut self, new_name: String) -> Result<(), ResourceGenericError> {
         if new_name.is_empty() {
             return Err(ResourceGenericError::NameIsEmpty());

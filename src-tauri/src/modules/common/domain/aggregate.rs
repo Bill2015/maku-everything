@@ -1,13 +1,5 @@
-use serde::{de::DeserializeOwned, Serialize};
-
-
-pub trait IAggregateRoot<T, V> 
-where V: Clone + Sized {
-    
-    fn to_properties(self) -> V;
-
-    fn reconstitute(properties: V) -> T;
-}
+use serde::Serialize;
+use serde::de::DeserializeOwned;
 
 pub trait ToPlainObject<P>
 where P: Clone + Sized + DeserializeOwned + Serialize {
@@ -44,10 +36,6 @@ macro_rules! base_aggregate {
                 $(
                     pub fn [<get_ $field>](&self) -> &$t {
                         &self.$field
-                    }
-
-                    pub fn [<take_ $field>](self) -> $t {
-                        self.$field
                     }
                 )*
             }

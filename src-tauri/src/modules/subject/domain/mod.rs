@@ -27,6 +27,9 @@ base_aggregate!(Subject {
 });
 
 impl Subject {
+    pub fn take_id(self) -> SubjectID {
+        self.id
+    }
 
     pub fn change_name(&mut self, new_name: String) -> Result<(), SubjectGenericError> {
         if new_name.is_empty() {

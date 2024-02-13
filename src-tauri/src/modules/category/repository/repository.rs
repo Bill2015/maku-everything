@@ -11,7 +11,7 @@ use crate::modules::category::domain::{Category, CategoryFactory};
 pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::init(&env::DB);
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct RuleItemDo {
+pub struct CategoryAddRuleItemDO {
     pub text: String,
     pub tag_id: Thing,
 }
@@ -26,7 +26,7 @@ pub struct CategoryDO {
     pub description: String,
     pub auth: bool,
     pub root_path: String,
-    pub rules: Vec<RuleItemDo>,
+    pub rules: Vec<CategoryAddRuleItemDO>,
     pub created_at: Datetime,
     pub updated_at: Datetime,
 }

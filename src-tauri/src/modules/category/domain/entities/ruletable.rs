@@ -1,24 +1,24 @@
 use serde::Serialize;
 
 use crate::modules::category::domain::CategoryGenericError;
-use crate::modules::category::domain::valueobj::RuleItemVO;
+use crate::modules::category::domain::valueobj::CategoryAddRuleItemVO;
 use crate::modules::tag::domain::TagID;
 
 #[derive(Debug, Clone, Serialize)]
-pub struct RuleTableEntity {
-    rules: Vec<RuleItemVO>
+pub struct CategoryAddRuleEntity {
+    rules: Vec<CategoryAddRuleItemVO>
 }
 
-impl RuleTableEntity  {
-    pub fn new(rules: Vec<RuleItemVO>) -> Self {
+impl CategoryAddRuleEntity  {
+    pub fn new(rules: Vec<CategoryAddRuleItemVO>) -> Self {
         Self { rules }
     }
 
-    pub fn get_rules(&self) -> &Vec<RuleItemVO> {
+    pub fn get_rules(&self) -> &Vec<CategoryAddRuleItemVO> {
         &self.rules
     }
 
-    pub fn take_rules(self) -> Vec<RuleItemVO> {
+    pub fn take_rules(self) -> Vec<CategoryAddRuleItemVO> {
         self.rules
     }
 
@@ -26,7 +26,7 @@ impl RuleTableEntity  {
         if let Some(_) = self.rules.iter().find(|x| x.text == text) {
             return Err(CategoryGenericError::DuplicatedRuleText());
         }
-        self.rules.push(RuleItemVO::new(text, tag_id));
+        self.rules.push(CategoryAddRuleItemVO::new(text, tag_id));
         Ok(())
     }
 }

@@ -29,6 +29,10 @@ base_aggregate!(Tag {
 });
 
 impl Tag {
+    pub fn take_id(self) -> TagID {
+        self.id
+    }
+
     pub fn change_name(&mut self, new_name: String) -> Result<(), TagGenericError> {
         if new_name.is_empty() {
             return Err(TagGenericError::NameIsEmpty());

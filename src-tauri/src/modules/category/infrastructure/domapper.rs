@@ -1,18 +1,18 @@
 use surrealdb::sql::Datetime;
 
-use crate::modules::category::domain::{CategoryProps, RuleItemVO, RuleTableEntity};
-use crate::modules::category::repository::{CategoryDO, RuleItemDo};
+use crate::modules::category::domain::{CategoryProps, CategoryAddRuleItemVO, CategoryAddRuleEntity};
+use crate::modules::category::repository::{CategoryDO, CategoryAddRuleItemDO};
 use crate::modules::common::domain::DomainModelMapper;
 
-impl DomainModelMapper<RuleItemVO> for RuleItemDo {
-    fn to_domain(self) -> RuleItemVO {
-        RuleItemVO {
+impl DomainModelMapper<CategoryAddRuleItemVO> for CategoryAddRuleItemDO {
+    fn to_domain(self) -> CategoryAddRuleItemVO {
+        CategoryAddRuleItemVO {
             text: self.text,
             tag_id: self.tag_id.into(),
         }
     }
 
-    fn from_domain(value: RuleItemVO) -> Self {
+    fn from_domain(value: CategoryAddRuleItemVO) -> Self {
         Self {
             text: value.text,
             tag_id: value.tag_id.into(),
@@ -24,8 +24,8 @@ impl DomainModelMapper<CategoryProps> for CategoryDO {
     fn to_domain(self) -> CategoryProps {
         let rules = self.rules
             .into_iter()
-            .map(|x| RuleItemDo::to_domain(x))
-            .collect::<Vec<RuleItemVO>>();
+            .map(|x| CategoryAddRuleItemDO::to_domain(x))
+            .collect::<Vec<CategoryAddRuleItemVO>>();
 
         CategoryProps {
             id: self.id.into(),
@@ -33,16 +33,16 @@ impl DomainModelMapper<CategoryProps> for CategoryDO {
             description: self.description,
             root_path: self.root_path,
             auth: self.auth,
-            rule_table: RuleTableEntity::new(rules),
+            rule_table: CategoryAddRuleEntity::new(rules),
             created_at: self.created_at.0,
             updated_at: self.created_at.0,
         }
     }
     fn from_domain(value: CategoryProps) -> Self {
-        let rules: Vec<RuleItemDo> = value.rule_table
+        let rules: Vec<CategoryAddRuleItemDO> = value.rule_table
             .get_rules()
             .into_iter()
-            .map(|x| RuleItemDo::from_domain(x.clone()))
+            .map(|x| CategoryAddRuleItemDO::from_domain(x.clone()))
             .collect();
 
         Self {
