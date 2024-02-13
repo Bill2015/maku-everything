@@ -69,7 +69,7 @@ impl ICommandHandler<ResourceRemoveTagCommand> for ResourceRemoveTagHandler<'_> 
             .await;
         
         match result {
-            Ok(value) => Ok(value.id),
+            Ok(value) => Ok(value.take_id()),
             _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }

@@ -4,7 +4,7 @@ use crate::modules::category::domain::CategoryGenericError;
 use crate::modules::category::domain::valueobj::RuleItemVO;
 use crate::modules::tag::domain::TagID;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct RuleTableEntity {
     rules: Vec<RuleItemVO>
 }
@@ -16,6 +16,10 @@ impl RuleTableEntity  {
 
     pub fn get_rules(&self) -> &Vec<RuleItemVO> {
         &self.rules
+    }
+
+    pub fn take_rules(self) -> Vec<RuleItemVO> {
+        self.rules
     }
 
     pub fn add_rule(&mut self, text: String, tag_id: TagID) -> Result<(), CategoryGenericError> {

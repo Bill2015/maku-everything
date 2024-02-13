@@ -5,7 +5,7 @@ use serde::Serialize;
 
 use crate::modules::resource::domain::ResourceGenericError;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct ResourceFileVO {
     pub uuid: String,
     pub name: String,

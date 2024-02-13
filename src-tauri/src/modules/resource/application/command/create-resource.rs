@@ -5,7 +5,7 @@ use serde::Deserialize;
 use crate::command_from_dto;
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::resource::application::dto::CreateResourceDto;
-use crate::modules::resource::domain::{ResourceAggregate, ResourceGenericError, ResourceID};
+use crate::modules::resource::domain::{ResourceFactory, ResourceGenericError, ResourceID};
 use crate::modules::resource::repository::ResourceRepository;
 use crate::modules::common::application::ICommandHandler;
 use crate::modules::tag::domain::TagID;
@@ -71,11 +71,11 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
 
 
         // create new resource
-        let mut new_resource = ResourceAggregate::new(
+        let mut new_resource = ResourceFactory::create(
             name,
             description,
-            &category.id,
-            category.root_path,
+            category.get_id(),
+            category.get_root_path().to_string(),
             file_path,
             url_path
         )?;
@@ -98,7 +98,7 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
             .await;
         
         match result {
-            Ok(value) => Ok(value.id),
+            Ok(value) => Ok(value.take_id()),
             _ => Err(ResourceGenericError::DBInternalError().into()),
         }
     }

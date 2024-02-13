@@ -69,7 +69,7 @@ impl ICommandHandler<UpdateTagCommand> for UpdateTagHandler<'_> {
             .await;
 
         match result {
-            Ok(value) => Ok(value.id),
+            Ok(value) => Ok(value.take_id()),
             _ => Err(TagGenericError::DBInternalError().into()),
         }
     }

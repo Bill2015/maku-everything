@@ -4,15 +4,15 @@ use crate::modules::tag::domain::TagID;
 
 use super::CategoryID;
 
-#[derive(Serialize, Deserialize)]
-pub struct PortingRuleItemObject {
+#[derive(Clone, Serialize, Deserialize)]
+pub struct CategoryAddRulePlainObject {
     pub text: String,
 
     pub tag_id: TagID,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct PortingCategoryObject {
+#[derive(Clone, Serialize, Deserialize)]
+pub struct CategoryPlainObject {
     pub id: CategoryID,
     
     pub name: String,
@@ -23,7 +23,7 @@ pub struct PortingCategoryObject {
 
     pub updated_at: String,
 
-    pub rule_table: Vec<PortingRuleItemObject>,
+    pub rules: Vec<CategoryAddRulePlainObject>,
 
     pub created_at: String,
 

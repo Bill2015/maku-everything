@@ -3,7 +3,7 @@ use serde::Serialize;
 
 use crate::modules::resource::domain::ResourceGenericError;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct ResourceUrlVO {
     pub host: String,
     pub full: String,

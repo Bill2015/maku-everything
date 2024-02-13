@@ -68,7 +68,7 @@ impl ICommandHandler<UpdateSubjectCommand> for UpdateSubjectHandler<'_> {
             .await;
 
         match result {
-            Ok(value) => Ok(value.id),
+            Ok(value) => Ok(value.take_id()),
             _ => Err(SubjectGenericError::DBInternalError().into()),
         }    
     }

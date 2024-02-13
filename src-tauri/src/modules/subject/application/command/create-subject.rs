@@ -6,7 +6,7 @@ use crate::command_from_dto;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::subject::application::dto::CreateSubjectDto;
-use crate::modules::subject::domain::{SubjectAggregate, SubjectGenericError, SubjectID};
+use crate::modules::subject::domain::{SubjectFactory, SubjectGenericError, SubjectID};
 use crate::modules::subject::repository::SubjectRepository;
 use crate::modules::common::application::ICommandHandler;
 
@@ -59,7 +59,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
             .ok_or(SubjectGenericError::BelongCategoryNotExists())?;
 
         // create new subject
-        let new_subject = SubjectAggregate::new(name, description, &category_id)?;
+        let new_subject = SubjectFactory::create(name, description, &category_id)?;
 
         // save
         let result = self.subject_repo
@@ -67,7 +67,7 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
             .await;
         
         match result {
-            Ok(value) => Ok(value.id),
+            Ok(value) => Ok(value.take_id()),
             _ => Err(SubjectGenericError::DBInternalError().into()),
         }
     }

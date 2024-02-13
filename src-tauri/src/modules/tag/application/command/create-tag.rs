@@ -8,7 +8,7 @@ use crate::modules::category::repository::CategoryRepository;
 use crate::modules::subject::domain::SubjectID;
 use crate::modules::subject::repository::SubjectRepository;
 use crate::modules::tag::application::dto::CreateTagDto;
-use crate::modules::tag::domain::{TagAggregate, TagGenericError, TagID};
+use crate::modules::tag::domain::{TagFactory, TagGenericError, TagID};
 use crate::modules::tag::repository::TagRepository;
 use crate::modules::common::application::ICommandHandler;
 
@@ -69,7 +69,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             .ok_or(TagGenericError::BelongSubjectNotExists())?;
 
         // create new tag
-        let new_tag = TagAggregate::new(name, description, &category_id, &subject_id)?;
+        let new_tag = TagFactory::create(name, description, &category_id, &subject_id)?;
 
         // save
         let result = self.tag_repo
@@ -77,7 +77,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             .await;
         
         match result {
-            Ok(value) => Ok(value.id),
+            Ok(value) => Ok(value.take_id()),
             _ => Err(TagGenericError::DBInternalError().into()),
         }
     }

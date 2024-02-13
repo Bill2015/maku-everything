@@ -4,8 +4,8 @@ use crate::modules::category::domain::CategoryID;
 
 use super::SubjectID;
 
-#[derive(Serialize, Deserialize)]
-pub struct PortingSubjectObject {
+#[derive(Clone, Serialize, Deserialize)]
+pub struct SubjectPlainObject {
     pub id: SubjectID,
 
     pub name: String,

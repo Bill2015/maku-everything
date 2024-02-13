@@ -4,8 +4,9 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::{Thing, Datetime, thing};
 
+use crate::modules::common::domain::DomainModelMapper;
 use crate::modules::common::repository::{env, tablens};
-use crate::modules::category::domain::CategoryAggregate;
+use crate::modules::category::domain::{Category, CategoryFactory};
 
 pub static CATEGORY_REPOSITORY: CategoryRepository<'_> = CategoryRepository::init(&env::DB);
 
@@ -53,21 +54,21 @@ impl<'a> CategoryRepository<'a> {
         }
     }
 
-    pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<CategoryAggregate>> {
+    pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<Category>> {
         let thing_id = thing(id).unwrap();
         let result: Option<CategoryDO> = self.db
             .select(thing_id)
             .await?;
 
-        let aggregate: Option<CategoryAggregate> = match result {
-            Some(value) => Some(CategoryAggregate::from(value)),
+        let aggregate: Option<Category> = match result {
+            Some(value) => Some(Self::model_to_entity(value)),
             None => None,
         };
         Ok(aggregate)
     }
 
-    pub async fn save(&self, data: CategoryAggregate) -> surrealdb::Result<CategoryAggregate> {
-        let category_do: CategoryDO = data.into();
+    pub async fn save(&self, data: Category) -> surrealdb::Result<Category> {
+        let category_do: CategoryDO = Self::entity_to_model(data);
         let id = category_do.id.clone();
 
         let is_new: bool = self.is_exist(&id.to_string()).await;
@@ -90,23 +91,29 @@ impl<'a> CategoryRepository<'a> {
             }
         };
         
-        let aggregate = CategoryAggregate::from(result.unwrap());
-
-        Ok(aggregate)
+        Ok(Self::model_to_entity(result.unwrap()))
     }
 
-    pub async fn delete(&self, id: &String) -> surrealdb::Result<Option<CategoryAggregate>> {
+    pub async fn delete(&self, id: &String) -> surrealdb::Result<Option<Category>> {
         let thing_id = thing(id).unwrap();
         let result: Option<CategoryDO> = self.db
             .delete(thing_id)
             .await?;
 
-        let aggregate: Option<CategoryAggregate> = match result {
-            Some(value) => Some(CategoryAggregate::from(value)),
+        let aggregate: Option<Category> = match result {
+            Some(value) => Some(Self::model_to_entity(value)),
             None => None,
         };
 
         Ok(aggregate)
+    }
+
+    fn entity_to_model(entity: Category) -> CategoryDO {
+        CategoryDO::from_domain(entity.to_properties())
+    }
+
+    fn model_to_entity(model: CategoryDO) -> Category {
+        CategoryFactory::reconstitute(model.to_domain())
     }
 }
 

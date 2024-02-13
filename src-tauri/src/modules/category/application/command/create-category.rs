@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::modules::category::application::dto::CreateCategoryDto;
-use crate::modules::category::domain::CategoryAggregate;
+use crate::modules::category::domain::CategoryFactory;
 use crate::modules::category::domain::CategoryGenericError;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::category::repository::CategoryRepository;
@@ -49,7 +49,7 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
         } = command;
 
         // create new category
-        let new_category = CategoryAggregate::new(name, description, root_path)?;
+        let new_category = CategoryFactory::create(name, description, root_path)?;
 
         // save
         let result = self.categroy_repo
@@ -57,7 +57,7 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
             .await;
 
         match result {
-            Ok(value) => Ok(value.id),
+            Ok(value) => Ok(value.take_id()),
             _ => Err(CategoryGenericError::DBInternalError().into()),
         }
     }

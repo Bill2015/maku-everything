@@ -4,10 +4,11 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
+use crate::modules::common::domain::DomainModelMapper;
 use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, CommonRepository, COMMON_REPOSITORY};
 use crate::modules::common::repository::tablens;
-use crate::modules::resource::domain::{ResourceAggregate, ResourceID};
+use crate::modules::resource::domain::{Resource, ResourceFactory, ResourceID};
 
 use super::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationRepository};
 
@@ -81,7 +82,7 @@ impl<'a> ResourceRepository<'a> {
         }
     }
 
-    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<ResourceAggregate>> {
+    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<Resource>> {
         let sql = format!(r#"
             SELECT 
                 *,
@@ -91,19 +92,19 @@ impl<'a> ResourceRepository<'a> {
             FROM type::table($table) WHERE {}"#, 
             builder_result.to_string());
 
-        let result: Vec<ResourceAggregate> = self.db
+        let result: Vec<Resource> = self.db
             .query(sql)
             .bind(("table", tablens::RESOURCE))
             .await?
             .take::<Vec<ResourceDO>>(0)?
             .into_iter()
-            .map(|val| ResourceAggregate::from(val) )
+            .map(|val| Self::model_to_entity(val))
             .collect();
 
         Ok(result) 
     }
 
-    async fn return_aggregate_by_id(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {
+    async fn return_aggregate_by_id(&self, id: String) -> surrealdb::Result<Option<Resource>> {
         let sql = r#"
             SELECT 
                 *,
@@ -119,10 +120,10 @@ impl<'a> ResourceRepository<'a> {
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
-        let result: Option<ResourceAggregate> = response
+        let result: Option<Resource> = response
             .take::<Vec<ResourceDO>>(0)?
             .pop()
-            .map(|val| ResourceAggregate::from(val));
+            .map(|val| Self::model_to_entity(val));
 
         Ok(result)
     }
@@ -140,18 +141,18 @@ impl<'a> ResourceRepository<'a> {
         }
     }
 
-    pub async fn find_by_id(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {
+    pub async fn find_by_id(&self, id: String) -> surrealdb::Result<Option<Resource>> {
         let result = self.return_aggregate_by_id(id)
             .await?;
 
         Ok(result)
     }
 
-    pub async fn save(&self, data: ResourceAggregate) -> surrealdb::Result<ResourceAggregate> {
-        let belong_category = data.belong_category.clone(); 
+    pub async fn save(&self, data: Resource) -> surrealdb::Result<Resource> {
+        let belong_category = data.get_belong_category().clone(); 
         let tagging = data.get_tagging().clone();
 
-        let resource_do: ResourceDO = data.into();
+        let resource_do: ResourceDO = Self::entity_to_model(data);
         let id: Thing = resource_do.id.clone();
         
         let is_new: bool = !self.is_exist(&id.to_string()).await;
@@ -196,18 +197,25 @@ impl<'a> ResourceRepository<'a> {
         Ok(final_result.unwrap())
     }
 
-    pub async fn delete(&self, id: String) -> surrealdb::Result<Option<ResourceAggregate>> {
+    pub async fn delete(&self, id: String) -> surrealdb::Result<Option<Resource>> {
         let thing_id = thing(id.as_str()).unwrap();
         let result: Option<ResourceDO> = self.db
             .delete(thing_id)
             .await?;
 
-        let aggregate: Option<ResourceAggregate> = match result {
-            Some(value) => Some(ResourceAggregate::from(value)),
+        let aggregate: Option<Resource> = match result {
+            Some(value) => Some(Self::model_to_entity(value)),
             None => None,
         };
 
         Ok(aggregate)
     }
-}
 
+    fn entity_to_model(entity: Resource) -> ResourceDO {
+        ResourceDO::from_domain(entity.to_properties())
+    }
+
+    fn model_to_entity(model: ResourceDO) -> Resource {
+        ResourceFactory::reconstitute(model.to_domain())
+    }
+}

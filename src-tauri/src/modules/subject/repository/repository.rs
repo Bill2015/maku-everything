@@ -4,9 +4,10 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
+use crate::modules::common::domain::DomainModelMapper;
 use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens, CommonRepository, COMMON_REPOSITORY};
-use crate::modules::subject::domain::{SubjectAggregate, SubjectID};
+use crate::modules::subject::domain::{Subject, SubjectFactory, SubjectID};
 
 pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -39,26 +40,26 @@ impl<'a> SubjectRepository<'a> {
         }
     }
 
-    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<SubjectAggregate>> {
+    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<Subject>> {
         let sql = format!(r#"
             SELECT 
                 *
             FROM type::table($table) WHERE {}"#, 
             builder_result.to_string());
 
-        let result: Vec<SubjectAggregate> = self.db
+        let result: Vec<Subject> = self.db
             .query(sql)
             .bind(("table", tablens::SUBJECT))
             .await?
             .take::<Vec<SubjectDO>>(0)?
             .into_iter()
-            .map(|val| { SubjectAggregate::from(val) })
+            .map(|val| Self::model_to_entity(val))
             .collect();
 
         Ok(result) 
     }
 
-    async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<SubjectAggregate>> {
+    async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<Subject>> {
         let sql = "SELECT * FROM type::table($table) WHERE id == $id";
 
         let mut response = self.db
@@ -67,10 +68,10 @@ impl<'a> SubjectRepository<'a> {
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
-        let result: Option<SubjectAggregate> = response
+        let result: Option<Subject> = response
             .take::<Vec<SubjectDO>>(0)?
             .pop()
-            .map(|val| SubjectAggregate::from(val));
+            .map(|val| Self::model_to_entity(val));
 
         Ok(result)
     }
@@ -88,17 +89,17 @@ impl<'a> SubjectRepository<'a> {
         }
     }
 
-    pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<SubjectAggregate>> {
+    pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<Subject>> {
         let result = self.return_aggregate_by_id(id)
             .await?;
 
         Ok(result)
     }
 
-    pub async fn save(&self, data: SubjectAggregate) -> surrealdb::Result<SubjectAggregate> {
-        let belong_category = data.belong_category.clone();
+    pub async fn save(&self, data: Subject) -> surrealdb::Result<Subject> {
+        let belong_category = data.get_belong_category().clone();
 
-        let subject_do: SubjectDO = data.into();
+        let subject_do: SubjectDO = Self::entity_to_model(data);
         let id: Thing = subject_do.id.clone();
 
         let is_new: bool = !self.is_exist(&id.to_string()).await;
@@ -136,17 +137,25 @@ impl<'a> SubjectRepository<'a> {
         Ok(final_result.unwrap())
     }
 
-    pub async fn delete(&self, id: String) -> surrealdb::Result<Option<SubjectAggregate>> {
+    pub async fn delete(&self, id: String) -> surrealdb::Result<Option<Subject>> {
         let result: Option<SubjectDO> = self.db
             .delete((tablens::SUBJECT, id))
             .await?;
 
-        let aggregate: Option<SubjectAggregate> = match result {
-            Some(value) => Some(SubjectAggregate::from(value)),
+        let aggregate: Option<Subject> = match result {
+            Some(value) => Some(Self::model_to_entity(value)),
             None => None,
         };
 
         Ok(aggregate)
+    }
+
+    fn entity_to_model(entity: Subject) -> SubjectDO {
+        SubjectDO::from_domain(entity.to_properties())
+    }
+
+    fn model_to_entity(model: SubjectDO) -> Subject {
+        SubjectFactory::reconstitute(model.to_domain())
     }
 }
 

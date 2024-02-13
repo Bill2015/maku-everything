@@ -7,15 +7,15 @@ use crate::modules::category::application::dto::{ExportCategoryDto, ExportCatego
 use crate::modules::category::domain::CategoryGenericError;
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::common::application::ICommandHandler;
-use crate::modules::common::domain::Porting;
+use crate::modules::common::domain::ToPlainObject;
 use crate::modules::common::infrastructure::QueryBuilder;
-use crate::modules::resource::domain::{PortingResourceObject, ResourceGenericError};
+use crate::modules::resource::domain::{ResourcePlainObject, ResourceGenericError};
 use crate::modules::resource::infrastructure::ResourceQueryBuilder;
 use crate::modules::resource::repository::ResourceRepository;
-use crate::modules::subject::domain::{PortingSubjectObject, SubjectGenericError};
+use crate::modules::subject::domain::{SubjectPlainObject, SubjectGenericError};
 use crate::modules::subject::infrastructure::SubjectQueryBuilder;
 use crate::modules::subject::repository::SubjectRepository;
-use crate::modules::tag::domain::{PortingTagObject, TagGenericError};
+use crate::modules::tag::domain::{TagPlainObject, TagGenericError};
 use crate::modules::tag::infrastructure::TagQueryBuilder;
 use crate::modules::tag::repository::TagRepository;
 
@@ -67,7 +67,7 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .await
             .or(Err(CategoryGenericError::DBInternalError()))?
             .ok_or(CategoryGenericError::IdNotFounded())?
-            .export_to()?;
+            .to_plain();
 
         // ------------------------------
         // subject part
@@ -80,8 +80,8 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .await
             .or(Err(SubjectGenericError::DBInternalError()))?
             .into_iter()
-            .map(|val| { val.export_to() })
-            .collect::<Result<Vec<PortingSubjectObject>, SubjectGenericError>>()?;
+            .map(|val| val.to_plain())
+            .collect::<Vec<SubjectPlainObject>>();
 
         // ------------------------------
         // tag part
@@ -94,8 +94,8 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .await
             .or(Err(TagGenericError::DBInternalError()))?
             .into_iter()
-            .map(|val| { val.export_to() })
-            .collect::<Result<Vec<PortingTagObject>, TagGenericError>>()?;
+            .map(|val| val.to_plain())
+            .collect::<Vec<TagPlainObject>>();
 
         // ------------------------------
         // resource part
@@ -108,8 +108,8 @@ impl ICommandHandler<ExportCategoryCommand> for ExportCategoryHandler<'_> {
             .await
             .or(Err(ResourceGenericError::DBInternalError()))?
             .into_iter()
-            .map(|val| { val.export_to() })
-            .collect::<Result<Vec<PortingResourceObject>, ResourceGenericError>>()?;
+            .map(|val| val.to_plain())
+            .collect::<Vec<ResourcePlainObject>>();
 
         let data = serde_json::to_string::<ExportCategoryResDto>(&ExportCategoryResDto { 
             category,

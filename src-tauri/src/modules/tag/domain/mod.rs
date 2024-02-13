@@ -1,7 +1,9 @@
-
+use serde::Serialize;
 use chrono::{DateTime, Utc};
-use crate::modules::common::domain::ID;
+
+use crate::base_aggregate;
 use crate::modules::category::domain::CategoryID;
+use crate::modules::common::domain::ToPlainObject;
 use crate::modules::common::infrastructure::dateutils;
 use crate::modules::subject::domain::SubjectID;
 
@@ -10,40 +12,23 @@ pub use id::TagID;
 mod error;
 pub use error::TagError;
 pub use error::TagGenericError;
-mod porting;
-pub use porting::PortingTagObject;
+mod factory;
+pub use factory::TagFactory;
+mod plainobj;
+pub use plainobj::TagPlainObject;
 
-pub struct TagAggregate {
-    pub id: TagID,
-    pub name: String,
-    pub belong_category: CategoryID,
-    pub belong_subject: SubjectID,
-    pub description: String,
-    pub auth: bool,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
+base_aggregate!(Tag {
+    id: TagID,
+    name: String,
+    belong_category: CategoryID,
+    belong_subject: SubjectID,
+    description: String,
+    auth: bool,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+});
 
-impl TagAggregate {
-    pub fn new(name: String, description: String, belong_category: &CategoryID, belong_subject: &SubjectID) -> Result<Self, TagGenericError> {
-        if name.len() <= 0 {
-            return Err(TagGenericError::NameIsEmpty());
-        }
-
-        Ok(
-            TagAggregate {
-                id: TagID::new(),
-                name: name,
-                belong_category: belong_category.clone(),
-                belong_subject: belong_subject.clone(),
-                description: description,
-                auth: false,
-                created_at: Utc::now(),
-                updated_at: Utc::now(),
-            }
-        )
-    }
-
+impl Tag {
     pub fn change_name(&mut self, new_name: String) -> Result<(), TagGenericError> {
         if new_name.is_empty() {
             return Err(TagGenericError::NameIsEmpty());
@@ -74,5 +59,20 @@ impl TagAggregate {
             return Ok(())
         }
         Err(TagGenericError::InvalidDateFormat())
+    }
+}
+
+impl ToPlainObject<TagPlainObject> for Tag {
+    fn to_plain(self) -> TagPlainObject {
+        TagPlainObject {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            belong_category: self.belong_category,
+            belong_subject: self.belong_subject,
+            created_at: dateutils::format(self.created_at),
+            updated_at: dateutils::format(self.updated_at),
+            auth: self.auth,
+        }
     }
 }

@@ -5,8 +5,8 @@ use crate::modules::subject::domain::SubjectID;
 
 use super::TagID;
 
-#[derive(Serialize, Deserialize)]
-pub struct PortingTagObject {
+#[derive(Clone, Serialize, Deserialize)]
+pub struct TagPlainObject {
     pub id: TagID,
 
     pub name: String,

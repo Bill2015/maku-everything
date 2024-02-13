@@ -10,16 +10,20 @@ use base64::Engine;
 use crate::command_from_dto;
 use crate::modules::category::application::dto::ExportCategoryResDto;
 use crate::modules::category::application::dto::ImportCategoryDto;
-use crate::modules::category::domain::{CategoryAggregate, CategoryGenericError, CategoryID, PortingCategoryObject};
+use crate::modules::category::domain::CategoryFactory;
+use crate::modules::category::domain::CategoryPlainObject;
+use crate::modules::category::domain::{Category, CategoryGenericError, CategoryID};
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::common::application::ICommandHandler;
-use crate::modules::common::domain::Porting;
-use crate::modules::resource::domain::PortingResourceTaggingObject;
-use crate::modules::resource::domain::{ResourceAggregate, PortingResourceObject};
+use crate::modules::resource::domain::ResourceFactory;
+use crate::modules::resource::domain::ResourceTaggingPlainObject;
+use crate::modules::resource::domain::{Resource, ResourcePlainObject};
 use crate::modules::resource::repository::ResourceRepository;
-use crate::modules::subject::domain::{SubjectID, SubjectAggregate, PortingSubjectObject};
+use crate::modules::subject::domain::SubjectFactory;
+use crate::modules::subject::domain::{SubjectID, Subject, SubjectPlainObject};
 use crate::modules::subject::repository::SubjectRepository;
-use crate::modules::tag::domain::{TagID, TagAggregate, PortingTagObject};
+use crate::modules::tag::domain::TagFactory;
+use crate::modules::tag::domain::{TagID, Tag, TagPlainObject};
 use crate::modules::tag::repository::TagRepository;
 
 #[derive(Deserialize)]
@@ -55,10 +59,10 @@ impl<'a> ImportCategoryHandler<'a> {
 
     pub fn check_relation(
         &self,
-        category: &PortingCategoryObject,
-        subjects: &Vec<PortingSubjectObject>,
-        tags: &Vec<PortingTagObject>,
-        resources: &Vec<PortingResourceObject>,
+        category: &CategoryPlainObject,
+        subjects: &Vec<SubjectPlainObject>,
+        tags: &Vec<TagPlainObject>,
+        resources: &Vec<ResourcePlainObject>,
     ) -> Result<(), CategoryGenericError> {
         let subject_id_set: HashSet<String> = subjects
             .iter()
@@ -71,7 +75,7 @@ impl<'a> ImportCategoryHandler<'a> {
             .collect();
 
         // check category import rules is exists
-        category.rule_table
+        category.rules
             .iter()
             .try_for_each(|val| {
                 match tag_id_set.contains(&val.tag_id.to_string()) {
@@ -101,30 +105,32 @@ impl<'a> ImportCategoryHandler<'a> {
 
     fn create(
         root_path: String,
-        category: PortingCategoryObject,
-        subjects: Vec<PortingSubjectObject>,
-        tags: Vec<PortingTagObject>,
-        resources: Vec<PortingResourceObject>,
-    ) -> Result<(CategoryAggregate, Vec<SubjectAggregate>, Vec<TagAggregate>, Vec<ResourceAggregate>), Error> {
-        let new_category = CategoryAggregate::import_from(PortingCategoryObject {
+        category: CategoryPlainObject,
+        subjects: Vec<SubjectPlainObject>,
+        tags: Vec<TagPlainObject>,
+        resources: Vec<ResourcePlainObject>,
+    ) -> Result<(Category, Vec<Subject>, Vec<Tag>, Vec<Resource>), Error> {
+        // ------------------------------
+        // category part
+        let new_category = CategoryFactory::from_plain(CategoryPlainObject {
             root_path: root_path.clone(),
             ..category
         })?;
-        let category_id = &new_category.id;
-        let new_root = &new_category.root_path;
+        let category_id = new_category.get_id();
+        let new_root = new_category.get_root_path();
 
         // ------------------------------
         // subject part
         let mut subids: HashMap<String, SubjectID> = HashMap::new();
-        let mut new_subjects: Vec<SubjectAggregate> = Vec::new();
+        let mut new_subjects: Vec<Subject> = Vec::new();
 
         for subject in subjects {
             let old_id = subject.id.to_string().clone();
-            let new_sub = SubjectAggregate::import_from(PortingSubjectObject { 
+            let new_sub = SubjectFactory::from_plain(SubjectPlainObject { 
                 belong_category: category_id.clone(), ..subject
             })?;
     
-            subids.insert(old_id, new_sub.id.clone());
+            subids.insert(old_id, new_sub.get_id().clone());
 
             new_subjects.push(new_sub);
         }
@@ -132,34 +138,34 @@ impl<'a> ImportCategoryHandler<'a> {
         // ------------------------------
         // tag part
         let mut tagids: HashMap<String, TagID> = HashMap::new();
-        let mut new_tags: Vec<TagAggregate> = Vec::new();
+        let mut new_tags: Vec<Tag> = Vec::new();
 
         for tag in tags {
             let old_id = tag.id.to_string().clone();
-            let new_tag = TagAggregate::import_from(PortingTagObject {
+            let new_tag = TagFactory::from_plain(TagPlainObject {
                 belong_category: category_id.clone(),
                 belong_subject: subids.get(&tag.belong_subject.to_string()).unwrap().clone(),
                 ..tag
             })?;
     
-            tagids.insert(old_id, new_tag.id.clone());
+            tagids.insert(old_id, new_tag.get_id().clone());
 
             new_tags.push(new_tag);
         }
         
         // ------------------------------
         // resource part
-        let mut new_resources: Vec<ResourceAggregate> = Vec::new();
+        let mut new_resources: Vec<Resource> = Vec::new();
 
         for res in resources {
             let new_tags = res.tags
                 .into_iter()
-                .map(|val| PortingResourceTaggingObject { 
+                .map(|val| ResourceTaggingPlainObject { 
                     id: tagids.get(&val.id.to_string()).unwrap().to_owned(), 
                     added_at: val.added_at,
                 })
-                .collect::<Vec<PortingResourceTaggingObject>>();
-            let new_res = ResourceAggregate::import_from(PortingResourceObject {
+                .collect::<Vec<ResourceTaggingPlainObject>>();
+            let new_res = ResourceFactory::from_plain(ResourcePlainObject {
                 belong_category: category_id.clone(),
                 root_path: new_root.to_string(),
                 tags: new_tags,
@@ -209,7 +215,7 @@ impl ICommandHandler<ImportCategoryCommand> for ImportCategoryHandler<'_> {
             .save(new_category)
             .await
             .or(Err(CategoryGenericError::DBInternalError()))?
-            .id;
+            .take_id();
 
         // ------------------------------
         // subject part

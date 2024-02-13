@@ -2,11 +2,11 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use surrealdb::sql::Thing;
 
-use crate::modules::category::domain::PortingCategoryObject;
-use crate::modules::subject::domain::PortingSubjectObject;
-use crate::modules::tag::domain::PortingTagObject;
-use crate::modules::resource::domain::PortingResourceObject;
+use crate::modules::category::domain::CategoryPlainObject;
+use crate::modules::subject::domain::SubjectPlainObject;
+use crate::modules::resource::domain::ResourcePlainObject;
 use crate::modules::common::application::thing_serialize;
+use crate::modules::tag::domain::TagPlainObject;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CategoryResDto {
@@ -30,11 +30,11 @@ pub struct CategoryResDto {
 
 #[derive(Serialize, Deserialize)]
 pub struct ExportCategoryResDto {
-    pub category: PortingCategoryObject,
+    pub category: CategoryPlainObject,
     
-    pub subjects: Vec<PortingSubjectObject>,
+    pub subjects: Vec<SubjectPlainObject>,
 
-    pub tags: Vec<PortingTagObject>,
+    pub tags: Vec<TagPlainObject>,
 
-    pub resources: Vec<PortingResourceObject>,
+    pub resources: Vec<ResourcePlainObject>,
 }

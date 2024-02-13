@@ -4,11 +4,13 @@ use surrealdb::Surreal;
 use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
+use crate::modules::common::domain::DomainModelMapper;
 use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::env;
 use crate::modules::common::repository::tablens;
 use crate::modules::common::repository::{CommonRepository, COMMON_REPOSITORY};
-use crate::tag::domain::{TagAggregate, TagID};
+use crate::modules::tag::domain::TagFactory;
+use crate::tag::domain::{Tag, TagID};
 
 pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -42,26 +44,26 @@ impl<'a> TagRepository<'a> {
         }
     }
 
-    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<TagAggregate>> {
+    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<Tag>> {
         let sql = format!(r#"
             SELECT 
                 *
             FROM type::table($table) WHERE {}"#, 
             builder_result.to_string());
 
-        let result: Vec<TagAggregate> = self.db
+        let result: Vec<Tag> = self.db
             .query(sql)
             .bind(("table", tablens::TAG))
             .await?
             .take::<Vec<TagDO>>(0)?
             .into_iter()
-            .map(|val| { TagAggregate::from(val) })
+            .map(|val| Self::model_to_entity(val))
             .collect();
 
         Ok(result) 
     }
 
-    async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<TagAggregate>> {
+    async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<Tag>> {
         let sql = "SELECT * FROM type::table($table) WHERE id == $id";
 
         let mut response = self.db
@@ -70,10 +72,10 @@ impl<'a> TagRepository<'a> {
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
-        let result: Option<TagAggregate> = response
+        let result: Option<Tag> = response
             .take::<Vec<TagDO>>(0)?
             .pop()
-            .map(|val| TagAggregate::from(val));
+            .map(|val| Self::model_to_entity(val));
 
         Ok(result)
     }
@@ -91,18 +93,18 @@ impl<'a> TagRepository<'a> {
         }
     }
 
-    pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<TagAggregate>> {
+    pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<Tag>> {
         let result = self.return_aggregate_by_id(id)
             .await?;
 
         Ok(result)
     }
 
-    pub async fn save(&self, data: TagAggregate) -> surrealdb::Result<TagAggregate> {
-        let belong_category = data.belong_category.clone();
-        let belong_subject = data.belong_subject.clone();
+    pub async fn save(&self, data: Tag) -> surrealdb::Result<Tag> {
+        let belong_category = data.get_belong_category().clone();
+        let belong_subject = data.get_belong_subject().clone();
 
-        let tag_do: TagDO = data.into();
+        let tag_do: TagDO = Self::entity_to_model(data);
         let id: Thing = tag_do.id.clone();
 
         let is_new: bool = !self.is_exist(&id.to_string()).await;
@@ -144,17 +146,25 @@ impl<'a> TagRepository<'a> {
         Ok(final_result.unwrap())
     }
 
-    pub async fn delete(&self, id: String) -> surrealdb::Result<Option<TagAggregate>> {
+    pub async fn delete(&self, id: String) -> surrealdb::Result<Option<Tag>> {
         let result: Option<TagDO> = self.db
             .delete((tablens::SUBJECT, id))
             .await?;
 
-        let aggregate: Option<TagAggregate> = match result {
-            Some(value) => Some(TagAggregate::from(value)),
+        let aggregate: Option<Tag> = match result {
+            Some(value) => Some(Self::model_to_entity(value)),
             None => None,
         };
 
         Ok(aggregate)
+    }
+
+    fn entity_to_model(entity: Tag) -> TagDO {
+        TagDO::from_domain(entity.to_properties())
+    }
+
+    fn model_to_entity(model: TagDO) -> Tag {
+        TagFactory::reconstitute(model.to_domain())
     }
 }
 

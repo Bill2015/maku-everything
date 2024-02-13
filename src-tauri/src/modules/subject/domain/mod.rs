@@ -1,6 +1,8 @@
 use serde::Serialize;
 use chrono::{DateTime, Utc};
-use crate::modules::common::domain::ID;
+
+use crate::base_aggregate;
+use crate::modules::common::domain::ToPlainObject;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::common::infrastructure::dateutils;
 
@@ -9,38 +11,22 @@ pub use id::SubjectID;
 mod error;
 pub use error::SubjectError;
 pub use error::SubjectGenericError;
-mod porting;
-pub use porting::PortingSubjectObject;
+mod factory;
+pub use factory::SubjectFactory;
+mod plainobj;
+pub use plainobj::SubjectPlainObject;
 
-#[derive(Debug, Serialize)]
-pub struct SubjectAggregate {
-    pub id: SubjectID,
-    pub name: String,
-    pub description: String,
-    pub belong_category: CategoryID,
-    pub auth: bool,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
+base_aggregate!(Subject {
+    id: SubjectID,
+    name: String,
+    description: String,
+    belong_category: CategoryID,
+    auth: bool,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+});
 
-impl SubjectAggregate {
-    pub fn new(name: String, description: String, belong_category: &CategoryID) -> Result<Self, SubjectGenericError> {
-        if name.len() <= 0 {
-            return  Err(SubjectGenericError::NameIsEmpty());
-        }
-
-        Ok(
-            SubjectAggregate {
-                id: SubjectID::new(),
-                name: name,
-                description: description,
-                belong_category: belong_category.clone(),
-                auth: false,
-                created_at: Utc::now(),
-                updated_at: Utc::now(),
-            }
-        )
-    }
+impl Subject {
 
     pub fn change_name(&mut self, new_name: String) -> Result<(), SubjectGenericError> {
         if new_name.is_empty() {
@@ -73,5 +59,19 @@ impl SubjectAggregate {
             return Ok(())
         }
         Err(SubjectGenericError::InvalidDateFormat())
+    }
+}
+
+impl ToPlainObject<SubjectPlainObject> for Subject {
+    fn to_plain(self) -> SubjectPlainObject {
+        SubjectPlainObject {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            belong_category: self.belong_category,
+            created_at: dateutils::format(self.created_at),
+            updated_at: dateutils::format(self.updated_at),
+            auth: self.auth,
+        }
     }
 }

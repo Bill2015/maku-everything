@@ -3,6 +3,8 @@ use std::path::Path;
 use serde::Serialize;
 use chrono::{DateTime, Utc};
 
+use crate::base_aggregate;
+use crate::modules::common::domain::ToPlainObject;
 use crate::modules::common::domain::ID;
 use crate::modules::common::infrastructure::dateutils;
 
@@ -19,22 +21,24 @@ pub use error::CategoryError;
 mod id;
 pub use id::CategoryID;
 
-mod porting;
-pub use porting::{PortingCategoryObject, PortingRuleItemObject};
+mod factory;
+pub use factory::CategoryFactory;
 
-#[derive(Debug, Serialize)]
-pub struct CategoryAggregate {
-    pub id: CategoryID,
-    pub name: String,
-    pub description: String,
-    pub root_path: String,
-    pub auth: bool,
-    pub rule_table: RuleTableEntity,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-}
+mod plainobj;
+pub use plainobj::{CategoryPlainObject, CategoryAddRulePlainObject};
 
-impl CategoryAggregate {
+base_aggregate!(Category {
+    id: CategoryID,
+    name: String,
+    description: String,
+    root_path: String,
+    auth: bool,
+    rule_table: RuleTableEntity,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+});
+
+impl Category {
     pub fn relove_path(path: String) -> Result<String, CategoryGenericError> {
         // path can't be empty
         if path.is_empty() {
@@ -55,29 +59,6 @@ impl CategoryAggregate {
         }
 
         Ok(new_path)
-    }
-
-    pub fn new(name: String, description: String, root_path: String) -> Result<Self, CategoryGenericError> {
-
-        let new_path = Self::relove_path(root_path)?;
-
-        // name can't be empty
-        if name.len() <= 0 {
-            return Err(CategoryGenericError::NameIsEmpty());
-        }
-
-        Ok(
-            CategoryAggregate {
-                id: CategoryID::new(),
-                name: name,
-                description: description,
-                root_path: new_path,
-                auth: false,
-                rule_table: RuleTableEntity::new(Vec::new()),
-                created_at: Utc::now(),
-                updated_at: Utc::now(),
-            }
-        )
     }
 
     pub fn set_updated_at(&mut self, new_date: &str) -> Result<(), CategoryGenericError> {
@@ -116,11 +97,28 @@ impl CategoryAggregate {
         self.auth = new_auth;
     }
 
-    pub fn get_rule_table(&self) -> &RuleTableEntity {
-        &self.rule_table
-    }
-
     pub fn get_mut_rule_table(&mut self) -> &mut RuleTableEntity {
         &mut self.rule_table
+    }
+}
+
+impl ToPlainObject<CategoryPlainObject> for Category {
+    fn to_plain(self) -> CategoryPlainObject {
+        let rules = self.rule_table
+            .take_rules()
+            .into_iter()
+            .map(|x| CategoryAddRulePlainObject { text: x.text, tag_id: x.tag_id })
+            .collect();
+
+        CategoryPlainObject {
+            id: self.id,
+            name: self.name,
+            description: self.description,
+            root_path: self.root_path,
+            rules: rules,
+            created_at: dateutils::format(self.created_at),
+            updated_at: dateutils::format(self.updated_at),
+            auth: self.auth,
+        }
     }
 }
