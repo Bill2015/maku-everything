@@ -1,6 +1,7 @@
 import { PropsWithChildren, createContext, useContext, useMemo, useRef } from 'react';
 import { useStore } from 'zustand';
-import { TextTagMapperStore, TextTagValue, createTextTagMapperStore } from './text-tag-mapper.store';
+import { CategoryAddRuleItemResDto } from '@api/category';
+import { TextTagMapperStore, createTextTagMapperStore } from './text-tag-mapper.store';
 
 const TextTagMapperContext = createContext<TextTagMapperStore | null>(null);
 
@@ -23,7 +24,7 @@ export function useTextTagMapperContext() {
     };
 }
 
-export function TextTagMapperProvider(props: PropsWithChildren & { defaultTextMap: Record<string, TextTagValue> }) {
+export function TextTagMapperProvider(props: PropsWithChildren & { defaultTextMap: CategoryAddRuleItemResDto[] }) {
     const { children, defaultTextMap } = props;
 
     const storeRef = useRef<TextTagMapperStore>();

@@ -8,7 +8,7 @@ use crate::modules::resource::domain::ResourcePlainObject;
 use crate::modules::common::application::thing_serialize;
 use crate::modules::tag::domain::TagPlainObject;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct CategoryResDto {
     #[serde(serialize_with = "thing_serialize")]
     pub id: Thing,
@@ -37,4 +37,34 @@ pub struct ExportCategoryResDto {
     pub tags: Vec<TagPlainObject>,
 
     pub resources: Vec<ResourcePlainObject>,
+}
+
+
+#[derive(Deserialize, Serialize)]
+pub struct CategoryAddRuleItemTagResDto {
+    #[serde(serialize_with = "thing_serialize")]
+    pub id: Thing,
+
+    pub name: String,
+
+    pub subject_name: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct CategoryAddRuleItemResDto {
+    pub tag: Option<CategoryAddRuleItemTagResDto>,
+
+    pub text: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct CategoryAddRulesResDto {
+    #[serde(serialize_with = "thing_serialize")]
+    pub id: Thing,
+
+    pub name: String,
+
+    pub root_path: String,
+
+    pub rules: Vec<CategoryAddRuleItemResDto>,
 }

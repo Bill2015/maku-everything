@@ -29,6 +29,16 @@ pub async fn update_category(data: UpdateCategoryDto) -> Result<CategoryID, Cate
     Ok(result)
 }
 
+#[tauri::command]
+pub async fn update_addrule_category(data: UpdateCategoryAddRuleDto) -> Result<CategoryID, CategoryError> {
+    let result = CATEGORY_SERVICE
+        .update_rules(data)
+        .await?;
+
+    Ok(result)
+}
+
+
 #[tauri::command(rename_all = "snake_case")]
 pub async fn import_category(data: ImportCategoryDto) -> Result<CategoryID, CategoryError> {
     let result = CATEGORY_SERVICE
@@ -70,6 +80,15 @@ pub async fn get_all_category() -> Result<Vec<CategoryResDto>, CategoryError> {
 pub async fn get_category_by_id(id: String) -> Result<Option<CategoryResDto>, CategoryError> {
     let result = CATEGORY_SERVICE
         .get_by_id(id)
+        .await?;
+
+    Ok(result)
+}
+
+#[tauri::command]
+pub async fn get_category_rules(id: String) -> Result<Option<CategoryAddRulesResDto>, CategoryError> {
+    let result = CATEGORY_SERVICE
+        .get_rules(id)
         .await?;
 
     Ok(result)

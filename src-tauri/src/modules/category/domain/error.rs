@@ -13,11 +13,17 @@ pub enum CategoryError {
     #[error("Updated Failed")]
     Update(Error),
 
+    #[error("Updated Rule Table Failed")]
+    UpdateRuleTable(Error),
+
     #[error("Retrieve all Category failed")]
     GetAll(Error),
 
     #[error("Get specific Category by id failed")]
     GetById(Error),
+
+    #[error("Get Category add rules by id failed")]
+    GetAddRules(Error),
 
     #[error("Querying Category failed")]
     Query(Error),
@@ -37,8 +43,10 @@ impl Serialize for CategoryError {
         let error_message = match self {
             CategoryError::Create(source) => serialize_error!(self, source),
             CategoryError::Update(source) => serialize_error!(self, source),
+            CategoryError::UpdateRuleTable(source) => serialize_error!(self, source),
             CategoryError::GetAll(source) => serialize_error!(self, source),
             CategoryError::GetById(source) => serialize_error!(self, source),
+            CategoryError::GetAddRules(source) => serialize_error!(self, source),
             CategoryError::Query(source) => serialize_error!(self, source),
             CategoryError::Import(source) => serialize_error!(self, source),
             CategoryError::Export(source) => serialize_error!(self, source),

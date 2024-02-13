@@ -37,3 +37,25 @@ export interface CategoryImportDto {
 
     data: string,
 }
+
+export interface CategoryAddRuleItemResDto {
+    tag: {
+        id: string,
+
+        name: string,
+
+        subject_name: string,
+    } | null,
+
+    text: string,
+}
+
+export interface CategoryAddRulesResDto {
+    id: string,
+
+    name: string,
+
+    root_path: string,
+
+    rules: CategoryAddRuleItemResDto[],
+}

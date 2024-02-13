@@ -67,6 +67,17 @@ impl<'a> CategoryService<'a> {
         Ok(result)
     }
 
+    pub async fn update_rules(&self, data: UpdateCategoryAddRuleDto) -> Result<CategoryID, CategoryError> {
+        let command  = UpdateCategoryAddRuleCommand::from(data);
+
+        let result = UpdateCategoryAddRuleHandler::register(self.category_repository, self.tag_repository)
+            .execute(command)
+            .await
+            .map_err(|err| CategoryError::UpdateRuleTable(anyhow!(err)))?;
+
+        Ok(result)
+    }
+
     pub async fn import(&self, data: ImportCategoryDto) -> Result<CategoryID, CategoryError> {
         let command = ImportCategoryCommand::from(data);
 
@@ -117,6 +128,17 @@ impl<'a> CategoryService<'a> {
             .query(query)
             .await
             .map_err(|err| CategoryError::GetById(anyhow!(err)))?;
+
+        Ok(result)
+    }
+
+    pub async fn get_rules(&self, id: String) -> Result<Option<CategoryAddRulesResDto>, CategoryError> {
+        let query = GetAddRulesCategoryQuery { id: id };
+        
+        let result = GetAddRulesCategoryHandler::register(self.category_queryrepo)
+            .query(query)
+            .await
+            .map_err(|err| CategoryError::GetAddRules(anyhow!(err)))?;
 
         Ok(result)
     }

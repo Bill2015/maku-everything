@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use serde::Serialize;
 
 use crate::modules::category::domain::CategoryGenericError;
@@ -27,6 +29,19 @@ impl CategoryAddRuleEntity  {
             return Err(CategoryGenericError::DuplicatedRuleText());
         }
         self.rules.push(CategoryAddRuleItemVO::new(text, tag_id));
+        Ok(())
+    }
+
+    pub fn update_rules(&mut self, rules: Vec<CategoryAddRuleItemVO>) -> Result<(), CategoryGenericError> {
+        let mut set: HashSet<&String> = HashSet::new();
+        for rule in &rules {
+            if set.contains(&rule.text) {
+                return Err(CategoryGenericError::DuplicatedRuleText());
+            }
+            set.insert(&rule.text);
+        }
+
+        self.rules = rules;
         Ok(())
     }
 }

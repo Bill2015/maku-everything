@@ -9,3 +9,7 @@ pub use get_by_id::*;
 #[path ="./query-category.rs"]
 mod query_category;
 pub use query_category::*;
+
+#[path ="./get-category-addrules.rs"]
+mod get_category_addrules;
+pub use get_category_addrules::*;

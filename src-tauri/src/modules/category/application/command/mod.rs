@@ -2,6 +2,10 @@
 mod create;
 pub use create::*;
 
+#[path ="./update-category-addrule.rs"]
+mod update_rule;
+pub use update_rule::*;
+
 #[path="./update-category.rs"]
 mod update;
 pub use update::*;

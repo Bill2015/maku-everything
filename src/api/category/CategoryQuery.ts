@@ -25,4 +25,16 @@ export namespace CategoryQuery {
             initialData:     null,
         });
     }
+
+    export function useGetRules(id: string) {
+        const queryFn = () => CategoryAPI.getRules(id);
+
+        return useQuery({
+            queryKey:        ['category-rules', id],
+            queryFn:         queryFn,
+            enabled:         !!id,
+            placeholderData: null,
+            initialData:     null,
+        });
+    }
 }

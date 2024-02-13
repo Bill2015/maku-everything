@@ -5,7 +5,7 @@ use surrealdb::sql::thing;
 
 use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens};
-use crate::modules::category::application::dto::CategoryResDto;
+use crate::modules::category::application::dto::{CategoryAddRulesResDto, CategoryResDto};
 
 pub static CATEGORY_QUERY_REPOSITORY: CategoryQueryRepository<'_> = CategoryQueryRepository::init(&env::DB);
 
@@ -69,5 +69,41 @@ impl<'a> CategoryQueryRepository<'a> {
             .unwrap();
 
         Ok(result) 
+    }
+
+    pub async fn get_rules(&self, id: &String) -> surrealdb::Result<Option<CategoryAddRulesResDto>> {
+        let sql = format!(r#"
+            SELECT
+                id,
+                name,
+                root_path,
+                function () {{ 
+                    return this.rules.map(({{ tag_id, text }}) => ({{
+                        tag: tag_id && {{
+                            id: tag_id.id,
+                            name: tag_id.name,
+                            subject_name: tag_id.belong_subject.name,
+                        }},
+                        text: text,
+                    }}))
+                }} as rules
+            FROM 
+                (
+                    SELECT * FROM category
+                    WHERE id == $id
+                    FETCH rules.tag_id, rules.tag_id.belong_subject
+                )
+        "#);
+            
+        let mut response = self.db
+                .query(sql)
+                .bind(("id", thing(id.as_str()).unwrap()))
+                .await?;
+    
+        let result: Option<CategoryAddRulesResDto> = response
+            .take::<Vec<CategoryAddRulesResDto>>(0)?
+            .pop();
+
+        Ok(result)
     }
 }
