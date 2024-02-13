@@ -43,7 +43,7 @@ export default function ResourceAddPage() {
 
     return (
         <AddResourceProvider category={category}>
-            <TextTagMapperProvider defaultTextMap={categoryRules.rules}>
+            <TextTagMapperProvider category={category} defaultTextMap={categoryRules.rules}>
                 <ResourceAddPageContent />
             </TextTagMapperProvider>
         </AddResourceProvider>

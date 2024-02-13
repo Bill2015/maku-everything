@@ -1,13 +1,12 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
     Button, Divider, Group, ScrollArea, Space, Stack, Text, Tooltip,
 } from '@mantine/core';
 import { IoIosSave } from 'react-icons/io';
 
 import { TagSelectOptionValue } from '@components/input';
-import { CategoryMutation } from '@api/category';
 import { TagMapperItem } from './TagMapperItem';
-import { useAddResourceContext, useTextTagMapperContext } from '../stores';
+import { useTextTagMapperContext } from '../stores';
 
 export interface TagMapperDisplayerProps {
     tagValues: TagSelectOptionValue[];
@@ -19,9 +18,14 @@ export interface TagMapperDisplayerProps {
 
 export function TagMapperDisplayer(props: TagMapperDisplayerProps) {
     const { tagValues, global = false, targetText = '' } = props;
-    const updateMapper = CategoryMutation.useUpdateRule();
-    const { category } = useAddResourceContext();
-    const { modified, textMapperList: globalMapperList, textMapInsert, textMapDelete, setHighlightText } = useTextTagMapperContext();
+    const {
+        modified,
+        textMapperList: globalMapperList,
+        textMapInsert,
+        textMapDelete,
+        setHighlightText,
+        handleUpdateMapper,
+    } = useTextTagMapperContext();
 
     const textMapperList = useMemo(() => {
         if (global) {
@@ -29,18 +33,6 @@ export function TagMapperDisplayer(props: TagMapperDisplayerProps) {
         }
         return globalMapperList.filter((val) => targetText.toLowerCase().includes(val.key.toLowerCase()));
     }, [global, targetText, globalMapperList]);
-
-    const handleUpdateMapper = useCallback(() => {
-        if (!category) {
-            return;
-        }
-
-        const items = globalMapperList
-            .filter((val) => val.value)
-            .map(({ key, value }) => ({ text: key, tag_id: value!.id }));
-
-        updateMapper.mutateAsync({ id: category!.id, rules: items });
-    }, [category, globalMapperList, updateMapper]);
 
     return (
         <Stack mih={0} gap={0}>
