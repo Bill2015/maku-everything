@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Carousel, Embla } from '@mantine/carousel';
 import { ActionIcon, Kbd, Stack, Text } from '@mantine/core';
 import { FaRegTrashCan } from 'react-icons/fa6';
@@ -16,6 +17,7 @@ const carouselClasses = {
 };
 
 export function AddPagePreviewSide() {
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceAdd.AddPagePreviewSide' });
     const [embla, setEmbla] = useState<Embla | null>(null);
     const { resources, activeResource, deleteResource, setActiveResource } = useAddResourceContext();
 
@@ -66,10 +68,10 @@ export function AddPagePreviewSide() {
         return (
             <Stack justify="center">
                 <Text fz="xl">
-                    Drag file into the App
+                    {t('drag_file_into_the_App')}
                 </Text>
                 <Text fz="xl">
-                    Or Use
+                    {t('or_use')}
                     {' '}
                     <Kbd>Ctrl</Kbd>
                     {' '}
@@ -77,7 +79,7 @@ export function AddPagePreviewSide() {
                     {' '}
                     <Kbd>V</Kbd>
                     {' '}
-                    to paste the URL in the App
+                    {t('to_paste_the_URL_in_the_App')}
                 </Text>
             </Stack>
         );

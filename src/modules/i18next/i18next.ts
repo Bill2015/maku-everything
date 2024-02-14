@@ -8,11 +8,13 @@ import commonEN_US from '@assets/locales/common/en-US.json';
 import pageCommonEN_US from '@assets/locales/pages/common/en-US.json';
 import pageCategorylistEN_US from '@assets/locales/pages/category-list/en-US.json';
 import pageResourcelistEN_US from '@assets/locales/pages/resource-list/en-US.json';
+import pageResourceAddEN_US from '@assets/locales/pages/resource-add/en-US.json';
 
 import commonZH_TW from '@assets/locales/common/zh-TW.json';
 import pageCommonZH_TW from '@assets/locales/pages/common/zh-TW.json';
 import pageCategorylistZH_TW from '@assets/locales/pages/category-list/zh-TW.json';
 import pageResourcelistZH_TW from '@assets/locales/pages/resource-list/zh-TW.json';
+import pageResourceAddZH_TW from '@assets/locales/pages/resource-add/zh-TW.json';
 
 export type SupportLangsType = 'enUS' | 'zhTW';
 
@@ -38,6 +40,7 @@ export const resources = {
             Common:       pageCommonEN_US,
             CategoryList: pageCategorylistEN_US,
             resourceList: pageResourcelistEN_US,
+            resourceAdd:  pageResourceAddEN_US,
         },
     },
     [SupportLangs.zhTW.key]: {
@@ -46,6 +49,7 @@ export const resources = {
             Common:       pageCommonZH_TW,
             CategoryList: pageCategorylistZH_TW,
             resourceList: pageResourcelistZH_TW,
+            resourceAdd:  pageResourceAddZH_TW,
         },
     },
 } as const;

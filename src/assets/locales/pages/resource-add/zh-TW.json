@@ -1,0 +1,33 @@
+{
+    "Main": {
+        "save": "儲存",
+        "save_all": "全部儲存"
+    },
+    "AddPageFunctionSide": {
+        "settings": "設定",
+        "global_defined_tag_map": "全部已定義的對應標籤",
+        "attrs": "屬性",
+        "mapped_tag": "對應的標籤"
+    },
+    "AddPagePreviewSide": {
+        "drag_file_into_the_App": "將檔案拖進來",
+        "or_use": "或在程式中使用",
+        "to_paste_the_URL_in_the_App": "來貼上網址或路徑"
+    },
+    "AttributePanel": {
+        "name": "名稱",
+        "description": "描述",
+        "auto_generate_tags": "自動產生的標籤",
+        "pre-added_Tags": "預先添加的標籤",
+        "add_tag_here": "在這裡添加標籤..."
+    },
+    "PathTypography": {
+        "add_to_rule": "添加到規則"
+    },
+    "TagMapperDisplayer": {
+        "target_text": "目標字串",
+        "appended_tag": "對應添加的標籤",
+        "save_changes": "更新規則",
+        "modified_hint": "標籤對應表有變動，你要保存變更嗎?"
+    }
+}

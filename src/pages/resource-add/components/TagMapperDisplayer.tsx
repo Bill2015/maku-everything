@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Button, Divider, Group, ScrollArea, Space, Stack, Text, Tooltip,
 } from '@mantine/core';
@@ -18,6 +19,7 @@ export interface TagMapperDisplayerProps {
 
 export function TagMapperDisplayer(props: TagMapperDisplayerProps) {
     const { tagOpitons, global = false, targetText = '' } = props;
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceAdd.TagMapperDisplayer' });
     const {
         modified,
         textMapperList: globalMapperList,
@@ -37,14 +39,14 @@ export function TagMapperDisplayer(props: TagMapperDisplayerProps) {
     return (
         <Stack mih={0} gap={0}>
             <Group align="center" pt="md">
-                <Text fw="bolder" c="violet" flex="0 0 30%">Target Text</Text>
-                <Text fw="bolder" c="violet">Appended Tag</Text>
+                <Text fw="bolder" c="violet" flex="0 0 30%">{t('target_text')}</Text>
+                <Text fw="bolder" c="violet">{t('appended_tag')}</Text>
                 { modified && (
-                    <Tooltip label="The text mapper has been modified, do you wanna save it?">
+                    <Tooltip label={t('modified_hint')}>
                         <Button color="cyan" variant="subtle" ml="auto" h="1.55rem" fw="bold" pl={10} pr={10} onClick={handleUpdateMapper}>
                             <IoIosSave />
                             <Space w="sm" />
-                            Update Changes
+                            {t('save_changes')}
                         </Button>
                     </Tooltip>
                 ) }

@@ -4,6 +4,7 @@ import { useActiveCategoryRedux } from '@store/global';
 import { CategoryQuery } from '@api/category';
 import { ReturnButton, TauriDropZone } from '@components/input';
 
+import { useTranslation } from 'react-i18next';
 import { AddResourceProvider, TextTagMapperProvider, useAddResourceContext } from './stores';
 import { useAddResoucesAction } from './hooks';
 import { AddPageFunctionSide, AddPagePreviewSide } from './components';
@@ -12,6 +13,7 @@ import '@mantine/carousel/styles.css';
 import classes from './ResourceAddPage.module.scss';
 
 export function ResourceAddPageContent() {
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceAdd.Main' });
     const { addFromFiles, addFromClipboard, saveActiveResource, saveAllResource } = useAddResoucesAction();
     const { resources } = useAddResourceContext();
 
@@ -29,8 +31,16 @@ export function ResourceAddPageContent() {
 
             <Affix position={{ bottom: 30, right: 20 }}>
                 <Group gap={5}>
-                    { resources.length >= 2 && <Button color="green" variant="subtle" onClick={saveAllResource}>Save All</Button> }
-                    { resources.length >= 1 && <Button color="lime" variant="subtle" onClick={saveActiveResource}>Save</Button> }
+                    { resources.length >= 2 && (
+                        <Button color="green" variant="subtle" onClick={saveAllResource}>
+                            {t('save_all')}
+                        </Button>
+                    )}
+                    { resources.length >= 1 && (
+                        <Button color="lime" variant="subtle" onClick={saveActiveResource}>
+                            {t('save')}
+                        </Button>
+                    )}
                     <ReturnButton />
                 </Group>
             </Affix>

@@ -1,4 +1,5 @@
 import { PropsWithChildren, useCallback, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Flex, Group, Space, Stack, Text, UnstyledButton } from '@mantine/core';
 import { RxCross2 } from 'react-icons/rx';
 import { TagComboSelect, TagComboSelectRef, TagSelectOptionValue } from '@components/input';
@@ -23,6 +24,7 @@ export interface AttributePanelProps {
 
 export function AttributePanel(props: AttributePanelProps) {
     const { tagOptions } = props;
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceAdd.AttributePanel' });
     const { activeResource, updateResource, updateResourceTag, updateResourceIgnoreText } = useAddResourceContext();
     const { getResourceSpecificTags } = useTextTagMapperContext();
     const tagComboRef = useRef<TagComboSelectRef>(null);
@@ -61,20 +63,20 @@ export function AttributePanel(props: AttributePanelProps) {
 
     return (
         <Stack gap={0}>
-            <SubTitle>Name</SubTitle>
+            <SubTitle>{t('name')}</SubTitle>
             <EditableText
                 key={activeResource.data.name}
                 value={activeResource.data.name}
-                name="name"
+                name={t('name')}
                 onChange={(val) => handleUpdate('name', val)}
             />
-            <SubTitle>Description</SubTitle>
+            <SubTitle>{t('description')}</SubTitle>
             <EditableText
                 value={activeResource.data.description}
-                name="name"
+                name={t('description')}
                 onChange={(val) => handleUpdate('description', val)}
             />
-            <SubTitle>Auto Generate Tags</SubTitle>
+            <SubTitle>{t('auto_generate_tags')}</SubTitle>
             <Flex gap={10} wrap="wrap">
                 {
                     getResourceSpecificTags(activeResource.data).map((value) => (
@@ -92,7 +94,7 @@ export function AttributePanel(props: AttributePanelProps) {
                     ))
                 }
             </Flex>
-            <SubTitle>Pre-Added Tags</SubTitle>
+            <SubTitle>{t('pre-added_Tags')}</SubTitle>
             <Flex gap={10} wrap="wrap">
                 {
                     activeResource.data.tags.map((value) => (
@@ -110,7 +112,7 @@ export function AttributePanel(props: AttributePanelProps) {
                 ref={tagComboRef}
                 data={filteredTagOptions}
                 dropDownMaxHeight="30vh"
-                inputProps={{ placeholder: 'add tag here...' }}
+                inputProps={{ placeholder: t('add_tag_here') }}
                 onSubmitOptions={(value) => {
                     if (!activeResource || !value) {
                         return;

@@ -1,0 +1,33 @@
+{
+    "Main": {
+        "save": "Save",
+        "save_all": "Save All"
+    },
+    "AddPageFunctionSide": {
+        "settings": "Settings",
+        "global_defined_tag_map": "Global Defined Tag Map",
+        "attrs": "Attrs",
+        "mapped_tag": "Mapped Tag"
+    },
+    "AddPagePreviewSide": {
+        "drag_file_into_the_App": "Drag file into the App",
+        "or_use": "Or Use",
+        "to_paste_the_URL_in_the_App": "to paste the URL in the App"
+    },
+    "AttributePanel": {
+        "name": "Name",
+        "description": "Description",
+        "auto_generate_tags": "Auto Generate Tags",
+        "pre-added_Tags": "Pre-Added Tags",
+        "add_tag_here": "add tag here..."
+    },
+    "PathTypography": {
+        "add_to_rule": "Add To Rule"
+    },
+    "TagMapperDisplayer": {
+        "target_text": "Target Text",
+        "appended_tag": "Appended Tag",
+        "save_changes": "Save Changes",
+        "modified_hint": "The text mapper has been modified, do you wanna save it?"
+    }
+}

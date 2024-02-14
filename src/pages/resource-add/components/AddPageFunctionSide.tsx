@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Collapse, Stack, Tabs, Title } from '@mantine/core';
 import { useDisclosure, useTextSelection } from '@mantine/hooks';
 import { IoIosArrowForward } from 'react-icons/io';
@@ -18,6 +19,7 @@ import classes from './AddPageFunctionSide.module.scss';
 type TabValueType = 'attr' | 'tag' | 'settings';
 
 export function AddPageFunctionSide() {
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceAdd.AddPageFunctionSide' });
     const { category, activeResource } = useAddResourceContext();
 
     const { highlightText, checkTextExist, textMapInsert } = useTextTagMapperContext();
@@ -31,10 +33,10 @@ export function AddPageFunctionSide() {
     if (!activeResource) {
         return (
             <Stack>
-                <Title order={3}>Settings</Title>
+                <Title order={3}>{t('settings')}</Title>
                 <Button variant="outline" bg="transparent" fz="md" fw={700} c="dimmed" onClick={toggle}>
                     <IoIosArrowForward />
-                    Global Defined Tag Map
+                    {t('global_defined_tag_map')}
                 </Button>
                 <Collapse in={opened} display="grid" mih={0}>
                     <TagMapperDisplayer global tagOpitons={tagOptions} />
@@ -72,13 +74,13 @@ export function AddPageFunctionSide() {
             >
                 <Tabs.List>
                     <Tabs.Tab value="attr" leftSection={<BiDetail />}>
-                        Attrs
+                        {t('attrs')}
                     </Tabs.Tab>
                     <Tabs.Tab value="tag" leftSection={<LiaMapSignsSolid />}>
-                        Mapped Tag
+                        {t('mapped_tag')}
                     </Tabs.Tab>
                     <Tabs.Tab value="settings" ml="auto" leftSection={<BsGear />}>
-                        Settings
+                        {t('settings')}
                     </Tabs.Tab>
                 </Tabs.List>
 
@@ -93,7 +95,7 @@ export function AddPageFunctionSide() {
                 <Tabs.Panel value="settings" p={10}>
                     <Title variant="outline" bg="transparent" fz="md" fw={700} c="dimmed" onClick={toggle}>
                         <IoIosArrowForward />
-                        Global Defined Tag Map
+                        {t('global_defined_tag_map')}
                     </Title>
                     <Collapse in={opened} display="grid" mih={0}>
                         <TagMapperDisplayer global tagOpitons={tagOptions} />
