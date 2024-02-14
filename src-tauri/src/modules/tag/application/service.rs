@@ -9,8 +9,8 @@ use crate::modules::tag::application::command::{CreateTagCommand, CreateTagHandl
 use crate::modules::common::application::{ICommandHandler, IQueryHandler};
 
 use super::command::*;
-use super::dto::*;
 use super::query::*;
+use super::dto::*;
 
 pub static TAG_SERVICE: TagService = TagService::init(
     &CATEGORY_REPOSITORY,

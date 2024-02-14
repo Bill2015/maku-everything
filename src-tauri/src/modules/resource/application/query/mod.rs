@@ -1,18 +1,14 @@
-#[path ="./get-all-resource.rs"]
-mod get_all;
-pub use get_all::*;
+mod get_all_resource;
+pub use get_all_resource::*;
 
-#[path ="./get-by-id-resource.rs"]
-mod get_by_id;
-pub use get_by_id::*;
+mod get_by_id_resource;
+pub use get_by_id_resource::*;
 
-#[path ="./resource-detail.rs"]
-mod detail;
-pub use detail::*;
+mod resource_detail;
+pub use resource_detail::*;
 
-#[path ="./list-resource.rs"]
-mod list;
-pub use list::*;
+mod query_resource;
+pub use query_resource::*;
 
 mod bystring;
 pub use bystring::*;

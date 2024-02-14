@@ -1,6 +1,8 @@
 use crate::modules::resource::domain::{ResourceError, ResourceID};
 
 use super::service::RESOURCE_SERVICE;
+use super::command::*;
+use super::query::*;
 use super::dto::*;
 
 #[tauri::command(rename_all = "snake_case")]

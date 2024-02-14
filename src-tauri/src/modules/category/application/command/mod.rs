@@ -1,19 +1,14 @@
-#[path="./create-category.rs"]
-mod create;
-pub use create::*;
+mod create_category;
+pub use create_category::*;
 
-#[path ="./update-category-addrule.rs"]
-mod update_rule;
-pub use update_rule::*;
+mod update_category_mapper_rule;
+pub use update_category_mapper_rule::*;
 
-#[path="./update-category.rs"]
-mod update;
-pub use update::*;
+mod update_category;
+pub use update_category::*;
 
-#[path="./import-category.rs"]
-mod import;
-pub use import::*;
+mod import_category;
+pub use import_category::*;
 
-#[path="./export-category.rs"]
-mod export;
-pub use export::*;
+mod export_category;
+pub use export_category::*;

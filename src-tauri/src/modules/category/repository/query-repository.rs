@@ -5,7 +5,8 @@ use surrealdb::sql::thing;
 
 use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens};
-use crate::modules::category::application::dto::{CategoryMapperRulesResDto, CategoryResDto};
+use crate::modules::category::application::dto::CategoryResDto;
+use crate::modules::category::application::query::CategoryMapperRulesResDto;
 
 pub static CATEGORY_QUERY_REPOSITORY: CategoryQueryRepository<'_> = CategoryQueryRepository::init(&env::DB);
 

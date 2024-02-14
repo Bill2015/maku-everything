@@ -1,15 +1,11 @@
-#[path="./create-resource.rs"]
-mod create;
-pub use create::*;
+mod create_resource;
+pub use create_resource::*;
 
-#[path="./update-resource.rs"]
-mod update;
-pub use update::*;
+mod update_resource;
+pub use update_resource::*;
 
-#[path ="./resource-add-tag.rs"]
-mod add_tag;
-pub use add_tag::*;
+mod resource_add_tag;
+pub use resource_add_tag::*;
 
-#[path ="./resource-remove-tag.rs"]
-mod remove_tag;
-pub use remove_tag::*;
+mod resource_remove_tag;
+pub use resource_remove_tag::*;

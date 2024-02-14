@@ -8,8 +8,8 @@ use crate::modules::subject::application::command::{CreateSubjectCommand, Create
 use crate::modules::common::application::{ICommandHandler, IQueryHandler};
 
 use super::command::*;
-use super::dto::*;
 use super::query::*;
+use super::dto::*;
 
 pub static SUBJECT_SERVICE: SubjectService = SubjectService::init(
     &CATEGORY_REPOSITORY,

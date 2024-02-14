@@ -1,6 +1,8 @@
 use crate::modules::tag::domain::{TagError, TagID};
 
 use super::service::TAG_SERVICE;
+use super::command::*;
+use super::query::*;
 use super::dto::*;
 
 #[tauri::command(rename_all = "snake_case")]

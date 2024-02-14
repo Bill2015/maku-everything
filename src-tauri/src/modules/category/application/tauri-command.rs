@@ -9,6 +9,8 @@ use tauri::api::dialog::blocking::FileDialogBuilder;
 use crate::modules::category::domain::{CategoryError, CategoryID};
 
 use super::service::CATEGORY_SERVICE;
+use super::command::*;
+use super::query::*;
 use super::dto::*;
 
 #[tauri::command(rename_all = "snake_case")]

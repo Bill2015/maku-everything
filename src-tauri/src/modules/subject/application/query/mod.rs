@@ -1,11 +1,8 @@
-#[path ="./get-all-subject.rs"]
-mod get_all;
-pub use get_all::*;
+mod get_all_subject;
+pub use get_all_subject::*;
 
-#[path ="./get-by-id-subject.rs"]
-mod get_by_id;
-pub use get_by_id::*;
+mod get_by_id_subject;
+pub use get_by_id_subject::*;
 
-#[path ="./query-subject.rs"]
 mod query_subject;
 pub use query_subject::*;

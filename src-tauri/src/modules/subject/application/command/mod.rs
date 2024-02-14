@@ -1,7 +1,5 @@
-#[path="./create-subject.rs"]
-mod create;
-pub use create::*;
+mod create_subject;
+pub use create_subject::*;
 
-#[path="./update-subject.rs"]
-mod update;
-pub use update::*;
+mod update_subject;
+pub use update_subject::*;

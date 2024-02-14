@@ -1,6 +1,8 @@
 use crate::subject::domain::{SubjectError, SubjectID};
 
 use super::service::SUBJECT_SERVICE;
+use super::command::*;
+use super::query::*;
 use super::dto::*;
 
 #[tauri::command(rename_all = "snake_case")]

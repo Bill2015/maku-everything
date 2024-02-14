@@ -1,0 +1,3 @@
+use serde::{Serialize, Deserialize};
+
+// Defined common dto here...

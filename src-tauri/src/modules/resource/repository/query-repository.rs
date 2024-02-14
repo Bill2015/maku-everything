@@ -6,7 +6,7 @@ use surrealdb::sql::thing;
 use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens};
 use crate::modules::resource::application::dto::ResourceResDto;
-use crate::modules::resource::application::dto::ResourceDetailDto;
+use crate::modules::resource::application::query::ResourceDetailDto;
 use crate::modules::resource::infrastructure::ResourceStringQL;
 
 pub static RESOURCE_QUERY_REPOSITORY: ResourceQueryRepository<'_> = ResourceQueryRepository::init(&env::DB);

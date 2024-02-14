@@ -1,7 +1,5 @@
-#[path="./create-tag.rs"]
-mod create;
-pub use create::*;
+mod create_tag;
+pub use create_tag::*;
 
-#[path="./update-tag.rs"]
-mod update;
-pub use update::*;
+mod update_tag;
+pub use update_tag::*;
