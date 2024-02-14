@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { PropsWithChildren, useCallback, useMemo, useRef } from 'react';
 import { Flex, Group, Space, Stack, Text, UnstyledButton } from '@mantine/core';
 import { RxCross2 } from 'react-icons/rx';
 import { TagComboSelect, TagComboSelectRef, TagSelectOptionValue } from '@components/input';
@@ -8,6 +8,15 @@ import { useAddResourceContext, useTextTagMapperContext } from '../stores';
 
 import classes from './AttributePanel.module.scss';
 import { TextTagValue } from '../stores/text-tag-mapper.store';
+
+function SubTitle({ children }: PropsWithChildren) {
+    return (
+        <>
+            <Space h="lg" />
+            <Text c="dimmed" fw="bolder" fz="sm" opacity="0.6">{children}</Text>
+        </>
+    );
+}
 
 export interface AttributePanelProps {
     tagValues: TagSelectOptionValue[];
@@ -70,37 +79,20 @@ export function AttributePanel(props: AttributePanelProps) {
 
     return (
         <Stack gap={0}>
-            <Space h="lg" />
-            <Text c="dimmed" fw="bolder">Name</Text>
+            <SubTitle>Name</SubTitle>
             <EditableText
                 key={activeResource.data.name}
                 value={activeResource.data.name}
                 name="name"
                 onChange={(val) => handleUpdate('name', val)}
             />
-            <Space h="lg" />
-            <Text c="dimmed" fw="bolder">Description</Text>
+            <SubTitle>Description</SubTitle>
             <EditableText
                 value={activeResource.data.description}
                 name="name"
                 onChange={(val) => handleUpdate('description', val)}
             />
-            <Space h="lg" />
-            <Text c="dimmed" fw="bolder">Pre-Added Tags</Text>
-            <Flex gap={10} wrap="wrap">
-                {
-                    activeResource.data.tags.map((value) => (
-                        <Group component="span" key={value.id} gap={0} className={classes.tagpill}>
-                            <TagTypography name={value.name} subjectName={value.subject_name} fontSize={0.8} />
-                            <UnstyledButton onClick={() => handleDeleteTag(value.id)}>
-                                <RxCross2 />
-                            </UnstyledButton>
-                        </Group>
-                    ))
-                }
-            </Flex>
-            <Space h="lg" />
-            <Text c="dimmed" fw="bolder">Auto Generate Tags</Text>
+            <SubTitle>Auto Generate Tags</SubTitle>
             <Flex gap={10} wrap="wrap">
                 {
                     Array.from(autoTagValue.entries()).map(([text, value]) => (
@@ -118,10 +110,24 @@ export function AttributePanel(props: AttributePanelProps) {
                     ))
                 }
             </Flex>
-            <Space h="lg" />
+            <SubTitle>Pre-Added Tags</SubTitle>
+            <Flex gap={10} wrap="wrap">
+                {
+                    activeResource.data.tags.map((value) => (
+                        <Group component="span" key={value.id} gap={0} className={classes.tagpill}>
+                            <TagTypography name={value.name} subjectName={value.subject_name} fontSize={0.8} />
+                            <UnstyledButton onClick={() => handleDeleteTag(value.id)}>
+                                <RxCross2 />
+                            </UnstyledButton>
+                        </Group>
+                    ))
+                }
+            </Flex>
+            <Space h="sm" />
             <TagComboSelect
                 ref={tagComboRef}
                 data={filteredTagValue}
+                dropDownMaxHeight="30vh"
                 onSubmitOptions={(value) => {
                     if (!activeResource || !value) {
                         return;
@@ -134,7 +140,7 @@ export function AttributePanel(props: AttributePanelProps) {
                     tagComboRef.current!.clearInput();
                 }}
             />
-            <Space h="45vh" />
+            <Space h="20vh" />
         </Stack>
     );
 }

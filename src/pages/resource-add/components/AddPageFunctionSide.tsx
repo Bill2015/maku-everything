@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button, Collapse, Stack, Tabs, Title } from '@mantine/core';
 import { useDisclosure, useTextSelection } from '@mantine/hooks';
 import { IoIosArrowForward } from 'react-icons/io';
@@ -14,6 +15,8 @@ import { AttributePanel } from './AttributePanel';
 
 import classes from './AddPageFunctionSide.module.scss';
 
+type TabValueType = 'attr' | 'tag' | 'settings';
+
 export function AddPageFunctionSide() {
     const { category, activeResource } = useAddResourceContext();
 
@@ -21,6 +24,7 @@ export function AddPageFunctionSide() {
     const { data: tagData } = TagQuery.useGetByCategory(category?.id || '');
     const tagValues = useTagComboSelectValue(tagData);
 
+    const [tabValue, setTabValue] = useState<TabValueType>('attr');
     const [opened, { toggle }] = useDisclosure(false);
     const selection = useTextSelection();
 
@@ -57,27 +61,33 @@ export function AddPageFunctionSide() {
                         return;
                     }
                     textMapInsert(selectionText, null);
+                    setTabValue('tag');
                 }}
             />
-            <Tabs defaultValue="tag" classNames={{ root: classes.tabRoot, panel: classes.tabPanel }}>
+            <Tabs
+                defaultValue="attr"
+                value={tabValue}
+                onChange={(val) => setTabValue(val! as TabValueType)}
+                classNames={{ root: classes.tabRoot, panel: classes.tabPanel }}
+            >
                 <Tabs.List>
-                    <Tabs.Tab value="tag" leftSection={<LiaMapSignsSolid />}>
-                        Tag
-                    </Tabs.Tab>
                     <Tabs.Tab value="attr" leftSection={<BiDetail />}>
                         Attrs
+                    </Tabs.Tab>
+                    <Tabs.Tab value="tag" leftSection={<LiaMapSignsSolid />}>
+                        Mapped Tag
                     </Tabs.Tab>
                     <Tabs.Tab value="settings" ml="auto" leftSection={<BsGear />}>
                         Settings
                     </Tabs.Tab>
                 </Tabs.List>
 
-                <Tabs.Panel value="tag">
-                    <TagMapperDisplayer targetText={text} tagValues={tagValues} />
-                </Tabs.Panel>
-
                 <Tabs.Panel value="attr">
                     <AttributePanel tagValues={tagValues} />
+                </Tabs.Panel>
+
+                <Tabs.Panel value="tag">
+                    <TagMapperDisplayer targetText={text} tagValues={tagValues} />
                 </Tabs.Panel>
 
                 <Tabs.Panel value="settings" p={10}>

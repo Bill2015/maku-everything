@@ -60,6 +60,8 @@ export interface TagComboSelectProps {
     onSubmitOptions: (option: TagSelectOptionValue | null) => void;
 
     inputProps?: InputProps;
+
+    dropDownMaxHeight?: string | number;
 }
 
 export interface TagComboSelectRef {
@@ -69,7 +71,7 @@ export interface TagComboSelectRef {
 }
 
 export const TagComboSelect = forwardRef<TagComboSelectRef, TagComboSelectProps>((props, ref) => {
-    const { data, defaultValue, onSubmitOptions, inputProps } = props;
+    const { data, defaultValue, onSubmitOptions, inputProps, dropDownMaxHeight = '40vh' } = props;
     const inputRef = useRef<HTMLInputElement>(null);
     const combobox = useCombobox({ onDropdownClose: () => combobox.resetSelectedOption() });
     const [searchText, setSearchText] = useState<string>('');
@@ -143,7 +145,7 @@ export const TagComboSelect = forwardRef<TagComboSelectRef, TagComboSelectProps>
             </Combobox.Target>
 
             <Combobox.Dropdown>
-                <Combobox.Options mah="40dvh" style={{ overflowY: 'auto' }}>
+                <Combobox.Options mah={dropDownMaxHeight} style={{ overflowY: 'auto' }}>
                     {
                         (options.length > 0)
                             ? options.map((val) => <TagOption key={val.id} {...val} />)
