@@ -59,7 +59,7 @@ export interface TagComboSelectProps {
 
     onSubmitOptions: (option: TagSelectOptionValue | null) => void;
 
-    inputProps?: InputProps;
+    inputProps?: InputProps & ElementProps<'input', keyof InputProps>;
 
     dropDownMaxHeight?: string | number;
 }

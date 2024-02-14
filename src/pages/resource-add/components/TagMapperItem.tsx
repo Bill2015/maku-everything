@@ -11,7 +11,7 @@ import classes from './TagMapperItem.module.scss';
 export interface TagMapperItemProps {
     text: string;
 
-    tagValues: TagSelectOptionValue[];
+    tagOptions: TagSelectOptionValue[];
 
     defaultTagValue: TagSelectOptionValue | null;
 
@@ -28,7 +28,7 @@ export interface TagMapperItemProps {
 
 export function TagMapperItem(props: TagMapperItemProps) {
     const {
-        text, tagValues, defaultTagValue,
+        text, tagOptions, defaultTagValue,
         onMouseEnter, onMouseLeave, onOptionSubmit, onEdit, onDelete,
     } = props;
     const comboSelectRef = useRef<TagComboSelectRef>(null);
@@ -48,7 +48,7 @@ export function TagMapperItem(props: TagMapperItemProps) {
                 {!defaultTagValue && (
                     <TagComboSelect
                         ref={comboSelectRef}
-                        data={tagValues}
+                        data={tagOptions}
                         defaultValue={defaultTagValue!}
                         onSubmitOptions={onOptionSubmit}
                     />

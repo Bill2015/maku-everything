@@ -7,7 +7,6 @@ import { ResourceCreateDto } from '@api/resource';
 import { useAddResourceContext, useTextTagMapperContext } from '../stores';
 
 import classes from './AttributePanel.module.scss';
-import { TextTagValue } from '../stores/text-tag-mapper.store';
 
 function SubTitle({ children }: PropsWithChildren) {
     return (
@@ -19,13 +18,13 @@ function SubTitle({ children }: PropsWithChildren) {
 }
 
 export interface AttributePanelProps {
-    tagValues: TagSelectOptionValue[];
+    tagOptions: TagSelectOptionValue[];
 }
 
 export function AttributePanel(props: AttributePanelProps) {
-    const { tagValues } = props;
+    const { tagOptions } = props;
     const { activeResource, updateResource, updateResourceTag, updateResourceIgnoreText } = useAddResourceContext();
-    const { textMapperList } = useTextTagMapperContext();
+    const { getResourceSpecificTags } = useTextTagMapperContext();
     const tagComboRef = useRef<TagComboSelectRef>(null);
 
     const handleUpdate = useCallback((fieldName: keyof ResourceCreateDto, newValue: string) => {
@@ -48,30 +47,13 @@ export function AttributePanel(props: AttributePanelProps) {
     }, [activeResource, updateResourceIgnoreText]);
 
     // prevent already added tag appear in tag combobox select
-    const filteredTagValue = useMemo(() => {
+    const filteredTagOptions = useMemo(() => {
         if (!activeResource) {
-            return tagValues;
+            return tagOptions;
         }
         const tagSet = new Set(activeResource!.data.tags.map((val) => val.id));
-        return tagValues.filter((val) => !tagSet.has(val.id));
-    }, [activeResource, tagValues]);
-
-    // auto generate tags
-    const autoTagValue = useMemo(() => {
-        const map: Map<string, (TextTagValue & { ignored: boolean })> = new Map();
-
-        if (!activeResource) {
-            return map;
-        }
-        const { data: resource } = activeResource;
-        for (const { key, value } of textMapperList) {
-            if (value && resource.name.toLowerCase().includes(key.toLowerCase())) {
-                const ignored = resource.ignoreText.has(key);
-                map.set(key, { ...value, ignored: ignored });
-            }
-        }
-        return map;
-    }, [activeResource, textMapperList]);
+        return tagOptions.filter((val) => !tagSet.has(val.id));
+    }, [activeResource, tagOptions]);
 
     if (!activeResource) {
         return <>Empty</>;
@@ -95,7 +77,7 @@ export function AttributePanel(props: AttributePanelProps) {
             <SubTitle>Auto Generate Tags</SubTitle>
             <Flex gap={10} wrap="wrap">
                 {
-                    Array.from(autoTagValue.entries()).map(([text, value]) => (
+                    getResourceSpecificTags(activeResource.data).map((value) => (
                         <Group component="span" key={value.id} gap={0} className={classes.tagpill} opacity={value.ignored ? '0.5' : '1.0'}>
                             <TagTypography
                                 name={value.name}
@@ -103,7 +85,7 @@ export function AttributePanel(props: AttributePanelProps) {
                                 fontSize={0.8}
                                 styles={{ main: { textDecoration: value.ignored ? 'line-through Crimson 2px' : 'none' } }}
                             />
-                            <UnstyledButton onClick={() => hanldeIgnored(text)}>
+                            <UnstyledButton onClick={() => hanldeIgnored(value.text)}>
                                 <RxCross2 />
                             </UnstyledButton>
                         </Group>
@@ -126,8 +108,9 @@ export function AttributePanel(props: AttributePanelProps) {
             <Space h="sm" />
             <TagComboSelect
                 ref={tagComboRef}
-                data={filteredTagValue}
+                data={filteredTagOptions}
                 dropDownMaxHeight="30vh"
+                inputProps={{ placeholder: 'add tag here...' }}
                 onSubmitOptions={(value) => {
                     if (!activeResource || !value) {
                         return;

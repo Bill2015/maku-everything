@@ -1,11 +1,14 @@
 import { useCallback } from 'react';
 import { showNotification } from '@components/notification';
 import { getNameAndExtFromPath, stringNormalize } from '@utils/urlParser';
-import { useAddResourceContext } from '../stores';
+import { ResourceCreateDto, ResourceMutation } from '@api/resource';
+import { useAddResourceContext, useTextTagMapperContext } from '../stores';
 import { ResourceCreateItem } from '../stores/add-resource.store';
 
 export function useAddResoucesAction() {
-    const { category, resources, addResource } = useAddResourceContext();
+    const { activeResource, category, resources, addResource, deleteResource } = useAddResourceContext();
+    const { getResourceSpecificTags } = useTextTagMapperContext();
+    const createResource = ResourceMutation.useCreate();
 
     // ------------------------------------------------
     /** drop file to upload */
@@ -89,8 +92,46 @@ export function useAddResoucesAction() {
         }
     }, [category, resources, addResource]);
 
+    // ------------------------------------------------
+    const buildResourceCreateDto = useCallback((resource: ResourceCreateItem) => {
+        const tags = getResourceSpecificTags(resource)
+            .filter((val) => val.ignored === false)
+            .map((val) => val.id)
+            .concat(resource.tags.map((val) => val.id));
+
+        const createResourceObj: ResourceCreateDto = {
+            name:            resource.name,
+            description:     resource.description,
+            belong_category: resource.belong_category,
+            file_path:       resource.file_path,
+            url_path:        resource.url_path,
+            tags:            tags,
+        };
+        return createResourceObj;
+    }, [getResourceSpecificTags]);
+
+    const saveActiveResource = useCallback(async () => {
+        if (!activeResource) {
+            return;
+        }
+        const resource = buildResourceCreateDto(activeResource.data);
+        await createResource.mutateAsync(resource);
+        deleteResource(activeResource.index);
+    }, [activeResource, createResource, deleteResource, buildResourceCreateDto]);
+
+    const saveAllResource = useCallback(async () => {
+        for (const data of resources) {
+            const resource = buildResourceCreateDto(data);
+            // eslint-disable-next-line no-await-in-loop
+            await createResource.mutateAsync(resource);
+            deleteResource(0);
+        }
+    }, [resources, buildResourceCreateDto, createResource, deleteResource]);
+
     return {
         addFromFiles,
         addFromClipboard,
+        saveActiveResource,
+        saveAllResource,
     };
 }

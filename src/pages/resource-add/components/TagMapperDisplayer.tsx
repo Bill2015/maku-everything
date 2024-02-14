@@ -9,7 +9,7 @@ import { TagMapperItem } from './TagMapperItem';
 import { useTextTagMapperContext } from '../stores';
 
 export interface TagMapperDisplayerProps {
-    tagValues: TagSelectOptionValue[];
+    tagOpitons: TagSelectOptionValue[];
 
     global?: boolean;
 
@@ -17,7 +17,7 @@ export interface TagMapperDisplayerProps {
 }
 
 export function TagMapperDisplayer(props: TagMapperDisplayerProps) {
-    const { tagValues, global = false, targetText = '' } = props;
+    const { tagOpitons, global = false, targetText = '' } = props;
     const {
         modified,
         textMapperList: globalMapperList,
@@ -53,11 +53,11 @@ export function TagMapperDisplayer(props: TagMapperDisplayerProps) {
             <ScrollArea.Autosize pt="sm" type="auto" style={{ textAlign: 'start' }}>
                 <Stack gap={10} pr={20}>
                     {
-                        textMapperList.map(({ key, value }) => (
+                        textMapperList.map(({ key, tagValue: value }) => (
                             <TagMapperItem
                                 key={key}
                                 text={key}
-                                tagValues={tagValues}
+                                tagOptions={tagOpitons}
                                 defaultTagValue={value ? {
                                     value:       value.name,
                                     subjectName: value.subject_name,

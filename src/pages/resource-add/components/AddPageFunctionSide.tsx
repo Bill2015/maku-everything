@@ -22,7 +22,7 @@ export function AddPageFunctionSide() {
 
     const { highlightText, checkTextExist, textMapInsert } = useTextTagMapperContext();
     const { data: tagData } = TagQuery.useGetByCategory(category?.id || '');
-    const tagValues = useTagComboSelectValue(tagData);
+    const tagOptions = useTagComboSelectValue(tagData);
 
     const [tabValue, setTabValue] = useState<TabValueType>('attr');
     const [opened, { toggle }] = useDisclosure(false);
@@ -37,7 +37,7 @@ export function AddPageFunctionSide() {
                     Global Defined Tag Map
                 </Button>
                 <Collapse in={opened} display="grid" mih={0}>
-                    <TagMapperDisplayer global tagValues={tagValues} />
+                    <TagMapperDisplayer global tagOpitons={tagOptions} />
                 </Collapse>
             </Stack>
         );
@@ -83,11 +83,11 @@ export function AddPageFunctionSide() {
                 </Tabs.List>
 
                 <Tabs.Panel value="attr">
-                    <AttributePanel tagValues={tagValues} />
+                    <AttributePanel tagOptions={tagOptions} />
                 </Tabs.Panel>
 
                 <Tabs.Panel value="tag">
-                    <TagMapperDisplayer targetText={text} tagValues={tagValues} />
+                    <TagMapperDisplayer targetText={text} tagOpitons={tagOptions} />
                 </Tabs.Panel>
 
                 <Tabs.Panel value="settings" p={10}>
@@ -96,7 +96,7 @@ export function AddPageFunctionSide() {
                         Global Defined Tag Map
                     </Title>
                     <Collapse in={opened} display="grid" mih={0}>
-                        <TagMapperDisplayer global tagValues={tagValues} />
+                        <TagMapperDisplayer global tagOpitons={tagOptions} />
                     </Collapse>
                 </Tabs.Panel>
             </Tabs>

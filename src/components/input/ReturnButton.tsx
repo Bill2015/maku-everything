@@ -13,6 +13,7 @@ export const ReturnButton = forwardRef<HTMLButtonElement, ReturnButtonProps>((pr
     const naviagte = useNavigate();
     return (
         <Button
+            variant="light"
             ref={ref}
             onClick={(e) => {
                 if (onClick) {

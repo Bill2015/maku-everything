@@ -96,30 +96,22 @@ export function AddPagePreviewSide() {
             >
                 <FaRegTrashCan />
             </ActionIcon>
-            {
-                resources.length === 1
-                    ? (
-                        <ResourceThumbnailDisplayer filePath={resources[0].file_path} url={resources[0].url_path} alt="" />
-                    )
-                    : (
-                        <Carousel
-                            slideGap="lg"
-                            loop
-                            withIndicators
-                            classNames={carouselClasses}
-                            getEmblaApi={setEmbla}
-                            onSlideChange={setActiveResource}
-                        >
-                            {
-                                resources.map((val) => (
-                                    <Carousel.Slide key={`${val.file_path}${val.url_path}`}>
-                                        <ResourceThumbnailDisplayer filePath={val.file_path} url={val.url_path} alt="" />
-                                    </Carousel.Slide>
-                                ))
-                            }
-                        </Carousel>
-                    )
-            }
+            <Carousel
+                slideGap="lg"
+                loop
+                withIndicators
+                classNames={carouselClasses}
+                getEmblaApi={setEmbla}
+                onSlideChange={setActiveResource}
+            >
+                {
+                    resources.map((val) => (
+                        <Carousel.Slide key={`${val.file_path}${val.url_path}`}>
+                            <ResourceThumbnailDisplayer filePath={val.file_path} url={val.url_path} alt="" />
+                        </Carousel.Slide>
+                    ))
+                }
+            </Carousel>
 
         </>
     );

@@ -10,7 +10,7 @@ export type TextTagValue = CategoryMapperRuleItemResDto['tag'];
 export type TextTagValueItem = {
     key: string,
     indexId: number,
-    value: TextTagValue
+    tagValue: TextTagValue
 };
 
 type TextTagMapperState = {
@@ -35,9 +35,9 @@ export const createTextTagMapperStore = (category: CategoryResDto, defaultTextMa
     defaultTextMap.forEach(({ text, tag }) => {
         indexId += 1;
         map.set(text, {
-            indexId: indexId,
-            key:     text,
-            value:   tag,
+            indexId:  indexId,
+            key:      text,
+            tagValue: tag,
         });
     });
     const defaultState: TextTagMapperState = {
@@ -58,12 +58,12 @@ export const createTextTagMapperStore = (category: CategoryResDto, defaultTextMa
             textMapInsert: (key: string, newValue: TextTagValue | null) => set((state) => {
                 if (state.textMap.has(key)) {
                     // eslint-disable-next-line no-param-reassign
-                    state.textMap.get(key)!.value = newValue;
+                    state.textMap.get(key)!.tagValue = newValue;
                 }
                 else {
                     indexId += 1;
                     state.textMap.set(key, {
-                        value: newValue,
+                        tagValue: newValue,
                         key,
                         indexId,
                     });

@@ -1,7 +1,8 @@
 import { PropsWithChildren, createContext, useCallback, useContext, useMemo, useRef } from 'react';
 import { useStore } from 'zustand';
 import { CategoryMapperRuleItemResDto, CategoryMutation, CategoryResDto } from '@api/category';
-import { TextTagMapperStore, createTextTagMapperStore } from './text-tag-mapper.store';
+import { TextTagMapperStore, TextTagValue, createTextTagMapperStore } from './text-tag-mapper.store';
+import { ResourceCreateItem } from './add-resource.store';
 
 const TextTagMapperContext = createContext<TextTagMapperStore | null>(null);
 
@@ -27,17 +28,35 @@ export function useTextTagMapperContext() {
         }
 
         const items = textMapperList
-            .filter((val) => val.value)
-            .map(({ key, value }) => ({ text: key, tag_id: value!.id }));
+            .filter((val) => val.tagValue)
+            .map(({ key, tagValue: value }) => ({ text: key, tag_id: value!.id }));
 
         updateMapper.mutateAsync({ id: category!.id, rules: items });
         resetModified();
     }, [category, textMapperList, updateMapper, resetModified]);
 
+    const getResourceSpecificTags = useCallback((resource: ResourceCreateItem) => {
+        const array: (TextTagValue & { ignored: boolean, text: string })[] = [];
+
+        for (const { key, tagValue } of textMapperList) {
+            const text = resource.file_path || resource.url_path;
+            if (tagValue && text!.toLowerCase().includes(key.toLowerCase())) {
+                const ignored = resource.ignoreText.has(key);
+                array.push({
+                    ...tagValue,
+                    ignored,
+                    text: key,
+                });
+            }
+        }
+        return array;
+    }, [textMapperList]);
+
     return {
         textMapperList,
         checkTextExist,
         handleUpdateMapper,
+        getResourceSpecificTags,
         ...states,
     };
 }
