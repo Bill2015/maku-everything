@@ -1,6 +1,6 @@
 import { PropsWithChildren, createContext, useCallback, useContext, useMemo, useRef } from 'react';
 import { useStore } from 'zustand';
-import { CategoryAddRuleItemResDto, CategoryMutation, CategoryResDto } from '@api/category';
+import { CategoryMapperRuleItemResDto, CategoryMutation, CategoryResDto } from '@api/category';
 import { TextTagMapperStore, createTextTagMapperStore } from './text-tag-mapper.store';
 
 const TextTagMapperContext = createContext<TextTagMapperStore | null>(null);
@@ -45,7 +45,7 @@ export function useTextTagMapperContext() {
 export interface TextTagMapperProviderProps extends PropsWithChildren {
     category: CategoryResDto;
 
-    defaultTextMap: CategoryAddRuleItemResDto[];
+    defaultTextMap: CategoryMapperRuleItemResDto[];
 }
 
 export function TextTagMapperProvider(props: TextTagMapperProviderProps) {

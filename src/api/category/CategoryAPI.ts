@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/tauri';
-import { CategoryResDto, CategoryCreateDto, ExportCategoryDto, CategoryImportDto, CategoryAddRulesResDto, UpdateCategoryAddRuleDto } from './Dto';
+import { CategoryResDto, CategoryCreateDto, ExportCategoryDto, CategoryImportDto, CategoryMapperRulesResDto, UpdateCategoryMapperRuleDto } from './Dto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace CategoryAPI {
@@ -15,8 +15,8 @@ export namespace CategoryAPI {
         return invoke<string>('create_category', { data });
     }
 
-    export function updateRule(data: UpdateCategoryAddRuleDto) {
-        return invoke<string>('update_addrule_category', { data });
+    export function updateMapperRule(data: UpdateCategoryMapperRuleDto) {
+        return invoke<string>('update_mapper_rule_category', { data });
     }
 
     export function importData(data: CategoryImportDto) {
@@ -27,7 +27,7 @@ export namespace CategoryAPI {
         return invoke<string>('export_category', { data });
     }
 
-    export function getRules(id: string) {
-        return invoke<CategoryAddRulesResDto>('get_category_rules', { id });
+    export function getMapperRules(id: string) {
+        return invoke<CategoryMapperRulesResDto>('get_category_mapper_rules', { id });
     }
 }

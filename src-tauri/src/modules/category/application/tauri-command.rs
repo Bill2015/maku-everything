@@ -30,7 +30,7 @@ pub async fn update_category(data: UpdateCategoryDto) -> Result<CategoryID, Cate
 }
 
 #[tauri::command]
-pub async fn update_addrule_category(data: UpdateCategoryAddRuleDto) -> Result<CategoryID, CategoryError> {
+pub async fn update_mapper_rule_category(data: UpdateCategoryMapperRuleDto) -> Result<CategoryID, CategoryError> {
     let result = CATEGORY_SERVICE
         .update_rules(data)
         .await?;
@@ -86,9 +86,9 @@ pub async fn get_category_by_id(id: String) -> Result<Option<CategoryResDto>, Ca
 }
 
 #[tauri::command]
-pub async fn get_category_rules(id: String) -> Result<Option<CategoryAddRulesResDto>, CategoryError> {
+pub async fn get_category_mapper_rules(id: String) -> Result<Option<CategoryMapperRulesResDto>, CategoryError> {
     let result = CATEGORY_SERVICE
-        .get_rules(id)
+        .get_mapper_rules(id)
         .await?;
 
     Ok(result)

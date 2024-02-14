@@ -4,7 +4,7 @@ use crate::modules::category::domain::CategoryID;
 use crate::modules::common::domain::ID;
 use crate::modules::common::infrastructure::dateutils;
 
-use super::{Category, CategoryGenericError, CategoryPlainObject, CategoryProps, CategoryAddRuleItemVO, CategoryAddRuleEntity};
+use super::{Category, CategoryGenericError, CategoryPlainObject, CategoryProps, CategoryMapperRuleItemVO, CategoryMapperRuleEntity};
 
 pub struct CategoryFactory { }
 
@@ -23,7 +23,7 @@ impl CategoryFactory {
             description: description,
             root_path: new_path,
             auth: false,
-            rule_table: CategoryAddRuleEntity::new(Vec::new()),
+            rule_table: CategoryMapperRuleEntity::new(Vec::new()),
             created_at: Utc::now(),
             updated_at: Utc::now(),
         }))
@@ -38,7 +38,7 @@ impl CategoryFactory {
 
         let rules = object.rules
             .into_iter()
-            .map(|x| CategoryAddRuleItemVO { text: x.text, tag_id: x.tag_id })
+            .map(|x| CategoryMapperRuleItemVO { text: x.text, tag_id: x.tag_id })
             .collect();
 
         Ok(Category::new(CategoryProps {
@@ -47,7 +47,7 @@ impl CategoryFactory {
             description: object.description,
             root_path: new_path,
             auth: object.auth,
-            rule_table: CategoryAddRuleEntity::new(rules),
+            rule_table: CategoryMapperRuleEntity::new(rules),
             created_at: dateutils::parse(&object.created_at)
                 .map_err(|_| CategoryGenericError::InvalidDateFormat())?
                 .and_utc(),

@@ -2,34 +2,34 @@ use anyhow::Error;
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use crate::modules::category::application::dto::{UpdateCategoryAddRuleDto, UpdateCategoryAddRuleItemDto};
-use crate::modules::category::domain::{CategoryAddRuleItemVO, CategoryGenericError, CategoryID};
+use crate::modules::category::application::dto::{UpdateCategoryMapperRuleDto, UpdateCategoryMapperRuleItemDto};
+use crate::modules::category::domain::{CategoryMapperRuleItemVO, CategoryGenericError, CategoryID};
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::common::application::ICommandHandler;
 use crate::command_from_dto;
 use crate::modules::tag::repository::TagRepository;
 
 #[derive(Deserialize)]
-pub struct UpdateCategoryAddRuleCommand {
+pub struct UpdateCategoryMapperRuleCommand {
     pub id: String,
-    pub rules: Vec<UpdateCategoryAddRuleItemDto>
+    pub rules: Vec<UpdateCategoryMapperRuleItemDto>
 }
-command_from_dto!(UpdateCategoryAddRuleCommand, UpdateCategoryAddRuleDto);
+command_from_dto!(UpdateCategoryMapperRuleCommand, UpdateCategoryMapperRuleDto);
 
 // =====================================
-pub struct UpdateCategoryAddRuleHandler<'a> {
+pub struct UpdateCategoryMapperRuleHandler<'a> {
     categroy_repo: &'a CategoryRepository<'a>,
     tag_repo: &'a TagRepository<'a>,
 }
 
-impl<'a> UpdateCategoryAddRuleHandler<'a> {
+impl<'a> UpdateCategoryMapperRuleHandler<'a> {
     pub fn register(categroy_repo: &'a CategoryRepository, tag_repo: &'a TagRepository) -> Self {
         Self { categroy_repo: &categroy_repo, tag_repo: &tag_repo }
     }
 }
 
 #[async_trait]
-impl ICommandHandler<UpdateCategoryAddRuleCommand> for UpdateCategoryAddRuleHandler<'_> {
+impl ICommandHandler<UpdateCategoryMapperRuleCommand> for UpdateCategoryMapperRuleHandler<'_> {
 
     fn get_name() -> String {
         String::from("Change Category Command")
@@ -37,8 +37,8 @@ impl ICommandHandler<UpdateCategoryAddRuleCommand> for UpdateCategoryAddRuleHand
 
     type Output = CategoryID;
 
-    async fn execute(&self, command: UpdateCategoryAddRuleCommand) -> Result<Self::Output, Error> {
-        let UpdateCategoryAddRuleCommand { id, rules } = command;
+    async fn execute(&self, command: UpdateCategoryMapperRuleCommand) -> Result<Self::Output, Error> {
+        let UpdateCategoryMapperRuleCommand { id, rules } = command;
 
         // check tag id
         for rule in &rules {
@@ -49,8 +49,8 @@ impl ICommandHandler<UpdateCategoryAddRuleCommand> for UpdateCategoryAddRuleHand
         
         let rule_items = rules
             .into_iter()
-            .map(|val| CategoryAddRuleItemVO::from(val.text, val.tag_id))
-            .collect::<Vec<CategoryAddRuleItemVO>>();
+            .map(|val| CategoryMapperRuleItemVO::from(val.text, val.tag_id))
+            .collect::<Vec<CategoryMapperRuleItemVO>>();
 
         // find by id
         let mut category = self.categroy_repo

@@ -33,15 +33,15 @@ pub struct ExportCategoryDto {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct UpdateCategoryAddRuleItemDto {
+pub struct UpdateCategoryMapperRuleItemDto {
     pub text: String,
     pub tag_id: String,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct UpdateCategoryAddRuleDto {
+pub struct UpdateCategoryMapperRuleDto {
     pub id: String,
-    pub rules: Vec<UpdateCategoryAddRuleItemDto>
+    pub rules: Vec<UpdateCategoryMapperRuleItemDto>
 }
 
 #[derive(Serialize, Deserialize)]

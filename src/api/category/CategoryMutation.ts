@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { CategoryAPI } from './CategoryAPI';
-import { CategoryCreateDto, ExportCategoryDto, CategoryImportDto, UpdateCategoryAddRuleDto } from './Dto';
+import { CategoryCreateDto, ExportCategoryDto, CategoryImportDto, UpdateCategoryMapperRuleDto } from './Dto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace CategoryMutation {
@@ -17,7 +17,7 @@ export namespace CategoryMutation {
     }
 
     export function useUpdateRule() {
-        const mutationFn = (data: UpdateCategoryAddRuleDto) => CategoryAPI.updateRule(data);
+        const mutationFn = (data: UpdateCategoryMapperRuleDto) => CategoryAPI.updateMapperRule(data);
 
         return useMutation({ mutationFn: mutationFn });
     }

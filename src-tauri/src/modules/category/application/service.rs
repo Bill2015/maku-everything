@@ -67,10 +67,10 @@ impl<'a> CategoryService<'a> {
         Ok(result)
     }
 
-    pub async fn update_rules(&self, data: UpdateCategoryAddRuleDto) -> Result<CategoryID, CategoryError> {
-        let command  = UpdateCategoryAddRuleCommand::from(data);
+    pub async fn update_rules(&self, data: UpdateCategoryMapperRuleDto) -> Result<CategoryID, CategoryError> {
+        let command  = UpdateCategoryMapperRuleCommand::from(data);
 
-        let result = UpdateCategoryAddRuleHandler::register(self.category_repository, self.tag_repository)
+        let result = UpdateCategoryMapperRuleHandler::register(self.category_repository, self.tag_repository)
             .execute(command)
             .await
             .map_err(|err| CategoryError::UpdateRuleTable(anyhow!(err)))?;
@@ -132,10 +132,10 @@ impl<'a> CategoryService<'a> {
         Ok(result)
     }
 
-    pub async fn get_rules(&self, id: String) -> Result<Option<CategoryAddRulesResDto>, CategoryError> {
-        let query = GetAddRulesCategoryQuery { id: id };
+    pub async fn get_mapper_rules(&self, id: String) -> Result<Option<CategoryMapperRulesResDto>, CategoryError> {
+        let query = GetMapperRulesCategoryQuery { id: id };
         
-        let result = GetAddRulesCategoryHandler::register(self.category_queryrepo)
+        let result = GetMapperRulesCategoryHandler::register(self.category_queryrepo)
             .query(query)
             .await
             .map_err(|err| CategoryError::GetAddRules(anyhow!(err)))?;

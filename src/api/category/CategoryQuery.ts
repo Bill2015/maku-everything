@@ -27,7 +27,7 @@ export namespace CategoryQuery {
     }
 
     export function useGetRules(id: string) {
-        const queryFn = () => CategoryAPI.getRules(id);
+        const queryFn = () => CategoryAPI.getMapperRules(id);
 
         return useQuery({
             queryKey:        ['category-rules', id],

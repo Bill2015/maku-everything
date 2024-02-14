@@ -41,7 +41,7 @@ pub struct ExportCategoryResDto {
 
 
 #[derive(Deserialize, Serialize)]
-pub struct CategoryAddRuleItemTagResDto {
+pub struct CategoryMapperRuleItemTagResDto {
     #[serde(serialize_with = "thing_serialize")]
     pub id: Thing,
 
@@ -51,14 +51,14 @@ pub struct CategoryAddRuleItemTagResDto {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct CategoryAddRuleItemResDto {
-    pub tag: Option<CategoryAddRuleItemTagResDto>,
+pub struct CategoryMapperRuleItemResDto {
+    pub tag: Option<CategoryMapperRuleItemTagResDto>,
 
     pub text: String,
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct CategoryAddRulesResDto {
+pub struct CategoryMapperRulesResDto {
     #[serde(serialize_with = "thing_serialize")]
     pub id: Thing,
 
@@ -66,5 +66,5 @@ pub struct CategoryAddRulesResDto {
 
     pub root_path: String,
 
-    pub rules: Vec<CategoryAddRuleItemResDto>,
+    pub rules: Vec<CategoryMapperRuleItemResDto>,
 }

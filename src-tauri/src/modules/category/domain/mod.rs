@@ -8,10 +8,10 @@ use crate::modules::common::domain::ToPlainObject;
 use crate::modules::common::infrastructure::dateutils;
 
 mod entities;
-pub use entities::CategoryAddRuleEntity;
+pub use entities::CategoryMapperRuleEntity;
 
 mod valueobj;
-pub use valueobj::CategoryAddRuleItemVO;
+pub use valueobj::CategoryMapperRuleItemVO;
 
 mod error;
 pub use error::CategoryGenericError;
@@ -32,7 +32,7 @@ base_aggregate!(Category {
     description: String,
     root_path: String,
     auth: bool,
-    rule_table: CategoryAddRuleEntity,
+    rule_table: CategoryMapperRuleEntity,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
 });
@@ -100,7 +100,7 @@ impl Category {
         self.auth = new_auth;
     }
 
-    pub fn get_mut_rule_table(&mut self) -> &mut CategoryAddRuleEntity {
+    pub fn get_mut_rule_table(&mut self) -> &mut CategoryMapperRuleEntity {
         &mut self.rule_table
     }
 }

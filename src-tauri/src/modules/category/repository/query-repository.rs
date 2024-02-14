@@ -5,7 +5,7 @@ use surrealdb::sql::thing;
 
 use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::{env, tablens};
-use crate::modules::category::application::dto::{CategoryAddRulesResDto, CategoryResDto};
+use crate::modules::category::application::dto::{CategoryMapperRulesResDto, CategoryResDto};
 
 pub static CATEGORY_QUERY_REPOSITORY: CategoryQueryRepository<'_> = CategoryQueryRepository::init(&env::DB);
 
@@ -71,7 +71,7 @@ impl<'a> CategoryQueryRepository<'a> {
         Ok(result) 
     }
 
-    pub async fn get_rules(&self, id: &String) -> surrealdb::Result<Option<CategoryAddRulesResDto>> {
+    pub async fn get_mapper_rules(&self, id: &String) -> surrealdb::Result<Option<CategoryMapperRulesResDto>> {
         let sql = format!(r#"
             SELECT
                 id,
@@ -100,8 +100,8 @@ impl<'a> CategoryQueryRepository<'a> {
                 .bind(("id", thing(id.as_str()).unwrap()))
                 .await?;
     
-        let result: Option<CategoryAddRulesResDto> = response
-            .take::<Vec<CategoryAddRulesResDto>>(0)?
+        let result: Option<CategoryMapperRulesResDto> = response
+            .take::<Vec<CategoryMapperRulesResDto>>(0)?
             .pop();
 
         Ok(result)

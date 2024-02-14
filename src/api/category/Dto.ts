@@ -28,7 +28,7 @@ export interface CategoryUpdateDto extends Partial<CategoryCreateDto> {
     id: string;
 }
 
-export interface UpdateCategoryAddRuleDto {
+export interface UpdateCategoryMapperRuleDto {
     id: string,
     rules: {
         text: string,
@@ -46,7 +46,7 @@ export interface CategoryImportDto {
     data: string,
 }
 
-export interface CategoryAddRuleItemResDto {
+export interface CategoryMapperRuleItemResDto {
     tag: {
         id: string,
 
@@ -58,12 +58,12 @@ export interface CategoryAddRuleItemResDto {
     text: string,
 }
 
-export interface CategoryAddRulesResDto {
+export interface CategoryMapperRulesResDto {
     id: string,
 
     name: string,
 
     root_path: string,
 
-    rules: CategoryAddRuleItemResDto[],
+    rules: CategoryMapperRuleItemResDto[],
 }

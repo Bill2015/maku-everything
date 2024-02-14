@@ -1,11 +1,11 @@
 import { createStore } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { enableMapSet } from 'immer';
-import { CategoryAddRuleItemResDto, CategoryResDto } from '@api/category';
+import { CategoryMapperRuleItemResDto, CategoryResDto } from '@api/category';
 
 enableMapSet();
 
-export type TextTagValue = CategoryAddRuleItemResDto['tag'];
+export type TextTagValue = CategoryMapperRuleItemResDto['tag'];
 
 export type TextTagValueItem = {
     key: string,
@@ -28,7 +28,7 @@ type TextTagMapperActions = {
 }
 
 // eslint-disable-next-line arrow-body-style
-export const createTextTagMapperStore = (category: CategoryResDto, defaultTextMap: CategoryAddRuleItemResDto[]) => {
+export const createTextTagMapperStore = (category: CategoryResDto, defaultTextMap: CategoryMapperRuleItemResDto[]) => {
     // for add order sorting
     let indexId = 0;
     const map = new Map<string, TextTagValueItem>();
