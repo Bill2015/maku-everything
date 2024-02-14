@@ -14,6 +14,7 @@ use crate::modules::category::domain::CategoryPlainObject;
 use crate::modules::category::domain::{Category, CategoryGenericError, CategoryID};
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::common::application::ICommandHandler;
+use crate::modules::common::domain::ID;
 use crate::modules::resource::domain::ResourceFactory;
 use crate::modules::resource::domain::ResourceTaggingPlainObject;
 use crate::modules::resource::domain::{Resource, ResourcePlainObject};
@@ -114,8 +115,10 @@ impl<'a> ImportCategoryHandler<'a> {
     ) -> Result<(Category, Vec<Subject>, Vec<Tag>, Vec<Resource>), Error> {
         // ------------------------------
         // category part
-        let new_category = CategoryFactory::from_plain(CategoryPlainObject {
+        let category_rules = category.rules.clone(); // add rule later
+        let mut new_category = CategoryFactory::from_plain(CategoryPlainObject {
             root_path: root_path.clone(),
+            rules: Vec::new(),
             ..category
         })?;
         let category_id = new_category.get_id();
@@ -176,7 +179,13 @@ impl<'a> ImportCategoryHandler<'a> {
 
             new_resources.push(new_res);
         }
-        
+
+        // ------------------------------
+        // category tag mapper re-construct
+        for rules in category_rules {
+            let tag_id = tagids.get(rules.tag_id.to_str()).unwrap();
+            new_category.get_mut_rule_table().add_rule(rules.text, tag_id.clone())?
+        }
 
         Ok((new_category, new_subjects, new_tags, new_resources))
     }
