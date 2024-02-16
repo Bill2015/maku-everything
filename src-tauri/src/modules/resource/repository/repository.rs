@@ -47,14 +47,16 @@ pub struct ResourceDO {
     pub id: Thing,
     pub name: String,
     pub description: String,
-    pub root_path: String,
     pub file: Option<ResourceFileDo>,
     pub url: Option<ResourceUrlDo>,
     pub auth: bool,
     pub created_at: Datetime,
     pub updated_at: Datetime,
-
     pub belong_category: Thing,
+    
+    #[serde(skip_serializing)]
+    #[serde(default = "String::default")]
+    pub root_path: String,
 
     #[serde(skip_serializing)]
     #[serde(default = "Vec::new")]
@@ -120,7 +122,7 @@ impl<'a> ResourceRepository<'a> {
             .bind(("id", thing(id.as_str()).unwrap()))
             .await?;
 
-        let result: Option<Resource> = response
+                let result: Option<Resource> = response
             .take::<Vec<ResourceDO>>(0)?
             .pop()
             .map(|val| Self::model_to_entity(val));

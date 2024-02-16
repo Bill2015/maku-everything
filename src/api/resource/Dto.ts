@@ -39,7 +39,7 @@ export interface ResourceCreateDto {
 
     belong_category: string,
 
-    tags: string[] | null,
+    tags?: string[] | null,
 
     file_path?: string | null,
 
