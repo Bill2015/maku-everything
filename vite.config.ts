@@ -1,11 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import path from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
+import { visualizer } from "rollup-plugin-visualizer";
 import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-    plugins: [react()],
+    plugins: [
+        react(),
+        visualizer() as PluginOption,
+    ],
     css: {
         preprocessorOptions: {
           scss: {
@@ -46,7 +50,7 @@ export default defineConfig(async () => ({
         // Tauri supports es2021
         target:    process.env.TAURI_PLATFORM === 'windows' ? 'chrome105' : 'safari13',
         // don't minify for debug builds
-        minify:    !process.env.TAURI_DEBUG ? 'esbuild' : false,
+        minify:    !process.env.TAURI_DEBUG ? true : false,
         // produce sourcemaps for debug builds
         sourcemap: !!process.env.TAURI_DEBUG,
     },

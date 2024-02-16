@@ -14,10 +14,11 @@ async function main() {
         console.error('Failed to determine platform target triple')
     }
     fs.readdir('./src-tauri/binaries/', (err, filenames) => {
-        for(const fileName of filenames) {
-            const index = fileName.lastIndexOf('.');
-            const ext = (index > 0) ? fileName.substring(index + 1) : '';
-            if (includeExt.includes(ext) && !fileName.includes(targetTriple)) {
+        for(const file of filenames) {
+            const index = file.lastIndexOf('.');
+            const ext = (index > 0) ? file.substring(index) : '';
+            const fileName = (index > 0) ? file.substring(0, index) : file;
+            if (includeExt.includes(ext) && !file.includes(targetTriple)) {
                 fs.renameSync(
                     `src-tauri/binaries/${fileName}${ext}`,
                     `src-tauri/binaries/${fileName}-${targetTriple}${ext}`
