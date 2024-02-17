@@ -39,7 +39,7 @@ This project is built using [Tauri](https://tauri.app/) and [React](https://reac
 2. Follow the Tauri [prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/) installation instructions
 3. Install the [SurealDB](https://github.com/surrealdb/surrealdb/releases/tag/v1.0.0-beta.9%2B20230402)
     > This database is where our application stores data
-    > Currently, stable version is **<font color="red">Surealdb-1.2.0</font>**
+    > Currently, stable version is **<font color="red">Surealdb-1.1.1</font>**
 4. Put surrealDB executable into [binaries folder](https://github.com/Bill2015/maku-everything/tree/master/src-tauri/binaries)
 
 ### Install The App
