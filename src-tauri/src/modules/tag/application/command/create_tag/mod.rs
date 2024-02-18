@@ -8,6 +8,7 @@ use crate::modules::category::repository::CategoryRepository;
 use crate::modules::subject::domain::SubjectID;
 use crate::modules::subject::repository::SubjectRepository;
 use crate::modules::tag::domain::{TagFactory, TagGenericError, TagID};
+use crate::modules::tag::domain::valueobj::TagAttributeFactory;
 use crate::modules::tag::repository::TagRepository;
 use crate::modules::common::application::ICommandHandler;
 
@@ -23,6 +24,9 @@ pub struct CreateTagCommand {
     pub belong_category: String,
 
     pub belong_subject: String,
+
+    #[serde(flatten)]
+    pub attrval: CreateTagTypeDto,
 }
 command_from_dto!(CreateTagCommand, CreateTagDto);
 
@@ -54,6 +58,7 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             description,
             belong_category,
             belong_subject,
+            attrval,
         } = command;
 
         // get CategoryID
@@ -70,13 +75,24 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             .then(|| SubjectID::from(belong_subject))
             .ok_or(TagGenericError::BelongSubjectNotExists())?;
 
+        // create tag attribute
+        let new_attr = match attrval {
+            CreateTagTypeDto::Normal => TagAttributeFactory::create_normal(),
+            CreateTagTypeDto::Number { start, end, defval } => TagAttributeFactory::create_number(start, end, defval),
+            CreateTagTypeDto::Text { defval } => TagAttributeFactory::create_text(defval),
+            CreateTagTypeDto::Date { defval } => TagAttributeFactory::create_date(defval),
+            CreateTagTypeDto::Bool { defval } => TagAttributeFactory::create_bool(defval),
+        }?;
+
         // create new tag
-        let new_tag = TagFactory::create(name, description, &category_id, &subject_id)?;
+        let new_tag = TagFactory::create(name, description, &category_id, &subject_id, new_attr)?;
 
         // save
         let result = self.tag_repo
             .save(new_tag)
             .await;
+
+        dbg!(&result);
         
         match result {
             Ok(value) => Ok(value.take_id()),

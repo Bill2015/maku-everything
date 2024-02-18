@@ -5,12 +5,14 @@ use crate::modules::subject::domain::SubjectID;
 use crate::modules::common::domain::ID;
 use crate::modules::common::infrastructure::dateutils;
 
+use super::plainobj::TagAttributePlainObject;
 use super::{Tag, TagGenericError, TagID, TagPlainObject, TagProps};
+use super::valueobj::TagAttrVO;
 
 pub struct TagFactory { }
 
 impl TagFactory {
-    pub fn create(name: String, description: String, belong_category: &CategoryID, belong_subject: &SubjectID) -> Result<Tag, TagGenericError> {
+    pub fn create(name: String, description: String, belong_category: &CategoryID, belong_subject: &SubjectID, attr: TagAttrVO) -> Result<Tag, TagGenericError> {
         if name.len() <= 0 {
             return  Err(TagGenericError::NameIsEmpty());
         }
@@ -22,6 +24,7 @@ impl TagFactory {
             belong_subject: belong_subject.clone(),
             description: description,
             auth: false,
+            attr: attr,
             created_at: Utc::now(),
             updated_at: Utc::now(),
         }))
@@ -32,6 +35,20 @@ impl TagFactory {
     }
 
     pub fn from_plain(object: TagPlainObject) -> Result<Tag, TagGenericError> {
+        let attr = match object.attrval {
+            TagAttributePlainObject::Normal => TagAttrVO::Normal,
+            TagAttributePlainObject::Number { start, end, defval } => TagAttrVO::WithNumber { start, end, defval },
+            TagAttributePlainObject::Text { defval } => TagAttrVO::WithText { defval },
+            TagAttributePlainObject::Date { defval } => {
+                TagAttrVO::WithDate {
+                    defval: dateutils::parse(defval)
+                        .map_err(|_| TagGenericError::InvalidDateFormat())?
+                        .and_utc()
+                }
+            },
+            TagAttributePlainObject::Bool { defval } => TagAttrVO::WithBool { defval },
+        };
+
         Ok(Tag::new(TagProps {
             id: TagID::new(),
             name: object.name,
@@ -39,6 +56,7 @@ impl TagFactory {
             belong_subject: object.belong_subject,
             description: object.description,
             auth: object.auth,
+            attr: attr,
             created_at: dateutils::parse(&object.created_at)
                 .map_err(|_| TagGenericError::InvalidDateFormat())?
                 .and_utc(),

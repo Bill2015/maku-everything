@@ -1,7 +1,6 @@
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
-use surrealdb::sql::{Datetime, Thing, thing};
+use surrealdb::sql::{Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
 use crate::modules::common::domain::DomainModelMapper;
@@ -12,22 +11,9 @@ use crate::modules::common::repository::{CommonRepository, COMMON_REPOSITORY};
 use crate::modules::tag::domain::TagFactory;
 use crate::tag::domain::{Tag, TagID};
 
+use super::TagDO;
+
 pub static TAG_REPOSITORY: TagRepository<'_> = TagRepository::init(&env::DB, &COMMON_REPOSITORY);
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TagDO {
-   pub id: Thing,
-
-   pub name: String,
-   pub description: String,
-   pub auth: bool,
-   pub created_at: Datetime,
-   pub updated_at: Datetime,
-
-   pub belong_category: Thing, 
-
-   pub belong_subject: Thing,
-}
 
 /**
  * Repository */

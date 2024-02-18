@@ -61,6 +61,9 @@ pub enum TagGenericError {
     #[error("Invalid date format")]
     InvalidDateFormat(),
 
+    #[error("Invalid number tag value")]
+    InvalidTagNumberValue(),
+
     #[error("unknown Tag error")]
     Unknown{ message: String },
     
