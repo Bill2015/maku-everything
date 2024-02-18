@@ -6,9 +6,32 @@ use super::ResourceID;
 
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(tag = "tagging_type", content = "attr")]
+pub enum ResourceTaggingAttrPlainObject {
+    #[serde(rename = "normal")]
+    Normal,
+
+    #[serde(rename = "number")]
+    Number(i64),
+
+    #[serde(rename = "text")]
+    Text(String),
+
+    #[serde(rename = "date")]
+    Date(String),
+
+    #[serde(rename = "bool")]
+    Bool(bool),
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ResourceTaggingPlainObject {
     pub id: TagID,
+
     pub added_at: String,
+
+    #[serde(flatten)]
+    pub attrval: ResourceTaggingAttrPlainObject,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

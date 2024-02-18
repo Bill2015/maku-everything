@@ -91,8 +91,6 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
         let result = self.tag_repo
             .save(new_tag)
             .await;
-
-        dbg!(&result);
         
         match result {
             Ok(value) => Ok(value.take_id()),

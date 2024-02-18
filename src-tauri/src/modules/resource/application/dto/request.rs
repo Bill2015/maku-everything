@@ -1,16 +1,24 @@
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize)]
-pub struct ResourceListQueryDto {
-    pub id: Option<String>,
+use crate::modules::resource::domain::entities::TaggingAttrPayload;
 
-    pub name: Option<String>,
-
-    pub belong_category: Option<String>, 
-
-    pub order_by: Option<String>,
-
-    pub limit: Option<i64>,
-
-    pub start: Option<i64>,
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ResourceTaggingAttrPayloadDto {
+    None,
+    Number(i64),
+    Text(String),
+    Date(String),
+    Bool(bool),
+}
+impl Into<TaggingAttrPayload> for ResourceTaggingAttrPayloadDto {
+    fn into(self) -> TaggingAttrPayload {
+        match self {
+            Self::None => TaggingAttrPayload::None,
+            Self::Number(val) => TaggingAttrPayload::Number(val),
+            Self::Text(val) => TaggingAttrPayload::Text(val),
+            Self::Date(val) => TaggingAttrPayload::Date(val),
+            Self::Bool(val) => TaggingAttrPayload::Bool(val),
+        }
+    }
 }

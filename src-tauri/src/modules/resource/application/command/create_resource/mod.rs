@@ -84,13 +84,13 @@ impl ICommandHandler<CreateResourceCommand> for CreateResourceHandler<'_> {
 
         if let Some(tags) = tags {
             for tag in tags {
-                let tag_id = self.tag_repo
-                    .is_exist(&tag)
+                let tag = self.tag_repo
+                    .find_by_id(&tag)
                     .await
-                    .then(|| TagID::from(tag))
+                    .or(Err(ResourceGenericError::DBInternalError()))?
                     .ok_or(ResourceGenericError::TagNotExists())?;
 
-                new_resource.get_mut_tagging().add_tag(&tag_id)?;
+                new_resource.get_mut_tagging().add_tag(&tag, None)?;
             }
         } 
         

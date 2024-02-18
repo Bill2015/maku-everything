@@ -3,10 +3,11 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::command_from_dto;
+use crate::modules::resource::application::dto::ResourceTaggingAttrPayloadDto;
+use crate::modules::resource::domain::entities::TaggingAttrPayload;
 use crate::modules::resource::domain::{ResourceGenericError, ResourceID};
 use crate::modules::resource::repository::ResourceRepository;
 use crate::modules::common::application::ICommandHandler;
-use crate::modules::tag::domain::TagID;
 use crate::modules::tag::repository::TagRepository;
 
 mod dto;
@@ -16,6 +17,7 @@ pub use dto::*;
 pub struct ResourceAddTagCommand {
     pub id: String,
     pub tag_id: String,
+    pub attrval: Option<ResourceTaggingAttrPayloadDto>,
 }
 command_from_dto!(ResourceAddTagCommand, ResourceAddTagDto);
 
@@ -44,14 +46,15 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
         let ResourceAddTagCommand { 
             id,
             tag_id,
+            attrval,
         } = command;
 
         //get TagID
-        let tag_id = self.tag_repo
-            .is_exist(&tag_id)
+        let tag = self.tag_repo
+            .find_by_id(&tag_id)
             .await
-            .then(|| TagID::from(tag_id))
-            .ok_or(ResourceGenericError::TagNotExists())?;   
+            .or(Err(ResourceGenericError::DBInternalError()))?
+            .ok_or(ResourceGenericError::TagNotExists())?;
 
         // find by id
         let mut resource = self.resource_repo
@@ -60,8 +63,9 @@ impl ICommandHandler<ResourceAddTagCommand> for ResourceAddTagHandler<'_> {
             .or(Err(ResourceGenericError::DBInternalError()))?
             .ok_or(ResourceGenericError::IdNotFound())?;
 
-        // add tag  
-        resource.get_mut_tagging().add_tag(&tag_id)?;
+        // add tag
+        let payload: Option<TaggingAttrPayload> = attrval.map(|x| x.into());
+        resource.get_mut_tagging().add_tag(&tag, payload)?;
         
         // save
         let result = self.resource_repo

@@ -84,6 +84,9 @@ pub enum ResourceGenericError {
     #[error("Tag that dose not exists")]
     TagNotExists(),
 
+    #[error("Invalid tagging attribute with tag")]
+    InvalidTaggingAttribute(),
+
     #[error("Find the ambiguous tags")]
     FindAmbiguousTags(),
 

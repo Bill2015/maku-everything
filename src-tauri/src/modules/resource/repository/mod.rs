@@ -8,3 +8,6 @@ pub use relation::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationReposito
 
 mod repository;
 pub use repository::*;
+
+mod data_model;
+pub use data_model::*;

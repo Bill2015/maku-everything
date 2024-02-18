@@ -167,7 +167,7 @@ impl<'a> ImportCategoryHandler<'a> {
                 .into_iter()
                 .map(|val| ResourceTaggingPlainObject { 
                     id: tagids.get(&val.id.to_string()).unwrap().to_owned(), 
-                    added_at: val.added_at,
+                    ..val
                 })
                 .collect::<Vec<ResourceTaggingPlainObject>>();
             let new_res = ResourceFactory::from_plain(ResourcePlainObject {
