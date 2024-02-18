@@ -37,16 +37,16 @@ impl TagFactory {
     pub fn from_plain(object: TagPlainObject) -> Result<Tag, TagGenericError> {
         let attr = match object.attrval {
             TagAttributePlainObject::Normal => TagAttrVO::Normal,
-            TagAttributePlainObject::Number { start, end, defval } => TagAttrVO::WithNumber { start, end, defval },
-            TagAttributePlainObject::Text { defval } => TagAttrVO::WithText { defval },
+            TagAttributePlainObject::Number { start, end, defval } => TagAttrVO::Number { start, end, defval },
+            TagAttributePlainObject::Text { defval } => TagAttrVO::Text { defval },
             TagAttributePlainObject::Date { defval } => {
-                TagAttrVO::WithDate {
+                TagAttrVO::Date {
                     defval: dateutils::parse(defval)
                         .map_err(|_| TagGenericError::InvalidDateFormat())?
                         .and_utc()
                 }
             },
-            TagAttributePlainObject::Bool { defval } => TagAttrVO::WithBool { defval },
+            TagAttributePlainObject::Bool { defval } => TagAttrVO::Bool { defval },
         };
 
         Ok(Tag::new(TagProps {

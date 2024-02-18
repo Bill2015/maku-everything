@@ -7,6 +7,7 @@ use crate::modules::category::domain::CategoryID;
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::subject::domain::SubjectID;
 use crate::modules::subject::repository::SubjectRepository;
+use crate::modules::tag::application::dto::TagAttrDto;
 use crate::modules::tag::domain::{TagFactory, TagGenericError, TagID};
 use crate::modules::tag::domain::valueobj::TagAttributeFactory;
 use crate::modules::tag::repository::TagRepository;
@@ -26,7 +27,7 @@ pub struct CreateTagCommand {
     pub belong_subject: String,
 
     #[serde(flatten)]
-    pub attrval: CreateTagTypeDto,
+    pub attrval: TagAttrDto,
 }
 command_from_dto!(CreateTagCommand, CreateTagDto);
 
@@ -77,11 +78,11 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
 
         // create tag attribute
         let new_attr = match attrval {
-            CreateTagTypeDto::Normal => TagAttributeFactory::create_normal(),
-            CreateTagTypeDto::Number { start, end, defval } => TagAttributeFactory::create_number(start, end, defval),
-            CreateTagTypeDto::Text { defval } => TagAttributeFactory::create_text(defval),
-            CreateTagTypeDto::Date { defval } => TagAttributeFactory::create_date(defval),
-            CreateTagTypeDto::Bool { defval } => TagAttributeFactory::create_bool(defval),
+            TagAttrDto::Normal => TagAttributeFactory::create_normal(),
+            TagAttrDto::Number { start, end, defval } => TagAttributeFactory::create_number(start, end, defval),
+            TagAttrDto::Text { defval } => TagAttributeFactory::create_text(defval),
+            TagAttrDto::Date { defval } => TagAttributeFactory::create_date(defval),
+            TagAttrDto::Bool { defval } => TagAttributeFactory::create_bool(defval),
         }?;
 
         // create new tag

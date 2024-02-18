@@ -15,36 +15,23 @@ pub struct ResourceUrlDo {
     pub full: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, strum_macros::Display)]
 #[serde(tag = "tagging_type", content = "attrval")]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
 pub enum ResourceTaggingAttrDO {
-    #[serde(rename = "normal")]
     #[serde(deserialize_with = "ResourceTaggingAttrDO::deserialize_null_default")]
     Normal(),
 
-    #[serde(rename = "number")]
     Number(i64),
 
-    #[serde(rename = "text")]
     Text(String),
 
-    #[serde(rename = "date")]
     Date(Datetime),
 
-    #[serde(rename = "bool")]
     Bool(bool),
 }
 impl ResourceTaggingAttrDO {
-    pub fn get_type_name(&self) -> String {
-        match self {
-            Self::Normal() => "normal",
-            Self::Number(..) => "number",
-            Self::Text(..) => "text",
-            Self::Date(..) => "date",
-            Self::Bool(..) => "bool",
-        }.to_string()
-    }
-
     fn deserialize_null_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
     where
         T: Default + Deserialize<'de>,

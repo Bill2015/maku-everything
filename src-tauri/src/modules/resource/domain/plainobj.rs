@@ -7,20 +7,16 @@ use super::ResourceID;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(tag = "tagging_type", content = "attr")]
+#[serde(rename_all = "snake_case")]
 pub enum ResourceTaggingAttrPlainObject {
-    #[serde(rename = "normal")]
     Normal,
 
-    #[serde(rename = "number")]
     Number(i64),
 
-    #[serde(rename = "text")]
     Text(String),
 
-    #[serde(rename = "date")]
     Date(String),
 
-    #[serde(rename = "bool")]
     Bool(bool),
 }
 

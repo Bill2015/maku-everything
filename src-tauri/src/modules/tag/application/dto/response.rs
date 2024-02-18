@@ -3,27 +3,21 @@ use surrealdb::sql::Thing;
 
 use crate::modules::common::application::thing_serialize;
 
+// Quick Example: https://play.rust-lang.org/?version=stable&mode=debug&edition=2018&gist=15cfab66d38ff8a15a9cf1d8d897ac68
+// See also: https://serde.rs/enum-representations.html
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(tag = "tag_type", content = "attr")]
-pub enum TagAttrResDto {
-    #[serde(rename = "normal")]
+#[serde(rename_all = "snake_case")]
+pub enum TagAttrDto {
     Normal,
 
-    #[serde(rename = "number")]
-    WithNumber {
-        start: i64,
-        end: i64,
-        defval: i64,
-    },
+    Number { start: i64, end: i64, defval: i64 },
 
-    #[serde(rename = "text")]
-    WithText { defval: String },
+    Text { defval: String },
 
-    #[serde(rename = "date")]
-    WithDate { defval: String },
+    Date { defval: String },
 
-    #[serde(rename = "bool")]
-    WithBool { defval: bool },
+    Bool { defval: bool },
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -50,7 +44,7 @@ pub struct TagResDto {
     pub auth: bool,
 
     #[serde(flatten)]
-    pub attrval: TagAttrResDto,
+    pub attrval: TagAttrDto,
 
     pub created_at: String,
 

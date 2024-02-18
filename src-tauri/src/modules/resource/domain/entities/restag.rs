@@ -10,9 +10,13 @@ use crate::modules::tag::domain::{Tag, TagID};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TaggingAttrPayload {
     None,
+
     Number(i64),
+
     Text(String),
+
     Date(String),
+
     Bool(bool),
 }
 
@@ -92,10 +96,10 @@ impl ResourceTaggingEntity {
     fn create_default_tagging_attr(tag: &Tag) -> ResourceTaggingAttrVO {
         match tag.get_attr().clone() {
             TagAttrVO::Normal => ResourceTaggingAttrVO::Normal,
-            TagAttrVO::WithNumber { defval, .. } => ResourceTaggingAttrVO::Number(defval),
-            TagAttrVO::WithText { defval } => ResourceTaggingAttrVO::Text(defval),
-            TagAttrVO::WithDate { defval } => ResourceTaggingAttrVO::Date(defval),
-            TagAttrVO::WithBool { defval } => ResourceTaggingAttrVO::Bool(defval),
+            TagAttrVO::Number { defval, .. } => ResourceTaggingAttrVO::Number(defval),
+            TagAttrVO::Text { defval } => ResourceTaggingAttrVO::Text(defval),
+            TagAttrVO::Date { defval } => ResourceTaggingAttrVO::Date(defval),
+            TagAttrVO::Bool { defval } => ResourceTaggingAttrVO::Bool(defval),
         }
     }
 
@@ -107,7 +111,7 @@ impl ResourceTaggingEntity {
                 }
                 Err(ResourceGenericError::InvalidTaggingAttribute())
             }
-            TagAttrVO::WithNumber { start, end, .. } => {
+            TagAttrVO::Number { start, end, .. } => {
                 if let TaggingAttrPayload::Number(val) = payload {
                     if val >= start && val <= end {
                         return Ok(ResourceTaggingAttrVO::Number(val));
@@ -115,19 +119,19 @@ impl ResourceTaggingEntity {
                 }
                 Err(ResourceGenericError::InvalidTaggingAttribute())
             },
-            TagAttrVO::WithText { .. } => {
+            TagAttrVO::Text { .. } => {
                 if let TaggingAttrPayload::Text(val) = payload {
                     return Ok(ResourceTaggingAttrVO::Text(val));
                 }
                 Err(ResourceGenericError::InvalidTaggingAttribute())
             },
-            TagAttrVO::WithBool { .. } => {
+            TagAttrVO::Bool { .. } => {
                 if let TaggingAttrPayload::Bool(val) = payload {
                     return Ok(ResourceTaggingAttrVO::Bool(val));
                 }
                 Err(ResourceGenericError::InvalidTaggingAttribute())
             }
-            TagAttrVO::WithDate { .. } => {
+            TagAttrVO::Date { .. } => {
                 if let TaggingAttrPayload::Date(val) = payload {
                     if let Ok(date) = dateutils::parse(val) {
                         return Ok(ResourceTaggingAttrVO::Date(date.and_utc()));

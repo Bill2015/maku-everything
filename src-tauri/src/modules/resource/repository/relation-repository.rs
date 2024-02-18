@@ -65,7 +65,7 @@ impl<'a> ResourceTagRelationRepository<'a> {
 
             let mut content: BTreeMap<&str, Value> = BTreeMap::new();
             content.insert("added_at", Value::Datetime(tag.added_at.into()));
-            content.insert("tagging_type", Value::Strand(tag.attrval.get_type_name().into()));
+            content.insert("tagging_type", Value::Strand(tag.attrval.to_string().into()));
             content.insert("attrval", tag.attrval.into());
 
             self.create_relation(&tag.id.to_string(), &resource_id, content.into()).await?

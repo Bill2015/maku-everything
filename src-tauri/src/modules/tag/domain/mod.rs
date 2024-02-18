@@ -76,10 +76,10 @@ impl ToPlainObject<TagPlainObject> for Tag {
     fn to_plain(self) -> TagPlainObject {
         let attrobj = match self.attr {
             TagAttrVO::Normal => TagAttributePlainObject::Normal,
-            TagAttrVO::WithNumber { start, end, defval } => TagAttributePlainObject::Number { start, end, defval },
-            TagAttrVO::WithText { defval } => TagAttributePlainObject::Text { defval },
-            TagAttrVO::WithDate { defval } => TagAttributePlainObject::Date { defval: dateutils::format(defval) },
-            TagAttrVO::WithBool { defval } => TagAttributePlainObject::Bool { defval },
+            TagAttrVO::Number { start, end, defval } => TagAttributePlainObject::Number { start, end, defval },
+            TagAttrVO::Text { defval } => TagAttributePlainObject::Text { defval },
+            TagAttrVO::Date { defval } => TagAttributePlainObject::Date { defval: dateutils::format(defval) },
+            TagAttrVO::Bool { defval } => TagAttributePlainObject::Bool { defval },
         };
 
         TagPlainObject {

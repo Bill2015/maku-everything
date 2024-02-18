@@ -9,20 +9,20 @@ impl DomainModelMapper<TagAttrVO> for TagAttrDO {
     fn to_domain(self) -> TagAttrVO {
         match self {
             Self::Normal => TagAttrVO::Normal,
-            Self::WithNumber { start, end, defval } => TagAttrVO::WithNumber { start, end, defval },
-            Self::WithText { defval } => TagAttrVO::WithText { defval },
-            Self::WithDate { defval } => TagAttrVO::WithDate { defval: defval.0 },
-            Self::WithBool { defval } => TagAttrVO::WithBool { defval },
+            Self::Number { start, end, defval } => TagAttrVO::Number { start, end, defval },
+            Self::Text { defval } => TagAttrVO::Text { defval },
+            Self::Date { defval } => TagAttrVO::Date { defval: defval.0 },
+            Self::Bool { defval } => TagAttrVO::Bool { defval },
         }
     }
 
     fn from_domain(value: TagAttrVO) -> Self {
         match value {
             TagAttrVO::Normal => Self::Normal,
-            TagAttrVO::WithNumber { start, end, defval } => Self::WithNumber { start, end, defval },
-            TagAttrVO::WithText { defval } => Self::WithText { defval },
-            TagAttrVO::WithDate { defval } => Self::WithDate { defval: Datetime(defval) },
-            TagAttrVO::WithBool { defval } => Self::WithBool { defval },
+            TagAttrVO::Number { start, end, defval } => Self::Number { start, end, defval },
+            TagAttrVO::Text { defval } => Self::Text { defval },
+            TagAttrVO::Date { defval } => Self::Date { defval: Datetime(defval) },
+            TagAttrVO::Bool { defval } => Self::Bool { defval },
         }
     }
 }

@@ -6,9 +6,13 @@ use crate::modules::tag::domain::TagID;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ResourceTaggingAttrVO {
     Normal,
+
     Number(i64),
+
     Text(String),
+
     Date(DateTime<Utc>),
+
     Bool(bool),
 }
 

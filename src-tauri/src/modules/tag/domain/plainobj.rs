@@ -7,20 +7,16 @@ use super::TagID;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(tag = "tag_type", content = "attr")]
+#[serde(rename_all = "snake_case")]
 pub enum TagAttributePlainObject {
-    #[serde(rename = "normal")]
     Normal,
 
-    #[serde(rename = "number")]
     Number { start: i64, end: i64, defval: i64 },
 
-    #[serde(rename = "text")]
     Text { defval: String },
 
-    #[serde(rename = "date")]
     Date { defval: String },
 
-    #[serde(rename = "bool")]
     Bool { defval: bool },
 }
 

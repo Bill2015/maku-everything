@@ -7,14 +7,14 @@ use crate::modules::tag::domain::TagGenericError;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TagAttrVO {
     Normal,
-    WithNumber {
-        start: i64,
-        end: i64,
-        defval: i64,
-    },
-    WithText { defval: String },
-    WithDate { defval: DateTime<Utc> },
-    WithBool { defval: bool },
+
+    Number { start: i64, end: i64, defval: i64 },
+
+    Text { defval: String },
+
+    Date { defval: DateTime<Utc> },
+
+    Bool { defval: bool },
 }
 
 pub struct TagAttributeFactory { }
@@ -32,22 +32,22 @@ impl TagAttributeFactory {
             return Err(TagGenericError::InvalidTagNumberValue());
         }
 
-        Ok(TagAttrVO::WithNumber{ start, end, defval })
+        Ok(TagAttrVO::Number{ start, end, defval })
     }
 
     pub fn create_text(defval: String) -> Result<TagAttrVO, TagGenericError> {
-        Ok(TagAttrVO::WithText { defval })
+        Ok(TagAttrVO::Text { defval })
     }
 
     pub fn create_date(defval: String) -> Result<TagAttrVO, TagGenericError> {
         if let Ok(date) = dateutils::parse(defval) {
-            return Ok(TagAttrVO::WithDate { defval: date.and_utc() })
+            return Ok(TagAttrVO::Date { defval: date.and_utc() })
         }
 
         Err(TagGenericError::InvalidDateFormat())
     }
 
     pub fn create_bool(defval: bool) -> Result<TagAttrVO, TagGenericError> {
-        Ok(TagAttrVO::WithBool { defval })
+        Ok(TagAttrVO::Bool { defval })
     }
 }

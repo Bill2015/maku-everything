@@ -3,25 +3,21 @@ use surrealdb::sql::{Datetime, Thing};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "tag_type", content = "attr")]
+#[serde(rename_all = "snake_case")]
 pub enum TagAttrDO {
-    #[serde(rename = "normal")]
     Normal,
 
-    #[serde(rename = "number")]
-    WithNumber {
+    Number {
         start: i64,
         end: i64,
         defval: i64,
     },
 
-    #[serde(rename = "text")]
-    WithText { defval: String },
+    Text { defval: String },
 
-    #[serde(rename = "date")]
-    WithDate { defval: Datetime },
+    Date { defval: Datetime },
 
-    #[serde(rename = "bool")]
-    WithBool { defval: bool },
+    Bool { defval: bool },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
