@@ -1,0 +1,25 @@
+{
+    "Main": {
+        "title": "Create New Tag",
+        "subtitle": "Basic tag data",
+        "belong_subject": "Belong Subject:",
+        "name": "Name:",
+        "name_placeholder": "Enter name here...",
+        "description": "Description:",
+        "description_placeholder": "Enter description here...",
+        "tag_type": "Tag Type:",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+    },
+    "TagAttributePanelContent": {
+        "title": "Attributes of the {{type}} tag",
+        "default_value": "default value",
+        "date_placehoder": "inpute default date here...",
+        "text_placehoder": "inpute default text here...",
+        "number_range": "number range",
+        "number_start": "start",
+        "number_end": "end",
+        "bool_true": "True",
+        "bool_false": "False"
+    }
+}

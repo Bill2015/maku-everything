@@ -9,6 +9,8 @@ import { SubjectQuery } from '@api/subject';
 import { ErrorResBody } from '@api/common';
 import { showNotification } from '@components/notification';
 import { BaseModal } from '@components/modal';
+import { useTranslation } from 'react-i18next';
+import { normalizeKey, useValueTranslation } from '@modules/i18next';
 import { TagAttributePanel } from './components';
 
 const DEFAULT_VALUE: TagCreateDto = {
@@ -21,6 +23,8 @@ const DEFAULT_VALUE: TagCreateDto = {
 };
 
 export function CreateTagModal() {
+    const { t } = useTranslation('modal', { keyPrefix: 'createTag.Main' });
+    const { tv } = useValueTranslation('AttributeType');
     const { activeCategory } = useActiveCategoryRedux();
     const [opened, { close, confirmClose, cancelClose }] = useCreateTagModal();
     const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
@@ -57,12 +61,12 @@ export function CreateTagModal() {
         return null;
     }
     return (
-        <BaseModal opened={opened} onClose={close} title="Create New Tag" size="xl">
+        <BaseModal opened={opened} onClose={close} title={t('title')} size="xl">
             <Group wrap="nowrap" align="stretch">
                 <Stack flex={1} gap={15}>
-                    <Title order={5}>Basic tag data</Title>
+                    <Title order={5}>{t('subtitle')}</Title>
                     <Stack gap={3}>
-                        <SubTitle>Belong Subject:</SubTitle>
+                        <SubTitle>{t('belong_subject')}</SubTitle>
                         <SubjectSelect
                             value={belongSubject?.value}
                             onClickResult={() => setBelongSubject(null)}
@@ -72,25 +76,25 @@ export function CreateTagModal() {
                     </Stack>
 
                     <Stack gap={3}>
-                        <SubTitle>Name:</SubTitle>
+                        <SubTitle>{t('name')}</SubTitle>
                         <Input
-                            placeholder="resource name"
+                            placeholder={t('name_placeholder')}
                             value={data.name}
                             onChange={(e) => handleUpdateData('name', e.target.value)}
                         />
                     </Stack>
 
                     <Stack gap={3}>
-                        <SubTitle>Description:</SubTitle>
+                        <SubTitle>{t('description')}</SubTitle>
                         <Input
-                            placeholder="resource description"
+                            placeholder={t('description_placeholder')}
                             value={data.description}
                             onChange={(e) => handleUpdateData('description', e.target.value)}
                         />
                     </Stack>
 
                     <Stack gap={3}>
-                        <SubTitle>Tag Type:</SubTitle>
+                        <SubTitle>{t('tag_type')}</SubTitle>
                         <SegmentedControl
                             color="blue"
                             defaultValue="normal"
@@ -98,13 +102,16 @@ export function CreateTagModal() {
                             miw="20rem"
                             value={data.tag_type}
                             onChange={(value) => handleUpdateData('tag_type', value as TagCreateDto['tag_type'])}
-                            data={Object.keys(TagAttrPayload.DEFAULT_VALUE)}
+                            data={
+                                Object.keys(TagAttrPayload.DEFAULT_VALUE)
+                                    .map((val) => ({ value: val, label: tv(normalizeKey(val)) }))
+                            }
                         />
                     </Stack>
 
                     <Group justify="space-between">
-                        <Button color="pink" onClick={cancelClose}>Cancel</Button>
-                        <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
+                        <Button color="pink" onClick={cancelClose}>{t('cancel')}</Button>
+                        <Button color="lime" onClick={handleCreateConfirm}>{t('confirm')}</Button>
                     </Group>
                 </Stack>
 

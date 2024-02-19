@@ -6,6 +6,8 @@ import {
 import { DateInput } from '@mantine/dates';
 import { SubTitle } from '@components/display';
 import { TagAttrPayload, TagCreateDto } from '@api/tag';
+import { useTranslation } from 'react-i18next';
+import { normalizeKey, useValueTranslation } from '@modules/i18next';
 
 export interface TagAttributePanelRootProps extends PropsWithChildren {
     hidden: boolean;
@@ -29,22 +31,23 @@ function TagAttributePanelNumber(props: {
     onDefaultChange: (value: number) => void;
 }) {
     const { value, onStartChange, onEndChange, onDefaultChange } = props;
+    const { t } = useTranslation('modal', { keyPrefix: 'createTag.TagAttributePanelContent' });
 
     const defaultProps: NumberInputProps = {
         w:                '7.5rem',
         size:             'xs',
         stepHoldDelay:    500,
-        stepHoldInterval: (t) => Math.max(1000 / t ** 2, 25),
+        stepHoldInterval: (step) => Math.max(1000 / step ** 2, 25),
     };
 
     return (
         <>
             <Stack gap={5}>
-                <SubTitle>start range</SubTitle>
+                <SubTitle>{t('number_range')}</SubTitle>
                 <Group>
                     <NumberInput
                         {...defaultProps}
-                        label="start"
+                        label={t('number_start')}
                         min={0}
                         max={value.end}
                         defaultValue={0}
@@ -57,7 +60,7 @@ function TagAttributePanelNumber(props: {
                     />
                     <NumberInput
                         {...defaultProps}
-                        label="end"
+                        label={t('number_end')}
                         min={value.start}
                         max={Number.MAX_SAFE_INTEGER}
                         defaultValue={100}
@@ -72,7 +75,7 @@ function TagAttributePanelNumber(props: {
             </Stack>
 
             <Stack gap={5}>
-                <SubTitle>default Value</SubTitle>
+                <SubTitle>{t('default_value')}</SubTitle>
                 <Slider
                     color="blue"
                     min={value.start}
@@ -91,11 +94,13 @@ function TagAttributePanelText(props: {
     onChange(value: string): void;
 }) {
     const { value, onChange } = props;
+    const { t } = useTranslation('modal', { keyPrefix: 'createTag.TagAttributePanelContent' });
+
     return (
         <Stack gap={3}>
-            <SubTitle>Default value</SubTitle>
+            <SubTitle>{t('default_value')}</SubTitle>
             <Input
-                placeholder="input default value..."
+                placeholder={t('text_placehoder')}
                 size="sm"
                 w="100%"
                 value={value.defval}
@@ -111,15 +116,16 @@ function TagAttributePanelBool(props: {
     onChange(value: boolean): void;
 }) {
     const { value, onChange } = props;
+    const { t } = useTranslation('modal', { keyPrefix: 'createTag.TagAttributePanelContent' });
+
     return (
         <Stack gap={3}>
-            <SubTitle>Default value</SubTitle>
+            <SubTitle>{t('default_value')}</SubTitle>
             <Switch
-                placeholder="input default value..."
                 color="lime"
                 size="md"
                 w="100%"
-                label={value.defval ? 'True' : 'False'}
+                label={value.defval ? t('bool_true') : t('bool_false')}
                 checked={value.defval}
                 onChange={(e) => onChange(e.currentTarget.checked)}
             />
@@ -132,6 +138,7 @@ function TagAttributePanelDate(props: {
     onChange(value: string): void;
 }) {
     const { value, onChange } = props;
+    const { t } = useTranslation('modal', { keyPrefix: 'createTag.TagAttributePanelContent' });
 
     function toDate() {
         const date = new Date(value.defval);
@@ -140,13 +147,13 @@ function TagAttributePanelDate(props: {
 
     return (
         <Stack gap={3}>
-            <SubTitle>default value</SubTitle>
+            <SubTitle>{t('default_value')}</SubTitle>
             <DateInput
                 w="100%"
                 value={toDate()}
                 onChange={(val) => val && onChange(val.toISOString())}
                 valueFormat="YYYY/MM/DD"
-                placeholder="Date input"
+                placeholder={t('date_placehoder')}
             />
         </Stack>
     );
@@ -161,6 +168,8 @@ export interface TagAttributePanelContentProps {
 
 function TagAttributePanelContent(props: TagAttributePanelContentProps) {
     const { displayType, onAttributeChange } = props;
+    const { t } = useTranslation('modal', { keyPrefix: 'createTag.TagAttributePanelContent' });
+    const { tv } = useValueTranslation('AttributeType');
     const [attrVal, setAttrVal] = useState<TagAttrPayload.All>({});
 
     // reset
@@ -214,8 +223,7 @@ function TagAttributePanelContent(props: TagAttributePanelContentProps) {
     return (
         <Stack gap={15}>
             <Title order={5}>
-                {displayType.toString()}
-                of Tag Attributes
+                {t('title', { type: tv(normalizeKey(displayType)) })}
             </Title>
             {renderContent()}
         </Stack>
