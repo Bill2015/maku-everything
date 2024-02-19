@@ -62,30 +62,32 @@ impl<'a> StringQLObjectGenerator<'a> {
                         _ => {}
                     };
                 },
-                QueryToken::TagToken { id, .. } => {
+                QueryToken::TagToken { id, attrval, .. } => {
+                    let (id, attrval) = (id.to_string(), attrval.clone());
                     match ops_stack.last().unwrap().0 {
                         TokenSymbol::Include => {
-                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Include, id.to_string(), None));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Include, id, attrval, false));
                         },
                         TokenSymbol::Exclude => {
-                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Exclude, id.to_string(), None));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Exclude, id, attrval, false));
                         }
                         _ => {
-                            tag_stack.push(StringQLItem::new(StringQLPrefix::Inherit, id.to_string(), None));
+                            tag_stack.push(StringQLItem::new(StringQLPrefix::Inherit, id, attrval, false));
                         },
                     }
                 },
                 QueryToken::SystemTagToken { namespace, value, attrval, .. } => {
+                    let attrval = attrval.clone();
                     let name = SystemTag::full_name(namespace, value);
                     match ops_stack.last().unwrap().0 {
                         TokenSymbol::Include => {
-                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Include, name, attrval.clone()));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Include, name, attrval, true));
                         },
                         TokenSymbol::Exclude => {
-                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Exclude, name, attrval.clone()));
+                            self.builder.add_item(StringQLItem::new(StringQLPrefix::Exclude, name, attrval, true));
                         }
                         _ => {
-                            tag_stack.push(StringQLItem::new(StringQLPrefix::Inherit, name, attrval.clone()));
+                            tag_stack.push(StringQLItem::new(StringQLPrefix::Inherit, name, attrval, true));
                         },
                     }
                 },

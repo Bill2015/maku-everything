@@ -8,6 +8,80 @@ use crate::modules::common::repository::env;
 
 pub static PRE_DEFINED_REPOSITORY: PreDefinedRepository<'_> = PreDefinedRepository::init(&env::DB);
 
+pub mod sql_utils {
+    use chrono::NaiveDate;
+
+    use super::sql_predefn;
+
+    const DATE_FORAMTER: &str = "%Y-%m-%d";
+
+    pub fn sql_range_date(field_name: &str, value: (&Option<NaiveDate>, &Option<NaiveDate>)) -> String {
+        if let (Some(start), Some(end)) = value {
+            return sql_predefn::between(
+                field_name, 
+                format!("type::datetime('{}')", start.format(DATE_FORAMTER)), 
+                format!("type::datetime('{}')", end.format(DATE_FORAMTER)),
+            );
+        }
+        if let Some(start) = value.0 {
+            return format!("({} >= type::datetime('{}'))", field_name, start.format(DATE_FORAMTER))
+        }
+        if let Some(end) = value.1 {
+            return format!("({} <= type::datetime('{}'))", field_name, end.format(DATE_FORAMTER))
+        }
+        return "(true)".to_string();
+    }
+
+    pub fn sql_range_number(field_name: &str, value: (&Option<usize>, &Option<usize>)) -> String {
+        match value {
+            (Some(start), Some(end)) => {
+                sql_predefn::between(field_name, start, end)
+            },
+            (Some(start), None) => {
+                format!("({} >= {})", field_name, start)
+            },
+            (None, Some(end)) => {
+                return format!("({} <= {})", field_name, end)
+            }
+            _ => "(true)".to_string()
+        }
+    }
+
+    /// It will generated the
+    /// ```rust
+    /// assert_eq!("!(person.married == true)", sql_with_prefix("(person.married == true)"))
+    /// ```
+    pub fn sql_with_prefix<S: Into<String>>(not_flag: bool, s: S) -> String {
+        match not_flag {
+            true => format!("!{}", s.into()),
+            false => s.into(),
+        }
+    }
+
+    /// It will generated the
+    /// ```rust
+    /// assert_eq!("(person.married == true)", sql_equal("person.married", true))
+    /// ```
+    pub fn sql_equal<S: ToString>(field_name: &str, target: &S) -> String {
+        format!("({} == {})", field_name, target.to_string())
+    }
+
+    /// It will generated the
+    /// ```rust
+    /// assert_eq!("(person.emails CONTAINS .com)", sql_contain("person.emails", ".com"))
+    /// ```
+    pub fn sql_contain<S: Into<String>>(field_name: &str, target: S) -> String {
+        format!("({} CONTAINS {})", field_name, target.into())
+    }
+
+    /// It will generated the
+    /// ```rust
+    /// assert_eq!("(person.name CONTAINS \"john\")", sql_contain_string("person.name", "john"))
+    /// ```
+    pub fn sql_contain_string<S: Into<String>>(field_name: &str, target: S) -> String {
+        format!("({} CONTAINS \"{}\")", field_name, target.into())
+    }
+}
 
 pub mod sql_predefn {
     use std::fmt::Display;

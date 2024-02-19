@@ -1,6 +1,6 @@
 use chrono::NaiveDate;
 
-use crate::modules::common::repository::sql_predefn;
+use crate::modules::common::repository::sql_utils;
 
 use super::{AttributeValue, AttributeValueType};
 
@@ -25,25 +25,6 @@ impl SystemTag {
     const TAG_NAME: &str = "@maku:name";
     const TAG_CREATED: &str = "@maku:created";
     const TAG_UPDATED: &str = "@maku:updated";
-
-    const DATE_FORAMTER: &str = "%Y-%m-%d";
-
-    fn date_format(field_name: &str, value: (&Option<NaiveDate>, &Option<NaiveDate>)) -> String {
-        if let (Some(start), Some(end)) = value {
-            return sql_predefn::between(
-                field_name, 
-                format!("type::datetime('{}')", start.format(Self::DATE_FORAMTER)), 
-                format!("type::datetime('{}')", end.format(Self::DATE_FORAMTER)),
-            );
-        }
-        if let Some(start) = value.0 {
-            return format!("({} >= type::datetime('{}'))", field_name, start.format(Self::DATE_FORAMTER))
-        }
-        if let Some(end) = value.1 {
-            return format!("({} <= type::datetime('{}'))", field_name, end.format(Self::DATE_FORAMTER))
-        }
-        return "(true)".to_string();
-    }
 
     pub fn full_name(namespace: &str, val: &str) -> String {
         format!("{}:{}", namespace, val)
@@ -87,80 +68,68 @@ impl SystemTag {
     /// assert_eq!(tag1, SystemTag::URL(None))
     /// ```
     pub fn from_str<S: Into<String>>(s: S, value: AttributeValue) -> Result<Self, String> {
-        match s.into().to_lowercase().as_str() {
-            Self::TAG_URL => Ok(SystemTag::URL(match value {
+        Ok(match s.into().to_lowercase().as_str() {
+            Self::TAG_URL => SystemTag::URL(match value {
                 AttributeValue::OptionText(text) => text,
                 _ => None,
-            })),
-            Self::TAG_TAGNUM => Ok(SystemTag::TagNums(match value {
+            }),
+            Self::TAG_TAGNUM => SystemTag::TagNums(match value {
                 AttributeValue::NumberRange(start, end) => (start, end),
                 _ => (None, None),
-            })),
-            Self::TAG_FILE => Ok(SystemTag::File(match value {
+            }),
+            Self::TAG_FILE => SystemTag::File(match value {
                 AttributeValue::OptionText(text) => text,
                 _ => None,
-            })),
-            Self::TAG_FILEXT => Ok(SystemTag::FileExt(match value {
+            }),
+            Self::TAG_FILEXT => SystemTag::FileExt(match value {
                 AttributeValue::Text(text) => text,
                 _ => "".to_string(),
-            })),
-            Self::TAG_NAME => Ok(SystemTag::Name(match value {
+            }),
+            Self::TAG_NAME => SystemTag::Name(match value {
                 AttributeValue::Text(text) => text,
                 _ => "".to_string(),
-            })),
-            Self::TAG_CREATED => Ok(SystemTag::CreatedAt(match value {
+            }),
+            Self::TAG_CREATED => SystemTag::CreatedAt(match value {
                 AttributeValue::DateRange(start, end) => (start, end),
                 _ => (None, None),
-            })),
-            Self::TAG_UPDATED => Ok(SystemTag::UpdatedAt(match value {
+            }),
+            Self::TAG_UPDATED => SystemTag::UpdatedAt(match value {
                 AttributeValue::DateRange(start, end) => (start, end),
                 _ => (None, None),
-            })),
-            _ => Err(String::from("Not Match Functional Tag"))
-        }
+            }),
+            _ => Err(String::from("Not Match Functional Tag"))?
+        })
     }
 
-    pub fn to_qlstring(&self, not_flag: bool) -> String {
-        let content = match self {
+    pub fn to_qlstring(&self) -> String {
+        match self {
             SystemTag::URL(text) => {
                 match text {
-                    Some(text) => format!("(url.full CONTAINS \"{}\")", text),
+                    Some(text) => sql_utils::sql_contain_string("url.full", text),
                     None => "(url)".to_string(),
                 }
             },
             SystemTag::File(text) => {
                 match text {
-                    Some(text) => format!("(file.name CONTAINS \"{}\")", text),
+                    Some(text) => sql_utils::sql_contain_string("file.name", text),
                     None => "(file)".to_string(),
                 }
             },
             SystemTag::Name(text) => {
-                format!("(name CONTAINS \"{}\")", text)
+                sql_utils::sql_contain_string("fname", text)
             },
             SystemTag::FileExt(text) => {
-                format!("(file.ext CONTAINS \"{}\")", text)
+                sql_utils::sql_contain_string("file.ext", text)
             },
             SystemTag::TagNums((start, end)) => {
-                if start.is_some() && end.is_some() {
-                    return sql_predefn::between("count(<-tagging<-tag.id)", start.unwrap(), end.unwrap())
-                }
-                if start.is_some() {
-                    return format!("(count(<-tagging<-tag.id) >= {})", start.unwrap())
-                }
-                if end.is_some() {
-                    return format!("(count(<-tagging<-tag.id) <= {})", end.unwrap())
-                }
-                return "(true)".to_string();
+                sql_utils::sql_range_number("count(<-tagging<-tag.id)", (start, end))
             },
             SystemTag::CreatedAt((date1, date2)) => {
-                Self::date_format("created_at", (date1, date2))
+                sql_utils::sql_range_date("created_at", (date1, date2))
             },
             SystemTag::UpdatedAt((date1, date2)) => {
-                Self::date_format("updated_at", (date1, date2))
+                sql_utils::sql_range_date("updated_at", (date1, date2))
             }
-        };
-
-        let not_symbol = if not_flag { "!" } else { "" };
-        format!("{}{}", not_symbol, content)
+        }
     }
 }
