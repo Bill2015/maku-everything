@@ -1,86 +1,120 @@
 import { useCallback, useState } from 'react';
-import { Button, Grid, Input, Text } from '@mantine/core';
-import { TagMutation } from '@api/tag';
+import { Button, Group, Input, SegmentedControl, Stack, Title } from '@mantine/core';
+import { TagAttrPayload, TagCreateDto, TagMutation } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
 import { useCreateTagModal } from '@store/modal';
 import { SubjectSelect } from '@components/input';
+import { SubTitle } from '@components/display';
 import { SubjectQuery } from '@api/subject';
 import { ErrorResBody } from '@api/common';
 import { showNotification } from '@components/notification';
 import { BaseModal } from '@components/modal';
+import { TagAttributePanel } from './components';
+
+const DEFAULT_VALUE: TagCreateDto = {
+    name:            '',
+    description:     '',
+    belong_category: '',
+    belong_subject:  '',
+    tag_type:        'normal',
+    attr:            {},
+};
 
 export function CreateTagModal() {
     const { activeCategory } = useActiveCategoryRedux();
     const [opened, { close, confirmClose, cancelClose }] = useCreateTagModal();
     const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
-    const [name, setName] = useState<string>('');
+
+    const [data, setData] = useState<TagCreateDto>(DEFAULT_VALUE);
     const [belongSubject, setBelongSubject] = useState<{ value: string, id: string } | null>(null);
-    const [description, setDescription] = useState<string>('');
     const createTag = TagMutation.useCreate();
 
-    const handleCreateConfirm = useCallback(() => {
-        if (activeCategory === null || belongSubject === null) {
+    const handleUpdateData = <T extends keyof TagCreateDto>(fields: T, value: TagCreateDto[T]) => {
+        setData((prev) => ({ ...prev, [fields]: value }));
+    };
+
+    const handleCreateConfirm = useCallback(async () => {
+        if (!belongSubject) {
             return;
         }
+
         try {
-            createTag.mutateAsync({
-                name:            name,
-                description:     description,
+            await createTag.mutateAsync({
+                ...data,
                 belong_category: activeCategory.id,
                 belong_subject:  belongSubject.id,
             });
-            setName('');
-            setDescription('');
+            setData(DEFAULT_VALUE);
             confirmClose();
         }
         catch (e) {
             const error = e as ErrorResBody;
             showNotification('Create Tag Failed', error.message, 'error');
         }
-    }, [createTag, description, name, activeCategory, belongSubject, confirmClose]);
+    }, [createTag, data, belongSubject, activeCategory, confirmClose]);
 
     if (activeCategory === null) {
         return null;
     }
     return (
-        <BaseModal opened={opened} onClose={close} title="Create New Tag" centered>
-            <Grid>
-                <Grid.Col span={4}>
-                    Belong Category:
-                </Grid.Col>
-                <Grid.Col span={8}>
-                    <Text>{activeCategory.name}</Text>
-                </Grid.Col>
-                <Grid.Col span={4}>
-                    Belong Subject:
-                </Grid.Col>
-                <Grid.Col span={8}>
-                    <SubjectSelect
-                        value={belongSubject?.value}
-                        onClickResult={() => setBelongSubject(null)}
-                        subjects={subjectData}
-                        onItemSelect={setBelongSubject}
+        <BaseModal opened={opened} onClose={close} title="Create New Tag" size="xl">
+            <Group wrap="nowrap" align="stretch">
+                <Stack flex={1} gap={15}>
+                    <Title order={5}>Basic tag data</Title>
+                    <Stack gap={3}>
+                        <SubTitle>Belong Subject:</SubTitle>
+                        <SubjectSelect
+                            value={belongSubject?.value}
+                            onClickResult={() => setBelongSubject(null)}
+                            subjects={subjectData}
+                            onItemSelect={setBelongSubject}
+                        />
+                    </Stack>
+
+                    <Stack gap={3}>
+                        <SubTitle>Name:</SubTitle>
+                        <Input
+                            placeholder="resource name"
+                            value={data.name}
+                            onChange={(e) => handleUpdateData('name', e.target.value)}
+                        />
+                    </Stack>
+
+                    <Stack gap={3}>
+                        <SubTitle>Description:</SubTitle>
+                        <Input
+                            placeholder="resource description"
+                            value={data.description}
+                            onChange={(e) => handleUpdateData('description', e.target.value)}
+                        />
+                    </Stack>
+
+                    <Stack gap={3}>
+                        <SubTitle>Tag Type:</SubTitle>
+                        <SegmentedControl
+                            color="blue"
+                            defaultValue="normal"
+                            maw="fit-content"
+                            miw="20rem"
+                            value={data.tag_type}
+                            onChange={(value) => handleUpdateData('tag_type', value as TagCreateDto['tag_type'])}
+                            data={Object.keys(TagAttrPayload.DEFAULT_VALUE)}
+                        />
+                    </Stack>
+
+                    <Group justify="space-between">
+                        <Button color="pink" onClick={cancelClose}>Cancel</Button>
+                        <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
+                    </Group>
+                </Stack>
+
+                <TagAttributePanel.Root hidden={data.tag_type === 'normal'}>
+                    <TagAttributePanel.Content
+                        displayType={data.tag_type}
+                        onAttributeChange={(val) => handleUpdateData('attr', val)}
                     />
-                </Grid.Col>
-                <Grid.Col span={4}>
-                    Name:
-                </Grid.Col>
-                <Grid.Col span={8}>
-                    <Input placeholder="resource name" value={name} onChange={(e) => setName(e.target.value)} />
-                </Grid.Col>
-                <Grid.Col span={4}>
-                    Description:
-                </Grid.Col>
-                <Grid.Col span={8}>
-                    <Input placeholder="resource description" value={description} onChange={(e) => setDescription(e.target.value)} />
-                </Grid.Col>
-                <Grid.Col span={6}>
-                    <Button color="pink" onClick={cancelClose}>Cancel</Button>
-                </Grid.Col>
-                <Grid.Col span={6} style={{ textAlign: 'end' }}>
-                    <Button color="lime" onClick={handleCreateConfirm}>Confirm</Button>
-                </Grid.Col>
-            </Grid>
+                </TagAttributePanel.Root>
+            </Group>
         </BaseModal>
     );
 }

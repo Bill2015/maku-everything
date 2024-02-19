@@ -16,6 +16,7 @@
 		"@emotion/react": "^11.11.3",
 		"@mantine/carousel": "^7.4.1",
 		"@mantine/core": "^7.4.1",
+		"@mantine/dates": "^7.4.1",
 		"@mantine/dropzone": "^7.4.1",
 		"@mantine/hooks": "^7.4.1",
 		"@mantine/notifications": "^7.4.1",

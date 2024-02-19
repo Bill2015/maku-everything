@@ -1,6 +1,6 @@
 import { PropsWithChildren, useState, useMemo, useRef, useEffect } from 'react';
 import { Flex, Group, Pill, Stack, Text } from '@mantine/core';
-import { millify }  from 'millify';
+import { millify } from 'millify';
 import { ResourceTagDto } from '@api/resource';
 import { TagQuery, TagResDto } from '@api/tag';
 
@@ -55,6 +55,7 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
             onRemove={() => onRemoveExistTag({ id: val.id, name: val.name })}
         >
             {val.name}
+            <Text size="0.5rem" component="span" c="teal">{val.attrval?.toString()}</Text>
             <Text size="xs" opacity="0.6" pl={5} component="span">
                 {`(${millify(val.tagged_count)})`}
             </Text>
