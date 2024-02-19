@@ -89,8 +89,8 @@ impl ResourceTaggingEntity {
         &self.tags
     }
 
-    pub fn get(self) -> (Vec<ResourceTaggingVO>, Vec<ResourceTaggingVO>, Vec<TagID>) {
-        (self.tags, self.add_tags, self.del_tags)
+    pub fn take(self) -> (Vec<ResourceTaggingVO>, Vec<ResourceTaggingVO>, Vec<ResourceTaggingVO>, Vec<TagID>) {
+        (self.tags, self.add_tags, self.update_tags, self.del_tags)
     }
 
     fn create_default_tagging_attr(tag: &Tag) -> ResourceTaggingAttrVO {

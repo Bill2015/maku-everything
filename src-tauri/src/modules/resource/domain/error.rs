@@ -33,6 +33,9 @@ pub enum ResourceError {
     #[error("Remove tag")]
     RemoveTag(Error),
 
+    #[error("update tag")]
+    UpdateTag(Error),
+
     #[error("Explore file failed")]
     ExploreFile(Error),
 }
@@ -52,6 +55,7 @@ impl Serialize for ResourceError {
             ResourceError::QueryingByString(source) => serialize_error!(self, source),
             ResourceError::AddTag(source) => serialize_error!(self, source),
             ResourceError::RemoveTag(source) => serialize_error!(self, source),
+            ResourceError::UpdateTag(source) => serialize_error!(self, source),
             ResourceError::ExploreFile(source) => serialize_error!(self, source),
         };
         error_message.serialize(serializer)
