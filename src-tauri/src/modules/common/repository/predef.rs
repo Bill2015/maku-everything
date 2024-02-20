@@ -76,10 +76,10 @@ pub mod sql_utils {
 
     /// It will generated the
     /// ```rust
-    /// assert_eq!("(person.name CONTAINS \"john\")", sql_contain_string("person.name", "john"))
+    /// assert_eq!("(fn::to_lowercase(person.name) CONTAINS string::lowercase(\"john\"))", sql_contain_string("person.name", "john"))
     /// ```
     pub fn sql_contain_string<S: Into<String>>(field_name: &str, target: S) -> String {
-        format!("({} CONTAINS \"{}\")", field_name, target.into())
+        format!(r#"({} CONTAINS string::lowercase("{}"))"#, sql_predefn::to_lowercase(field_name), target.into())
     }
 }
 
@@ -87,6 +87,7 @@ pub mod sql_predefn {
     use std::fmt::Display;
 
     pub const BETWEEN_FN: &str = "fn::between";
+    pub const LOWERCASE_FN: &str = "fn::to_lowercase";
 
     /// generate sql pre-defined `between` function
     /// ### example:
@@ -103,6 +104,17 @@ pub mod sql_predefn {
             F: ToString + Display,
     {
         format!("({}({}, {}, {}))", BETWEEN_FN, target, start, end)
+    }
+
+    /// generate sql pre-defined `to_lowercase` function
+    /// ### example:
+    /// ```
+    /// let s1 = between("abc");
+    /// 
+    /// assert_eq!(s1, "fn::to_lowercase(abc)")
+    /// ```
+    pub fn to_lowercase<T: ToString + Display>(target: T) -> String {
+        format!("({}({}))", LOWERCASE_FN, target)
     }
 }
 
@@ -122,6 +134,7 @@ impl<'a> PreDefinedRepository<'a> {
 
     pub async fn define_fns(&self) -> surrealdb::Result<()> {
         self.define_between_fn().await?;
+        self.define_to_lowercase().await?;
 
         Ok(())
     }
@@ -133,6 +146,24 @@ impl<'a> PreDefinedRepository<'a> {
                 RETURN ($target >= $start AND $target <= $end);
             }};
         "#, sql_predefn::BETWEEN_FN);
+
+        let _ = self.db
+            .query(sql)
+            .await?;
+
+        Ok(())
+    }
+
+    async fn define_to_lowercase(&self) -> surrealdb::Result<()> {
+        let sql = format!(r#"
+            DEFINE FUNCTION {0}($name: any) {{
+                RETURN IF type::is::string($name) THEN
+                    string::lowercase($name)
+                ELSE
+                    ""
+                END
+            }};
+        "#, sql_predefn::LOWERCASE_FN);
 
         let _ = self.db
             .query(sql)
