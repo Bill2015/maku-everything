@@ -1,4 +1,7 @@
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
+import * as relativeTime from 'dayjs/plugin/relativeTime';
+// related issues: https://github.com/iamkun/dayjs/issues/475#issuecomment-1278002092
+dayjs.extend(relativeTime);
 
 export type DateTimeUnit = Extract<dayjs.OpUnitType, 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds'>;
 
