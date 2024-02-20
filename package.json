@@ -4,13 +4,13 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"prepare": "ts-node --esm  ./src-tauri/binaries/converter.ts",
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
 		"test": "jest",
 		"test:coverage": "jest --coverage",
-		"tauri": "tauri"
+		"tauri": "tauri",
+		"tauri:sidecar": "ts-node --esm  ./src-tauri/binaries/converter.ts"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.11.3",

@@ -11,7 +11,7 @@ In addition, the program is completely independent and does not require the inst
 - 👓 Modern and intuitive interface
 - ⚡ Lightweight and fast
 - 🔍 Powerful resource search system
-- 📌 Powrful tag system
+- 📌 Powerful tag system
 - 🏷️ Multi-Level Label Management
 - 🌐 Multi-language supported
 - 🔗 Can also add web links to the software
@@ -38,7 +38,7 @@ You can see this problem on the right side pictures. this image is from [Danboor
 https://github.com/Bill2015/maku-everything/assets/63895869/08d2e11d-022e-4998-8b74-b7d6db2f4047
 
 ---
-### Adding Resoures
+### Adding Resources
 Adding resources from locally, in this example, you can see there is a feature called `text map`, this feature can attach the tag automatically from the file name. \
 In the future, we plan this feature also to get the text from the web URL, which means web crawling is necessary
 
@@ -49,8 +49,8 @@ You not only have local files but also you can paste the URL to create the Resou
 https://github.com/Bill2015/maku-everything/assets/63895869/431f908a-f127-4d63-bf63-f772f61478c6
 
 ---
-### Search Resoures
-This feature is another powerful feature, not only just  `exclude` and `include`, also has the autocomplete, grouping, and functional tags.
+### Search Resources
+This feature is another powerful feature, not only just  `exclude` and `include`, also has autocomplete, grouping, and functional tags.
 
 https://github.com/Bill2015/maku-everything/assets/63895869/9f2df158-5e21-4cd2-ba44-59756aeeeb65
 
@@ -63,7 +63,6 @@ https://github.com/Bill2015/maku-everything/assets/63895869/075a8221-4e53-4b6a-b
 If you want to change the category root path. you can export the whole category and import it in another path.
 
 https://github.com/Bill2015/maku-everything/assets/63895869/3ecb2bec-2a72-44f1-9e0f-eb2c13d04627
-
 
 ## 📥 Desktop App Download
 Coming Soon!
@@ -94,10 +93,15 @@ This project is built using [Tauri](https://tauri.app/) and [React](https://reac
 4. Put surrealDB executable into [binaries folder](https://github.com/Bill2015/maku-everything/tree/master/src-tauri/binaries)
 
 ### Install The App
-And the path to this Project
+At the path in this Project
 Install the necessary dependencies
 ```sh
 npm install
+```
+
+### Prepare Ehe Sidecar
+```sh
+npm run tauri:sidecar
 ```
 
 ### Live Development
@@ -108,7 +112,7 @@ npm run tauri dev
 ```
 
 ### Building
-To build a redistributable, production mode package
+To build a redistributable, production-mode package
 ```sh
 npm run tauri buld
 ```
