@@ -19,7 +19,7 @@ In addition, the program is completely independent and does not require the inst
 
 ## 🖥️ Demonstrations
 > [!NOTE] 
-> Some features are just temporary. it may change in the future.
+> Some `features` or `UI` are just temporary. it may change in the future.
 
 ### Create Category
 Create a category, the category is the root of `resources`, `tag topics`, `tags` and contains a root directory to add resources, resources with different root directories cannot be added.
