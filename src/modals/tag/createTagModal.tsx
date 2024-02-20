@@ -19,7 +19,7 @@ const DEFAULT_VALUE: TagCreateDto = {
     belong_category: '',
     belong_subject:  '',
     tag_type:        'normal',
-    attr:            {},
+    attr:            null,
 };
 
 export function CreateTagModal() {

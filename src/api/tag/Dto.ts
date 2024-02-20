@@ -9,7 +9,7 @@ export namespace TagAttrPayload {
         TagAttrPayload.Bool;
 
     // eslint-disable-next-line @typescript-eslint/ban-types
-    export type Normal = {};
+    export type Normal = null;
     export type Number = { start: number, end: number, defval: number };
     export type Text = { defval: string };
     export type Date = { defval: string };
@@ -25,7 +25,7 @@ export namespace TagAttrPayload {
     }
 
     export const DEFAULT_VALUE: {[T in Variant]: AsType<T>} = {
-        normal: {},
+        normal: null,
         number: {
             start:  0,
             end:    100,

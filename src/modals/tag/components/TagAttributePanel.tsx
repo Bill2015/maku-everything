@@ -170,7 +170,7 @@ function TagAttributePanelContent(props: TagAttributePanelContentProps) {
     const { displayType, onAttributeChange } = props;
     const { t } = useTranslation('modal', { keyPrefix: 'createTag.TagAttributePanelContent' });
     const { tv } = useValueTranslation('AttributeType');
-    const [attrVal, setAttrVal] = useState<TagAttrPayload.All>({});
+    const [attrVal, setAttrVal] = useState<TagAttrPayload.All>(null);
 
     // reset
     useEffect(() => setAttrVal(TagAttrPayload.DEFAULT_VALUE[displayType]), [displayType]);
@@ -184,10 +184,13 @@ function TagAttributePanelContent(props: TagAttributePanelContentProps) {
         fieldName: F,
         value: TagAttrPayload.AsType<T>[F],
     ) => {
-        setAttrVal((prev) => ({ ...prev, [fieldName]: value }));
+        setAttrVal((prev) => prev && ({ ...prev, [fieldName]: value }));
     };
 
     const renderContent = useCallback(() => {
+        if (!attrVal) {
+            return;
+        }
         switch (displayType) {
         case 'normal': return (<>empty</>);
         case 'number': return (
