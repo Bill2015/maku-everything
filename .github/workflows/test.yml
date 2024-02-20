@@ -1,0 +1,32 @@
+name: TEST-CI
+
+run-name: ${{ github.actor }} is running GitHub Actions
+
+on:
+  push:
+    branches: [ "master", "Bill2015/*" ]
+  pull_request:
+    branches: [ "master" ]
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  check_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+      - uses: actions/checkout@v3
+  
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # Run commands
+      - name: install deps
+      - run: npm ci
+      - run: npm run build --if-present
+
+      # Testing
+      - name: test the project
+      - run: npm test
