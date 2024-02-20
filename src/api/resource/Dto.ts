@@ -66,6 +66,14 @@ export interface ResourceTagOperateDto {
 
 export type ResourceTagAttrValDto = null | number | string | boolean;
 
+export interface ResourceUpdateTagDto {
+    id: string;
+
+    tag_id: string;
+
+    attrval: ResourceTagAttrValDto,
+}
+
 export type ResourceTagDto = {
     id: string,
 

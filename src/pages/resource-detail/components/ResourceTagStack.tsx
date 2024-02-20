@@ -1,12 +1,11 @@
 import { PropsWithChildren, useState, useMemo, useRef, useEffect } from 'react';
-import { Flex, Group, Pill, Stack, Text } from '@mantine/core';
-import { millify } from 'millify';
-import { ResourceTagDto } from '@api/resource';
+import { Flex, Group, Stack, Text } from '@mantine/core';
+import { ResourceTagAttrValDto, ResourceTagDto } from '@api/resource';
 import { TagQuery, TagResDto } from '@api/tag';
 
 import { ResourceTagSelect } from './ResourceTagSelect';
 
-import classes from './ResourceTagStack.module.scss';
+import { ResourceTagPill } from './ResourceTagPill';
 
 export interface ResourceTagGroupProps {
     subjectName: string;
@@ -19,11 +18,13 @@ export interface ResourceTagGroupProps {
 
     onSelectNewTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
 
-    onRemoveExistTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
+    onRemoveTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
+
+    onUpdateTag: (tag: Pick<ResourceTagDto, 'id'|'name'>, attrVal: ResourceTagAttrValDto) => void;
 }
 
 export function ResourceTagGroup(props: ResourceTagGroupProps) {
-    const { subjectName, autoFocus, subjectId, tags, onSelectNewTag, onRemoveExistTag } = props;
+    const { subjectName, autoFocus, subjectId, tags, onSelectNewTag, onRemoveTag, onUpdateTag } = props;
     const selectRef = useRef<HTMLInputElement>(null);
     const [searchValue, setSearchValue] = useState<string>('');
     const [selectValue, setSelectValue] = useState<string>('');
@@ -47,20 +48,7 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
         }
     };
 
-    const itemChip = tags.map((val) => (
-        <Pill
-            classNames={{ root: classes.pillRoot, label: classes.pilllabel }}
-            withRemoveButton
-            key={val.id}
-            onRemove={() => onRemoveExistTag({ id: val.id, name: val.name })}
-        >
-            {val.name}
-            <Text size="0.5rem" component="span" c="teal">{val.attrval?.toString()}</Text>
-            <Text size="xs" opacity="0.6" pl={5} component="span">
-                {`(${millify(val.tagged_count)})`}
-            </Text>
-        </Pill>
-    ));
+    const itemChip = tags.map((val) => <ResourceTagPill key={val.id} tag={val} onRemoveTag={onRemoveTag} onUpdateTag={onUpdateTag} />);
 
     const selectableTags = useMemo(() => subjectTags
         .filter((tag) => !tags.find((obj) => obj.id === tag.id)), [tags, subjectTags]);
