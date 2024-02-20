@@ -9,8 +9,9 @@ import { compilerOptions } from './tsconfig.json';
 module.exports = {
     preset:             'ts-jest',
     testEnvironment:    'jsdom',
+    
     setupFilesAfterEnv: [
-        '<rootDir>/jest-setup.tsx',
+        '<rootDir>/src/__test__/setups/global.tsx',
         '<rootDir>/src/__test__/setups/matchMedia.js',
         '<rootDir>/src/__test__/setups/i18next.ts',
     ],
@@ -45,7 +46,11 @@ module.exports = {
     ],
     collectCoverageFrom: [
         '<rootDir>/src/**/*.{ts,tsx}',
-        '!<rootDir>/src/__test__/**',
-        '!(.*)index.ts$',
     ],
+    coveragePathIgnorePatterns: [
+        '/node_modules/',
+        '/__test__/',
+        '(.*)index.ts$',
+        '(.*).d.ts$'
+    ]
 };
