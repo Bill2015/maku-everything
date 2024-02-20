@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import * as lodash from 'lodash';
+import lodash from 'lodash';
 import { TagResDto } from '@api/tag';
 
 import { QueryingNodeProps } from './QueryingNode';
