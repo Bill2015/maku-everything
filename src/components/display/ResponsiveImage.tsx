@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import * as lodash from 'lodash';
+import lodash from 'lodash';
 import { Image, ImageProps, Loader } from '@mantine/core';
 import { useState } from 'react';
 

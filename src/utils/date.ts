@@ -1,4 +1,4 @@
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 export type DateTimeUnit = Extract<dayjs.OpUnitType, 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds'>;
 
