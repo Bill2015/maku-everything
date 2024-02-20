@@ -81,8 +81,13 @@ impl From<StringQLObject> for ResourceStringQL {
                 StringQLPrefix::Exclude =>  group_items.join(" AND "),
                 StringQLPrefix::Inherit => group_items.join(" OR "),
             };
+            let not_flag = match group.prefix {
+                StringQLPrefix::Include => false,
+                StringQLPrefix::Exclude => true,
+                StringQLPrefix::Inherit => false,
+            };
 
-            q.push(group_result);
+            q.push(sql_utils::sql_with_prefix(not_flag, format!("({})", group_result)));
         }
 
         Self { qlstr: q.join(" AND ") }
