@@ -71,14 +71,15 @@ impl<'a> ResourceQueryRepository<'a> {
                 *,
                 (->belong->subject.name)[0] AS subject_name,
                 (->tagging.added_at)[0] AS added_at,
+                (->tagging.attrval)[0] AS attrval,
                 array::len(->tagging.out) as tagged_count
                 FROM tag 
                 WHERE ->tagging->resource.id CONTAINS $parent.id
                 ORDER BY added_at ASC
             ) AS tags
             FROM type::table($table)
-            WHERE id == $id"#, 
-            Self::ROOT_PATH_FIELD);
+            WHERE id == $id
+        "#, Self::ROOT_PATH_FIELD);
                     
         let result: Option<ResourceDetailDto> = self.db
             .query(sql)

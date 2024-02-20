@@ -2,8 +2,13 @@
 mod qlobj;
 pub use qlobj::*;
 
+mod attrval;
+pub use attrval::*;
+
 mod systags;
 pub use systags::SystemTag;
+
+use crate::modules::common::repository::sql_utils;
 
 /// Generate String Querying Language \
 /// This is depend on SurrealDB
@@ -16,80 +21,76 @@ impl ResourceStringQL {
     pub fn get(&self) -> String {
         self.qlstr.clone()
     }
+
+    pub fn item_to_qlstring(item: &StringQLItem) -> String {
+        let attribute = item.get_attribute().clone().unwrap_or(AttributeValue::None);
+        let value = item.get_value();
+
+        let not_flag = match item.get_prefix() {
+            StringQLPrefix::Include => false,
+            StringQLPrefix::Exclude => true,
+            StringQLPrefix::Inherit => false,
+        };
+
+        // system tag
+        if *item.is_system() {
+            if let Ok(function_tag) = SystemTag::from_str(value, attribute) {
+                return sql_utils::sql_with_prefix(not_flag, function_tag.to_qlstring());
+            }
+            panic!("Invalid SystemTag!");
+        }
+        // normal
+        else {
+            let tagging = format!("(<-(tagging WHERE in == {}).attrval)[0]", value);
+            let ql = match attribute {
+                AttributeValue::None => sql_utils::sql_contain("<-tagging.in", value),
+                AttributeValue::Text(text) => sql_utils::sql_contain_string(&tagging, text),
+                AttributeValue::OptionText(text) => {
+                    match text {
+                        Some(val) => sql_utils::sql_contain_string(&tagging, val),
+                        None => sql_utils::sql_contain("<-tagging.in", value),
+                    }
+                },
+                AttributeValue::NumberRange(start, end) => sql_utils::sql_range_number(&tagging, (&start, &end)),
+                AttributeValue::DateRange(start, end) => sql_utils::sql_range_date(&tagging, (&start, &end)),
+                AttributeValue::Bool(val) => sql_utils::sql_equal(&tagging, &val),
+            };
+
+            sql_utils::sql_with_prefix(not_flag, ql)
+        }
+    }
 }
 
 impl From<StringQLObject> for ResourceStringQL {
     fn from(qloject: StringQLObject) -> Self {
         let mut q: Vec<String> = Vec::new();
 
-        let mut contains_all: Vec<&str> = Vec::new();
-
-        let mut contains_not: Vec<&str> = Vec::new();
-
         for item in qloject.get_items() {
-            let attribute = item.get_attribute().clone().unwrap_or(AttributeValue::None);
-            
-            match item.get_prefix() {
-                StringQLPrefix::Include => {
-                    if let Ok(function_tag) = SystemTag::from_str(item.get_value(), attribute) {
-                        q.push(function_tag.to_qlstring(false));
-                    }
-                    else {
-                        contains_all.push(item.get_value());
-                    }
-                },
-                StringQLPrefix::Exclude => {
-                    if let Ok(function_tag) = SystemTag::from_str(item.get_value(), attribute) {
-                        q.push(function_tag.to_qlstring(true));
-                    }
-                    else {
-                        contains_not.push(item.get_value());
-                    }
-                },
-                StringQLPrefix::Inherit => {},
-            }
-        }
-
-        if !contains_all.is_empty() {
-            q.push(format!("(<-tagging<-tag.id CONTAINSALL [{}])", contains_all.join(", ")));
-        }
-
-        if !contains_not.is_empty() {
-            q.push(format!("!(<-tagging<-tag.id CONTAINSANY [{}])", contains_not.join(", ")));
+            let item_qlstring = ResourceStringQL::item_to_qlstring(&item);
+            q.push(item_qlstring);
         }
         
         for group in qloject.get_groups() {
-            let mut group_items: Vec<String> = Vec::new();
-            let mut pure_items: Vec<String> = Vec::new();
-
-            for item in group.items.iter() {
-                let attribute = item.get_attribute().clone().unwrap_or(AttributeValue::None);
-                if let Ok(system_tag) = SystemTag::from_str(item.get_value(), attribute) {
-                    group_items.push(system_tag.to_qlstring(false));
-                }
-                else {
-                    pure_items.push(item.get_value().to_string());
-                }
-            }
+            let group_items: Vec<String> = group.items.iter()
+                .map(|item| ResourceStringQL::item_to_qlstring(&item))
+                .collect();
             
             // determine the group prefix
-            match group.prefix {
-                StringQLPrefix::Include => {
-                    if !pure_items.is_empty() {
-                        group_items.push(format!("(<-tagging<-tag.id CONTAINSANY [{}])", pure_items.join(", ")));
-                    }
-                    q.push(format!("({})", group_items.join(" OR ")))
-                },
-                StringQLPrefix::Exclude => {
-                    if !pure_items.is_empty() {
-                        group_items.push(format!("(<-tagging<-tag.id CONTAINSALL [{}])", pure_items.join(", ")));
-                    }
-                    q.push(format!("!({})", group_items.join(" AND ")))
-                },
-                StringQLPrefix::Inherit => {}
-            }
+            let group_result =  match group.prefix {
+                StringQLPrefix::Include => group_items.join(" OR "),
+                StringQLPrefix::Exclude =>  group_items.join(" AND "),
+                StringQLPrefix::Inherit => group_items.join(" OR "),
+            };
+            let not_flag = match group.prefix {
+                StringQLPrefix::Include => false,
+                StringQLPrefix::Exclude => true,
+                StringQLPrefix::Inherit => false,
+            };
+
+            q.push(sql_utils::sql_with_prefix(not_flag, format!("({})", group_result)));
         }
 
         Self { qlstr: q.join(" AND ") }
     }
 }
+

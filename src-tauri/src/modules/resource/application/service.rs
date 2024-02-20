@@ -90,7 +90,16 @@ impl<'a> ResourceService<'a> {
         Ok(result)
     }
 
+    pub async fn update_resource_tag(&self, data: ResourceUpdateTagDto) -> Result<ResourceID, ResourceError> {
+        let command = ResourceUpdateTagCommand::from(data);
 
+        let result = ResourceUpdateTagHandler::register(self.resource_repository, self.tag_respository)
+            .execute(command)
+            .await
+            .map_err(|err| ResourceError::UpdateTag(anyhow!(err)))?;
+
+        Ok(result)
+    }
 
     pub async fn get_resource_by_id(&self, resource_id: String) -> Result<Option<ResourceResDto>, ResourceError> {
         let query = GetByIdResourceQuery { id: resource_id };

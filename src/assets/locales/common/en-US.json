@@ -54,5 +54,14 @@
         "PathInput": {
             "file_button": "select local path"
         }
+    },
+    "Value": {
+        "AttributeType": {
+            "normal": "normal",
+            "number": "number",
+            "text": "text",
+            "date": "date",
+            "bool": "bool"
+        }
     }
 }

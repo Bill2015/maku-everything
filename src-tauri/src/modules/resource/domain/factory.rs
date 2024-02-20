@@ -5,8 +5,9 @@ use crate::modules::common::domain::ID;
 use crate::modules::common::infrastructure::dateutils;
 
 use super::entities::ResourceTaggingEntity;
+use super::plainobj::ResourceTaggingAttrPlainObject;
 use super::{Resource, ResourceGenericError, ResourceID, ResourcePlainObject, ResourceProps};
-use super::valueobj::{ResourceFileVO, ResourceTaggingVO, ResourceUrlVO};
+use super::valueobj::{ResourceFileVO, ResourceTaggingAttrVO, ResourceTaggingVO, ResourceUrlVO};
 
 pub struct ResourceFactory { }
 
@@ -70,8 +71,25 @@ impl ResourceFactory {
         let tags = object.tags
             .into_iter()
             .map(|val| {
+                let attrval = match val.attrval {
+                    ResourceTaggingAttrPlainObject::Normal => ResourceTaggingAttrVO::Normal,
+                    ResourceTaggingAttrPlainObject::Number(val) => ResourceTaggingAttrVO::Number(val),
+                    ResourceTaggingAttrPlainObject::Text(val) => ResourceTaggingAttrVO::Text(val),
+                    ResourceTaggingAttrPlainObject::Date(val) => {
+                        ResourceTaggingAttrVO::Date(
+                            dateutils::parse(val)
+                                .map_err(|_| ResourceGenericError::InvalidDateFormat())?
+                                .and_utc()
+                        )
+                    },
+                    ResourceTaggingAttrPlainObject::Bool(val) => ResourceTaggingAttrVO::Bool(val),
+                };
                 if let Ok(date) = dateutils::parse(&val.added_at) {
-                    return Ok(ResourceTaggingVO { id: val.id, added_at: date.and_utc() });
+                    return Ok(ResourceTaggingVO { 
+                        id: val.id,
+                        added_at: date.and_utc(),
+                        attrval: attrval,
+                    });
                 }
                 
                 Err(ResourceGenericError::InvalidDateFormat())

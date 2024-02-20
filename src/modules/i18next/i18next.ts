@@ -9,12 +9,14 @@ import pageCommonEN_US from '@assets/locales/pages/common/en-US.json';
 import pageCategorylistEN_US from '@assets/locales/pages/category-list/en-US.json';
 import pageResourcelistEN_US from '@assets/locales/pages/resource-list/en-US.json';
 import pageResourceAddEN_US from '@assets/locales/pages/resource-add/en-US.json';
+import modalTagCreateEN_US from '@assets/locales/modal/create-tag/en-US.json';
 
 import commonZH_TW from '@assets/locales/common/zh-TW.json';
 import pageCommonZH_TW from '@assets/locales/pages/common/zh-TW.json';
 import pageCategorylistZH_TW from '@assets/locales/pages/category-list/zh-TW.json';
 import pageResourcelistZH_TW from '@assets/locales/pages/resource-list/zh-TW.json';
 import pageResourceAddZH_TW from '@assets/locales/pages/resource-add/zh-TW.json';
+import modalTagCreateZH_TW from '@assets/locales/modal/create-tag/zh-TW.json';
 
 export type SupportLangsType = 'enUS' | 'zhTW';
 
@@ -42,6 +44,7 @@ export const resources = {
             resourceList: pageResourcelistEN_US,
             resourceAdd:  pageResourceAddEN_US,
         },
+        modal: { createTag: modalTagCreateEN_US },
     },
     [SupportLangs.zhTW.key]: {
         common: commonZH_TW,
@@ -51,6 +54,7 @@ export const resources = {
             resourceList: pageResourcelistZH_TW,
             resourceAdd:  pageResourceAddZH_TW,
         },
+        modal: { createTag: modalTagCreateZH_TW },
     },
 } as const;
 

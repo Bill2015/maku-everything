@@ -2,21 +2,45 @@ use surrealdb::sql::Datetime;
 
 use crate::modules::common::domain::DomainModelMapper;
 use crate::modules::resource::domain::entities::ResourceTaggingEntity;
-use crate::modules::resource::domain::valueobj::{ResourceFileVO, ResourceTaggingVO, ResourceUrlVO};
+use crate::modules::resource::domain::valueobj::{ResourceFileVO, ResourceTaggingAttrVO, ResourceTaggingVO, ResourceUrlVO};
 use crate::modules::resource::domain::ResourceProps;
-use crate::modules::resource::repository::{ResourceDO, ResourceFileDo, ResourceTaggingDo, ResourceUrlDo};
+use crate::modules::resource::repository::{ResourceDO, ResourceFileDo, ResourceTaggingAttrDO, ResourceTaggingDo, ResourceUrlDo};
+
+impl DomainModelMapper<ResourceTaggingAttrVO> for ResourceTaggingAttrDO {
+    fn to_domain(self) -> ResourceTaggingAttrVO {
+        match self {
+            Self::Normal() => ResourceTaggingAttrVO::Normal,
+            Self::Number(val) => ResourceTaggingAttrVO::Number(val),
+            Self::Text(val) => ResourceTaggingAttrVO::Text(val),
+            Self::Date(val) => ResourceTaggingAttrVO::Date(val.0),
+            Self::Bool(val) => ResourceTaggingAttrVO::Bool(val),
+        }
+    }
+
+    fn from_domain(value: ResourceTaggingAttrVO) -> Self {
+        match value {
+            ResourceTaggingAttrVO::Normal => Self::Normal(),
+            ResourceTaggingAttrVO::Number(val) => Self::Number(val),
+            ResourceTaggingAttrVO::Text(val) => Self::Text(val),
+            ResourceTaggingAttrVO::Date(val) => Self::Date(Datetime(val)),
+            ResourceTaggingAttrVO::Bool(val) => Self::Bool(val),
+        }
+    }
+}
 
 impl DomainModelMapper<ResourceTaggingVO> for ResourceTaggingDo {
     fn to_domain(self) -> ResourceTaggingVO {
         ResourceTaggingVO {
             id: self.id.into(),
             added_at: self.added_at.0,
+            attrval: self.attrval.to_domain(),
         }
     }
     fn from_domain(value: ResourceTaggingVO) -> Self {
         Self {
             id: value.id.into(),
-            added_at: Datetime(value.added_at)
+            added_at: Datetime(value.added_at),
+            attrval: ResourceTaggingAttrDO::from_domain(value.attrval),
         }
     }
 }

@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+use crate::modules::tag::application::dto::TagAttrDto;
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateTagDto {
@@ -9,4 +10,7 @@ pub struct CreateTagDto {
     pub belong_category: String,
 
     pub belong_subject: String,
+
+    #[serde(flatten)]
+    pub attrval: TagAttrDto,
 }

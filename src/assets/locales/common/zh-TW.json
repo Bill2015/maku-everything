@@ -54,5 +54,14 @@
         "PathInput": {
             "file_button": "選擇本地路徑"
         }
+    },
+    "Value": {
+        "AttributeType": {
+            "normal": "一般",
+            "number": "數值",
+            "text": "文字",
+            "date": "日期",
+            "bool": "布林"
+        }
     }
 }

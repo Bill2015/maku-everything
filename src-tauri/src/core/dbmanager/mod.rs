@@ -44,7 +44,6 @@ impl DatabaseManagerStatus {
 pub struct DatabaseManager {
     cmd: Command,
     child: Option<Child>,
-    // api_process: Option<GroupChild>,
 }
 
 impl DatabaseManager {    
@@ -53,7 +52,7 @@ impl DatabaseManager {
 
         let tc = TCommand::new_sidecar("surreal")
             .map_err(|err| DBManagerError::ExcutedCommandFailed(anyhow!(err)))?
-            .args(["start", "-A", "--user", "root", "--pass", "root"]);
+            .args(["start", /* "file:mydatabase.db",*/ "-A", "--auth", "--user", "root", "--pass", "root"]);
         
         Ok(DatabaseManager {
             cmd: tc.into(),

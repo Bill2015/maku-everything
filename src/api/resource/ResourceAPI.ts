@@ -7,6 +7,7 @@ import {
     ResourceResDto,
     ResourceTagOperateDto,
     ResourceUpdateDto,
+    ResourceUpdateTagDto,
 } from './Dto';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -49,5 +50,9 @@ export namespace ResourceAPI {
 
     export function removeTag(data: ResourceTagOperateDto) {
         return invoke('remove_resource_tag', { data });
+    }
+
+    export function updateTag(data: ResourceUpdateTagDto) {
+        return invoke('update_resource_tag', { data });
     }
 }

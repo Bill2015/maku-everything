@@ -1,3 +1,5 @@
+import { TagAttrValue } from '@api/tag';
+
 export interface ResourceUrlDto {
     full: string;
 
@@ -62,7 +64,17 @@ export interface ResourceTagOperateDto {
     tag_id: string;
 }
 
-export interface ResourceTagDto {
+export type ResourceTagAttrValDto = null | number | string | boolean;
+
+export interface ResourceUpdateTagDto {
+    id: string;
+
+    tag_id: string;
+
+    attrval: ResourceTagAttrValDto,
+}
+
+export type ResourceTagDto = {
     id: string,
 
     name: string,
@@ -77,8 +89,12 @@ export interface ResourceTagDto {
 
     created_at: string,
 
+    added_at: string,
+
+    attrval: ResourceTagAttrValDto,
+
     updated_at: string,
-}
+} & TagAttrValue
 
 export interface ResourceDetailDto {
     id: string,

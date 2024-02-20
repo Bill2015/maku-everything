@@ -1,0 +1,25 @@
+{
+    "Main": {
+        "title": "建立新的標籤",
+        "subtitle": "基本屬性",
+        "belong_subject": "在此類別下:",
+        "name": "名稱:",
+        "name_placeholder": "在這裡輸入名稱...",
+        "description": "描述:",
+        "description_placeholder": "在這裡輸入描述...",
+        "tag_type": "標籤類型:",
+        "cancel": "取消",
+        "confirm": "確認"
+    },
+    "TagAttributePanelContent": {
+        "title": "{{type}}的標籤屬性",
+        "default_value": "預設值",
+        "date_placehoder": "在這裡預設輸入日期...",
+        "text_placehoder": "在這裡預設文字日期...",
+        "number_range": "範圍",
+        "number_start": "起始",
+        "number_end": "結束",
+        "bool_true": "真",
+        "bool_false": "否"
+    }
+}

@@ -14,8 +14,13 @@ pub use error::TagError;
 pub use error::TagGenericError;
 mod factory;
 pub use factory::TagFactory;
+pub mod valueobj;
 mod plainobj;
 pub use plainobj::TagPlainObject;
+
+use valueobj::TagAttrVO;
+
+use self::plainobj::TagAttributePlainObject;
 
 base_aggregate!(Tag {
     id: TagID,
@@ -24,6 +29,7 @@ base_aggregate!(Tag {
     belong_subject: SubjectID,
     description: String,
     auth: bool,
+    attr: TagAttrVO,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
 });
@@ -68,6 +74,14 @@ impl Tag {
 
 impl ToPlainObject<TagPlainObject> for Tag {
     fn to_plain(self) -> TagPlainObject {
+        let attrobj = match self.attr {
+            TagAttrVO::Normal => TagAttributePlainObject::Normal,
+            TagAttrVO::Number { start, end, defval } => TagAttributePlainObject::Number { start, end, defval },
+            TagAttrVO::Text { defval } => TagAttributePlainObject::Text { defval },
+            TagAttrVO::Date { defval } => TagAttributePlainObject::Date { defval: dateutils::format(defval) },
+            TagAttrVO::Bool { defval } => TagAttributePlainObject::Bool { defval },
+        };
+
         TagPlainObject {
             id: self.id,
             name: self.name,
@@ -76,6 +90,7 @@ impl ToPlainObject<TagPlainObject> for Tag {
             belong_subject: self.belong_subject,
             created_at: dateutils::format(self.created_at),
             updated_at: dateutils::format(self.updated_at),
+            attrval: attrobj,
             auth: self.auth,
         }
     }

@@ -11,7 +11,7 @@ mod error;
 pub use error::ResourceError;
 pub use error::ResourceGenericError;
 mod plainobj;
-pub use plainobj::{ResourcePlainObject, ResourceTaggingPlainObject};
+pub use plainobj::{ResourcePlainObject, ResourceTaggingPlainObject, ResourceTaggingAttrPlainObject};
 
 pub mod valueobj;
 use valueobj::{ResourceFileVO, ResourceUrlVO};
@@ -20,6 +20,7 @@ mod factory;
 pub use factory::ResourceFactory;
 
 use self::entities::ResourceTaggingEntity;
+use self::valueobj::ResourceTaggingAttrVO;
 pub mod entities;
 
 // =====================================================
@@ -90,9 +91,22 @@ impl ToPlainObject<ResourcePlainObject> for Resource {
         let tags = self.tagging
             .vals()
             .into_iter()
-            .map(move |x| ResourceTaggingPlainObject {
-                id: x.id.clone(),
-                added_at: dateutils::format(x.added_at),
+            .map(move |x| {
+                let attrval = match x.attrval.clone() {
+                    ResourceTaggingAttrVO::Normal => ResourceTaggingAttrPlainObject::Normal,
+                    ResourceTaggingAttrVO::Number(val) => ResourceTaggingAttrPlainObject::Number(val),
+                    ResourceTaggingAttrVO::Text(val) => ResourceTaggingAttrPlainObject::Text(val),
+                    ResourceTaggingAttrVO::Date(val) => {
+                        ResourceTaggingAttrPlainObject::Date(dateutils::format(val))
+                    },
+                    ResourceTaggingAttrVO::Bool(val) => ResourceTaggingAttrPlainObject::Bool(val),
+                };
+
+                ResourceTaggingPlainObject {
+                    id: x.id.clone(),
+                    added_at: dateutils::format(x.added_at),
+                    attrval: attrval,
+                }
             })
             .collect::<Vec<ResourceTaggingPlainObject>>();
 

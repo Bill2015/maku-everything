@@ -9,3 +9,6 @@ pub use resource_add_tag::*;
 
 mod resource_remove_tag;
 pub use resource_remove_tag::*;
+
+mod resource_update_tag;
+pub use resource_update_tag::*;

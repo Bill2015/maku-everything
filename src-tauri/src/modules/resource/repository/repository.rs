@@ -1,7 +1,6 @@
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use surrealdb::Surreal;
-use surrealdb::sql::{Datetime, Thing, thing};
+use surrealdb::sql::{Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
 use crate::modules::common::domain::DomainModelMapper;
@@ -10,6 +9,7 @@ use crate::modules::common::repository::{env, CommonRepository, COMMON_REPOSITOR
 use crate::modules::common::repository::tablens;
 use crate::modules::resource::domain::{Resource, ResourceFactory, ResourceID};
 
+use super::ResourceDO;
 use super::{RESOURCE_TAG_RELATION_REPOSITORY, ResourceTagRelationRepository};
 
 pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::init(
@@ -17,51 +17,6 @@ pub static RESOURCE_REPOSITORY: ResourceRepository<'_> = ResourceRepository::ini
     &COMMON_REPOSITORY, 
     &RESOURCE_TAG_RELATION_REPOSITORY
 );
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ResourceFileDo {
-    pub uuid: String,
-    pub name: String,
-    pub path: String,
-    pub ext: String,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ResourceUrlDo {
-    pub host: String,
-    pub full: String,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ResourceTaggingDo {
-    #[serde(alias = "in")]
-    pub id: Thing,
-
-    pub added_at: Datetime,
-}
-
-/**
- * Resource Data Object */
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ResourceDO {
-    pub id: Thing,
-    pub name: String,
-    pub description: String,
-    pub file: Option<ResourceFileDo>,
-    pub url: Option<ResourceUrlDo>,
-    pub auth: bool,
-    pub created_at: Datetime,
-    pub updated_at: Datetime,
-    pub belong_category: Thing,
-    
-    #[serde(skip_serializing)]
-    #[serde(default = "String::default")]
-    pub root_path: String,
-
-    #[serde(skip_serializing)]
-    #[serde(default = "Vec::new")]
-    pub tags: Vec<ResourceTaggingDo>,
-}
 
 /**
  * Repository */

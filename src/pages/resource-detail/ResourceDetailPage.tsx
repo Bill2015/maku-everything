@@ -30,6 +30,7 @@ export default function ResourcesDetailPage() {
     const exporeFile = ResourceMutation.useExporeFile();
     const addResourceTag = ResourceMutation.useAddTag();
     const removeResourceTag = ResourceMutation.useRemoveTag();
+    const updateResourceTag = ResourceMutation.useUpdateTag();
 
     const {
         data: resourceData,
@@ -119,8 +120,16 @@ export default function ResourcesDetailPage() {
                                         await addResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
                                         resourceRefetch();
                                     }}
-                                    onRemoveExistTag={async (tag) => {
+                                    onRemoveTag={async (tag) => {
                                         await removeResourceTag.mutateAsync({ id: resourceData.id, tag_id: tag.id });
+                                        resourceRefetch();
+                                    }}
+                                    onUpdateTag={async (tag, attrVal) => {
+                                        await updateResourceTag.mutateAsync({
+                                            id:      resourceData.id,
+                                            tag_id:  tag.id,
+                                            attrval: attrVal,
+                                        });
                                         resourceRefetch();
                                     }}
                                 />

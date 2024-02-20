@@ -5,3 +5,4 @@ export * from './EditableText';
 export * from './ResourceThumbnailDisplayer';
 export * from './DateTimeDisplayer';
 export * from './TagTypography';
+export * from './SubTitle';

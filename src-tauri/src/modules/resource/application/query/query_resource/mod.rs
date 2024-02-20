@@ -8,7 +8,10 @@ use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::resource::domain::ResourceGenericError;
 use crate::modules::resource::infrastructure::ResourceQueryBuilder;
 use crate::modules::resource::repository::ResourceQueryRepository;
-use crate::modules::resource::application::dto::{ResourceListQueryDto, ResourceResDto};
+use crate::modules::resource::application::dto::ResourceResDto;
+
+mod dto;
+pub use dto::ResourceListQueryDto;
 
 #[derive(Deserialize)]
 pub struct ListResourceQuery { 

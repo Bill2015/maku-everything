@@ -2,7 +2,8 @@ use surrealdb::sql::Thing;
 use serde::{Deserialize, Serialize};
 
 use crate::modules::common::application::thing_serialize;
-use crate::modules::resource::application::dto::{ResourceFileDto, ResourceUrlDto};
+use crate::modules::resource::application::dto::{ResourceFileDto, ResourceTaggingAttrPayloadDto, ResourceUrlDto};
+use crate::modules::tag::application::dto::TagAttrDto;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ResourceTagDto {
@@ -19,6 +20,11 @@ pub struct ResourceTagDto {
     pub subject_name: String,
 
     pub tagged_count: i64,
+
+    #[serde(flatten)]
+    pub attr: TagAttrDto,
+
+    pub attrval: ResourceTaggingAttrPayloadDto,
 
     pub added_at: String,
 
