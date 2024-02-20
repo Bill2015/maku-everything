@@ -28,7 +28,6 @@
 		"embla-carousel-react": "^7.1.0",
 		"i18next": "^23.9.0",
 		"immer": "^10.0.3",
-		"lodash": "^4.17.21",
 		"mantine-contextmenu": "^7.5.0",
 		"millify": "^6.1.0",
 		"react": "^18.2.0",
@@ -37,6 +36,7 @@
 		"react-icons": "^5.0.1",
 		"react-redux": "^9.1.0",
 		"react-router-dom": "^6.22.1",
+		"remeda": "^1.43.0",
 		"zustand": "^4.5.1"
 	},
 	"devDependencies": {

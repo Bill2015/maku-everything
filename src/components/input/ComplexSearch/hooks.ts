@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import lodash from 'lodash';
+import * as R from 'remeda';
 import { TagResDto } from '@api/tag';
 
 import { QueryingNodeProps } from './QueryingNode';
@@ -250,13 +250,13 @@ export const useComplexSearch = (tags: TagResDto[], searchText: string) => {
             };
             let concatNode: QueryingNodeProps | null = null;
             if (!comboxProps) {
-                newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, { type: 'attribute', label: value });
+                newNode = R.merge<QueryingNodeProps, QueryingNodeProps>(newNode, { type: 'attribute', label: value });
             }
             else if (InputSymbol.isValid(value)) {
-                newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, { type: 'operator', label: value });
+                newNode = R.merge<QueryingNodeProps, QueryingNodeProps>(newNode, { type: 'operator', label: value });
             }
             else {
-                newNode = lodash.merge<QueryingNodeProps, QueryingNodeProps>(newNode, {
+                newNode = R.merge<QueryingNodeProps, QueryingNodeProps>(newNode, {
                     type: 'tag', label: comboxProps['data-name']!, groupName: comboxProps['data-groupname']!,
                 });
                 concatNode = { type: 'display-only', label: (status.groupStatus === 'in-include') ? 'or' : 'and' };
