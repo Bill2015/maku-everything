@@ -24,8 +24,9 @@ jobs:
 
       # Run commands
       - name: install deps
-      - run: npm ci
-      - run: npm run build --if-present
+        run: |
+          npm ci
+          npm run build --if-present
 
       # Testing
       - name: test the project
