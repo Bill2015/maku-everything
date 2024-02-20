@@ -8,7 +8,10 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(async () => ({
     plugins: [
         react(),
-        visualizer() as PluginOption,
+        visualizer({
+            emitFile: true,
+            filename: "build-size-report.html",
+        }) as PluginOption,
     ],
     css: {
         preprocessorOptions: {

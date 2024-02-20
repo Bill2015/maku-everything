@@ -31,7 +31,6 @@ module.exports = {
         // SVG Mock
         '\\.(svg)$': '<rootDir>/src/__test__/mocks/svgMock.tsx',
         '\\.(css|less|scss)$': '<rootDir>/src/__test__/mocks/styleMock.js',
-        // '^lodash-es$': 'lodash',
         ...pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>' }),
     },
     /**

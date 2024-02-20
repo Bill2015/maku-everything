@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import lodash from 'lodash';
 import { Image, ImageProps, Loader } from '@mantine/core';
 import { useState } from 'react';
 
@@ -26,7 +25,7 @@ export function ResponsiveImage(props: ResponsiveImageProps) {
                     w="100%"
                     display="flex"
                     size="lg"
-                    h={lodash.random(100, 300)}
+                    h={(Math.random() * 300) + 100}
                     style={{ alignItems: 'center', justifyContent: 'center' }}
                 />
             ) }
