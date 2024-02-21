@@ -1,5 +1,17 @@
 <h1 align="center">Maku Everything</h1>
 
+<p align="center">
+  <img src="https://img.shields.io/github/watchers/Bill2015/maku-everything" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/Bill2015/maku-everything/actions/workflows/test.yml/badge.svg" />
+  <img src="https://img.shields.io/github/repo-size/Bill2015/maku-everything" />
+  <img src="https://img.shields.io/github/commit-activity/w/Bill2015/maku-everything" />
+  <img src="https://tokei.rs/b1/github/Bill2015/maku-everything" />
+</p>
+
+
 Maku-Everything is a tagging system similar to [Danbooru](https://danbooru.donmai.us/) or [Gelbooru](https://gelbooru.com/) that allows you to manage any kind of files and documents with a powerful search and tagging system that makes it easier to find the file, and the tags don't affect the original file name. \
 In addition, the program is completely independent and does not require the installation of any other software.
 
