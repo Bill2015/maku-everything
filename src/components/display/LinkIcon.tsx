@@ -1,6 +1,7 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { open } from '@tauri-apps/api/shell';
 
-import { ActionIcon, ActionIconProps, Tooltip } from '@mantine/core';
+import { ActionIcon, ActionIconProps, ElementProps, Tooltip, TooltipProps } from '@mantine/core';
 import { IconType } from 'react-icons';
 import { FaYoutube } from 'react-icons/fa';
 import { FaLink } from 'react-icons/fa6';
@@ -20,12 +21,22 @@ export interface LinkIconProps extends ActionIconProps {
 
         host: string;
     };
+    tooltipProps?: TooltipProps & ElementProps<'div', keyof TooltipProps>;
+
+    onTooltipOpen?: () => void;
+    onTooltipClose?: () => void;
 }
 
 /**
  * According URL host to determin which icon will be showing */
 export function LinkIcon(props: LinkIconProps) {
-    const { url, ...actionIconProps } = props;
+    const {
+        url,
+        tooltipProps,
+        onTooltipOpen,
+        onTooltipClose,
+        ...actionIconProps
+    } = props;
 
     const IconElement = (() => {
         if (URL_ICON_MAPPER.has(url.host)) {
@@ -41,10 +52,10 @@ export function LinkIcon(props: LinkIconProps) {
             label={`↖️ ${url.full}`}
             classNames={{ tooltip: classes.tooltip }}
             offset={10}
+            {...tooltipProps}
         >
             <ActionIcon
                 classNames={{ root: classes.ActionIconRoot }}
-                // eslint-disable-next-line react/jsx-props-no-spreading
                 {...actionIconProps}
                 onClick={() => {
                     open(url.full)
@@ -52,6 +63,8 @@ export function LinkIcon(props: LinkIconProps) {
                             showNotification('Invalid URL', url.full, 'error');
                         });
                 }}
+                onMouseEnter={() => onTooltipOpen && onTooltipOpen()}
+                onMouseLeave={() => onTooltipClose && onTooltipClose()}
             >
                 <IconElement />
             </ActionIcon>
