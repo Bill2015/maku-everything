@@ -1,13 +1,28 @@
-import * as dayjs from 'dayjs';
-import * as relativeTime from 'dayjs/plugin/relativeTime';
-// related issues: https://github.com/iamkun/dayjs/issues/475#issuecomment-1278002092
-dayjs.extend(relativeTime);
+import {
+    format,
+    parseISO,
+    differenceInYears,
+    differenceInMonths,
+    differenceInWeeks,
+    differenceInDays,
+    differenceInHours,
+    differenceInMinutes,
+    differenceInSeconds,
+} from 'date-fns';
 
-export type DateTimeUnit = Extract<dayjs.OpUnitType, 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds'>;
-
-const DATE_STAMPS: DateTimeUnit[] = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'];
+export type DateTimeUnit = 'years' | 'months' | 'weeks' | 'days' | 'hours' | 'minutes' | 'seconds';
 
 export type DateTimeInterval = { value: number, stamp: DateTimeUnit };
+
+const DIFFS: { diffn: typeof differenceInYears, stamp: DateTimeUnit }[] = [
+    { diffn: differenceInYears, stamp: 'years' },
+    { diffn: differenceInMonths, stamp: 'months' },
+    { diffn: differenceInWeeks, stamp: 'weeks' },
+    { diffn: differenceInDays, stamp: 'days' },
+    { diffn: differenceInHours, stamp: 'hours' },
+    { diffn: differenceInMinutes, stamp: 'minutes' },
+    { diffn: differenceInSeconds, stamp: 'seconds' },
+];
 
 /**
  * Get DateTime interval \
@@ -23,11 +38,11 @@ export type DateTimeInterval = { value: number, stamp: DateTimeUnit };
  * @param targetDate for diff datetime
  * @returns largest time interval */
 export function getDateTimeInterval(targetDate: string): DateTimeInterval | null {
-    const current = dayjs();
-    const target = dayjs(targetDate);
+    const current = new Date();
+    const target = parseISO(targetDate);
 
-    for (const stamp of DATE_STAMPS) {
-        const value = current.diff(target, stamp);
+    for (const { diffn, stamp } of DIFFS) {
+        const value = diffn(current, target);
         if (value > 0) {
             return { value, stamp };
         }
@@ -45,5 +60,5 @@ export function getDateTimeInterval(targetDate: string): DateTimeInterval | null
  * @param str target string
  * @returns new formated datetime */
 export function formatDateTime(str: string): string {
-    return dayjs(str).format('YYYY-MM-DD HH:mm:ss');
+    return format(parseISO(str), 'yyyy-MM-dd HH:mm:ss');
 }
