@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaCircleRight } from 'react-icons/fa6';
+import { MdInfoOutline } from 'react-icons/md';
 import {
     Card, Text, Tooltip, Stack, Collapse, ActionIcon, Box, UnstyledButton,
 } from '@mantine/core';
 import { useHover, useToggle } from '@mantine/hooks';
-import { MdInfoOutline } from 'react-icons/md';
 
 import { ResourceResDto } from '@api/resource';
-import { DateTimeDisplayer, LinkIcon, ResourceThumbnailDisplayer } from '@components/display';
+import { ActionFileIcon, DateTimeDisplayer, ActionLinkIcon, ResourceThumbnailDisplayer } from '@components/display';
+
 import classes from './ResourceCard.module.scss';
 
 export interface ResourceCardProps {
@@ -29,30 +30,24 @@ export function ResourceCard(props: ResourceCardProps) {
             <Card ref={hoverRef} shadow="lg" radius="md" withBorder classNames={{ root: classes.cardroot }}>
                 <Card.Section mb="-10px">
                     <Box pos="relative">
-                        {
-                            data.url && (
-                                <LinkIcon
-                                    pos="absolute"
-                                    top="5px"
-                                    right="5px"
-                                    url={data.url!}
-                                    onTooltipOpen={() => setTooltipOn(true)}
-                                    onTooltipClose={() => setTooltipOn(false)}
-                                />
-                            )
-                        }
-                        {
-                            hovered && (
-                                <>
-                                    <ActionIcon pos="absolute" left="5px" bottom="10px" variant="light" onClick={() => toggleInfo()}>
-                                        <MdInfoOutline />
-                                    </ActionIcon>
-                                    <ActionIcon pos="absolute" size="lg" right="5px" bottom="10px" variant="light" title={t('detail')} onClick={() => onDetailClick(data)}>
-                                        <FaCircleRight />
-                                    </ActionIcon>
-                                </>
-                            )
-                        }
+                        <Stack gap={0} pos="absolute" top="5px" right="5px">
+                            {data.file && (
+                                <ActionFileIcon variant="light" color="gray" fz="1.5rem" filePath={data.root_path + data.file.path} onTooltipChange={setTooltipOn} />
+                            )}
+                            {data.url && (
+                                <ActionLinkIcon url={data.url!} onTooltipChange={setTooltipOn} />
+                            )}
+                        </Stack>
+                        {hovered && (
+                            <>
+                                <ActionIcon pos="absolute" left="5px" bottom="10px" variant="light" onClick={() => toggleInfo()}>
+                                    <MdInfoOutline />
+                                </ActionIcon>
+                                <ActionIcon pos="absolute" size="lg" right="5px" bottom="10px" variant="light" title={t('detail')} onClick={() => onDetailClick(data)}>
+                                    <FaCircleRight />
+                                </ActionIcon>
+                            </>
+                        )}
                         <UnstyledButton>
                             <ResourceThumbnailDisplayer url={data.url?.full} filePath={`${data.root_path}${data.file?.path}`} alt={data.name} />
                         </UnstyledButton>

@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
-import { FcOpenedFolder } from 'react-icons/fc';
 import {
-    Box, Grid, Text, Button, Flex, ScrollArea, Affix, rem, Divider, Group,
+    Box, Grid, Text, Flex, ScrollArea, Affix, rem, Divider, Group,
 } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
@@ -11,7 +10,7 @@ import { ModalName, useModelConfirmAction } from '@store/modal';
 import { ResourceMutation, ResourceQuery, ResourceUpdateDto } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { SubjectQuery } from '@api/subject';
-import { EditableText } from '@components/display';
+import { ActionFileIcon, EditableText } from '@components/display';
 import { ReturnButton } from '@components/input';
 import { showNotification } from '@components/notification';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
@@ -27,7 +26,6 @@ export default function ResourcesDetailPage() {
     const [newSubjectId, setNewSubjectId] = useState<string>('');
 
     const updateResource = ResourceMutation.useUpdate();
-    const exporeFile = ResourceMutation.useExporeFile();
     const addResourceTag = ResourceMutation.useAddTag();
     const removeResourceTag = ResourceMutation.useRemoveTag();
     const updateResourceTag = ResourceMutation.useUpdateTag();
@@ -40,12 +38,6 @@ export default function ResourcesDetailPage() {
     } = ResourceQuery.useGetDetail(resourceId as string);
 
     const { data: subjects } = SubjectQuery.useGetByCategory(activeCategory?.id);
-
-    const handleExporeClick = useCallback(() => {
-        if (resourceData && resourceData.file) {
-            exporeFile.mutateAsync(resourceData.root_path + resourceData.file.path);
-        }
-    }, [exporeFile, resourceData]);
 
     const handleResourceUpdate = useCallback(async (fieldName: keyof ResourceUpdateDto, newVal: string) => {
         if (resourceId) {
@@ -86,9 +78,7 @@ export default function ResourcesDetailPage() {
                         </Flex>
                         {
                             resourceData.file && (
-                                <Button onClick={handleExporeClick} pos="absolute" right="30px" variant="subtle" p={0} fz="1.75em">
-                                    <FcOpenedFolder />
-                                </Button>
+                                <ActionFileIcon filePath={resourceData.root_path + resourceData.file.path} pos="absolute" right="30px" variant="subtle" p={0} fz="1.75em" />
                             )
                         }
                     </Group>
