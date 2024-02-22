@@ -24,6 +24,8 @@ export default function ResourcesDetailPage() {
 
     // when new subject group was created, use for auto focus
     const [newSubjectId, setNewSubjectId] = useState<string>('');
+    const [name, setName] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
 
     const updateResource = ResourceMutation.useUpdate();
     const addResourceTag = ResourceMutation.useAddTag();
@@ -41,10 +43,14 @@ export default function ResourcesDetailPage() {
 
     const handleResourceUpdate = useCallback(async (fieldName: keyof ResourceUpdateDto, newVal: string) => {
         if (resourceId) {
-            updateResource.mutateAsync({ id: resourceId, [fieldName]: newVal })
-                .catch((e) => showNotification('Update Resource Failed', e.message, 'error'))
-                .then(() => resourceRefetch())
-                .then(() => showNotification('Update Resource Successful', '', 'success'));
+            await updateResource.mutateAsync({ id: resourceId, [fieldName]: newVal })
+                .then(() => {
+                    showNotification('Update Resource Successful', '', 'success');
+                })
+                .catch((e) => {
+                    showNotification('Update Resource Failed', e.message, 'error');
+                })
+                .finally(() => resourceRefetch());
         }
     }, [resourceId, updateResource, resourceRefetch]);
 
@@ -87,16 +93,28 @@ export default function ResourcesDetailPage() {
                             name="name"
                             fz="1.5rem"
                             fw="bold"
-                            value={resourceData.name}
-                            onChange={(val) => handleResourceUpdate('name', val)}
+                            value={name || resourceData.name}
+                            onEdit={() => setName(resourceData.name)}
+                            onChange={setName}
+                            onEditFinished={(newVal, isEdited) => {
+                                if (isEdited) {
+                                    handleResourceUpdate('name', newVal);
+                                }
+                            }}
                         />
                         <EditableText
                             name="description"
                             fz="1rem"
                             opacity="0.5"
                             fw="initial"
-                            value={resourceData.description}
-                            onChange={(val) => handleResourceUpdate('description', val)}
+                            value={description || resourceData.description}
+                            onEdit={() => setDescription(resourceData.description)}
+                            onEditFinished={(newVal, isEdited) => {
+                                if (isEdited) {
+                                    handleResourceUpdate('description', newVal);
+                                }
+                            }}
+                            onChange={setDescription}
                         />
                         <ResourceTagStack>
                             {resourceTagData.map(({ subjectId, subjectName, tags }) => (
