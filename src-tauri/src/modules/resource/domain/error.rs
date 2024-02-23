@@ -38,6 +38,9 @@ pub enum ResourceError {
 
     #[error("Explore file failed")]
     ExploreFile(Error),
+
+    #[error("Rename file failed")]
+    Rename(Error),
 }
 
 impl Serialize for ResourceError {
@@ -57,6 +60,7 @@ impl Serialize for ResourceError {
             ResourceError::RemoveTag(source) => serialize_error!(self, source),
             ResourceError::UpdateTag(source) => serialize_error!(self, source),
             ResourceError::ExploreFile(source) => serialize_error!(self, source),
+            ResourceError::Rename(source) => serialize_error!(self, source),
         };
         error_message.serialize(serializer)
     }
@@ -79,6 +83,9 @@ pub enum ResourceGenericError {
     #[error("No File name")]
     FileNameIsEmpty(),
     
+    #[error("Rename file failed")]
+    RenameFileFailed(),
+
     #[error("Name is empty")]
     NameIsEmpty(),
 
@@ -96,6 +103,9 @@ pub enum ResourceGenericError {
 
     #[error("Id not found")]
     IdNotFound(),
+
+    #[error("File Is Empty")]
+    FileIsEmpty(),
 
     #[error("Belong Category id is not exists")]
     BelongCategoryNotExists(),

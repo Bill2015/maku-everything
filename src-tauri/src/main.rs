@@ -87,6 +87,7 @@ fn main() {
             resource::application::add_resource_tag,
             resource::application::remove_resource_tag,
             resource::application::update_resource_tag,
+            resource::application::rename_resource_file_name,
             resource::application::get_resource_detail,
             resource::application::list_resource,
             resource::application::querying_by_string,

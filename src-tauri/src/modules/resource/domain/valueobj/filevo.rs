@@ -4,6 +4,7 @@ use std::path::Path;
 use serde::Serialize;
 
 use crate::modules::resource::domain::ResourceGenericError;
+use crate::utils::StringUtils;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct ResourceFileVO {
@@ -32,15 +33,23 @@ impl ResourceFileVO {
         }
 
         let ext = match path.is_file() {
-            true => path.extension().unwrap_or(OsStr::new("txt")),
+            true => path.extension().unwrap_or(OsStr::new("")),
             false => OsStr::new("folder"),
+        };
+
+        let ext = String::from(ext.to_str().unwrap());
+        let name = String::from(path.file_name().unwrap().to_str().unwrap());
+        let name = match path.is_file() {
+            true if ext.len() <= 0 => name,
+            true => String::from(name.slice(..name.chars().count() - ext.chars().count() - 1)),
+            false => name,
         };
 
         Ok(
             ResourceFileVO {
                 uuid: String::from("id"),
-                name: String::from(path.file_name().unwrap().to_str().unwrap()),
-                ext: String::from(ext.to_str().unwrap()),
+                name: name,
+                ext: ext,
                 path: String::from(main_path),
             }
         )
