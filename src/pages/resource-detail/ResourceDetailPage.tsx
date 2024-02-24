@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
-import { FcOpenedFolder } from 'react-icons/fc';
 import {
-    Box, Grid, Text, Button, Flex, ScrollArea, Affix, rem, Divider, Group,
+    Box, Grid, Text, Flex, ScrollArea, Affix, rem, Divider, Group,
 } from '@mantine/core';
 
 import { useActiveCategoryRedux } from '@store/global';
@@ -11,7 +10,7 @@ import { ModalName, useModelConfirmAction } from '@store/modal';
 import { ResourceMutation, ResourceQuery, ResourceUpdateDto } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { SubjectQuery } from '@api/subject';
-import { EditableText } from '@components/display';
+import { ActionFileIcon, EditableText } from '@components/display';
 import { ReturnButton } from '@components/input';
 import { showNotification } from '@components/notification';
 import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
@@ -25,9 +24,10 @@ export default function ResourcesDetailPage() {
 
     // when new subject group was created, use for auto focus
     const [newSubjectId, setNewSubjectId] = useState<string>('');
+    const [name, setName] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
 
     const updateResource = ResourceMutation.useUpdate();
-    const exporeFile = ResourceMutation.useExporeFile();
     const addResourceTag = ResourceMutation.useAddTag();
     const removeResourceTag = ResourceMutation.useRemoveTag();
     const updateResourceTag = ResourceMutation.useUpdateTag();
@@ -41,18 +41,16 @@ export default function ResourcesDetailPage() {
 
     const { data: subjects } = SubjectQuery.useGetByCategory(activeCategory?.id);
 
-    const handleExporeClick = useCallback(() => {
-        if (resourceData && resourceData.file) {
-            exporeFile.mutateAsync(resourceData.root_path + resourceData.file.path);
-        }
-    }, [exporeFile, resourceData]);
-
     const handleResourceUpdate = useCallback(async (fieldName: keyof ResourceUpdateDto, newVal: string) => {
         if (resourceId) {
-            updateResource.mutateAsync({ id: resourceId, [fieldName]: newVal })
-                .catch((e) => showNotification('Update Resource Failed', e.message, 'error'))
-                .then(() => resourceRefetch())
-                .then(() => showNotification('Update Resource Successful', '', 'success'));
+            await updateResource.mutateAsync({ id: resourceId, [fieldName]: newVal })
+                .then(() => {
+                    showNotification('Update Resource Successful', '', 'success');
+                })
+                .catch((e) => {
+                    showNotification('Update Resource Failed', e.message, 'error');
+                })
+                .finally(() => resourceRefetch());
         }
     }, [resourceId, updateResource, resourceRefetch]);
 
@@ -86,9 +84,7 @@ export default function ResourcesDetailPage() {
                         </Flex>
                         {
                             resourceData.file && (
-                                <Button onClick={handleExporeClick} pos="absolute" right="30px" variant="subtle" p={0} fz="1.75em">
-                                    <FcOpenedFolder />
-                                </Button>
+                                <ActionFileIcon filePath={resourceData.root_path + resourceData.file.path} pos="absolute" right="30px" variant="subtle" p={0} fz="1.75em" />
                             )
                         }
                     </Group>
@@ -97,16 +93,28 @@ export default function ResourcesDetailPage() {
                             name="name"
                             fz="1.5rem"
                             fw="bold"
-                            value={resourceData.name}
-                            onChange={(val) => handleResourceUpdate('name', val)}
+                            value={name || resourceData.name}
+                            onEdit={() => setName(resourceData.name)}
+                            onChange={setName}
+                            onEditFinished={(newVal, isEdited) => {
+                                if (isEdited) {
+                                    handleResourceUpdate('name', newVal);
+                                }
+                            }}
                         />
                         <EditableText
                             name="description"
                             fz="1rem"
                             opacity="0.5"
                             fw="initial"
-                            value={resourceData.description}
-                            onChange={(val) => handleResourceUpdate('description', val)}
+                            value={description || resourceData.description}
+                            onEdit={() => setDescription(resourceData.description)}
+                            onEditFinished={(newVal, isEdited) => {
+                                if (isEdited) {
+                                    handleResourceUpdate('description', newVal);
+                                }
+                            }}
+                            onChange={setDescription}
                         />
                         <ResourceTagStack>
                             {resourceTagData.map(({ subjectId, subjectName, tags }) => (

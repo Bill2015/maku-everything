@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Group, Input, SegmentedControl, Stack, Title } from '@mantine/core';
 import { TagAttrPayload, TagCreateDto, TagMutation } from '@api/tag';
 import { useActiveCategoryRedux } from '@store/global';
@@ -27,7 +27,14 @@ export function CreateTagModal() {
     const { tv } = useValueTranslation('AttributeType');
     const { activeCategory } = useActiveCategoryRedux();
     const [opened, { close, confirmClose, cancelClose }] = useCreateTagModal();
-    const { data: subjectData } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
+    const { data: subjectData, refetch: refetchSubject } = SubjectQuery.useGetByCategory(activeCategory && activeCategory.id);
+
+    // refetch the subject
+    useEffect(() => {
+        if (opened === true) {
+            refetchSubject();
+        }
+    }, [opened, refetchSubject]);
 
     const [data, setData] = useState<TagCreateDto>(DEFAULT_VALUE);
     const [belongSubject, setBelongSubject] = useState<{ value: string, id: string } | null>(null);

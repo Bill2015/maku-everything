@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useMemo, useRef } from 'react';
+import { PropsWithChildren, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flex, Group, Space, Stack, Text, UnstyledButton } from '@mantine/core';
 import { RxCross2 } from 'react-icons/rx';
@@ -28,6 +28,8 @@ export function AttributePanel(props: AttributePanelProps) {
     const { activeResource, updateResource, updateResourceTag, updateResourceIgnoreText } = useAddResourceContext();
     const { getResourceSpecificTags } = useTextTagMapperContext();
     const tagComboRef = useRef<TagComboSelectRef>(null);
+    const [name, setName] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
 
     const handleUpdate = useCallback((fieldName: keyof ResourceCreateDto, newValue: string) => {
         updateResource(activeResource!.index, {
@@ -65,16 +67,19 @@ export function AttributePanel(props: AttributePanelProps) {
         <Stack gap={0}>
             <SubTitle>{t('name')}</SubTitle>
             <EditableText
-                key={activeResource.data.name}
-                value={activeResource.data.name}
+                value={name || activeResource.data.name}
                 name={t('name')}
-                onChange={(val) => handleUpdate('name', val)}
+                onEdit={() => setName(activeResource.data.name)}
+                onChange={setName}
+                onEditFinished={(val) => handleUpdate('name', val)}
             />
             <SubTitle>{t('description')}</SubTitle>
             <EditableText
-                value={activeResource.data.description}
+                value={description || activeResource.data.description}
                 name={t('description')}
-                onChange={(val) => handleUpdate('description', val)}
+                onEdit={() => setDescription(activeResource.data.description)}
+                onChange={setDescription}
+                onEditFinished={(val) => handleUpdate('description', val)}
             />
             <SubTitle>{t('auto_generate_tags')}</SubTitle>
             <Flex gap={10} wrap="wrap">
