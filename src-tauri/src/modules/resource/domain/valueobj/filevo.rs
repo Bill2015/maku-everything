@@ -1,4 +1,3 @@
-use std::ffi::OsStr;
 use std::path::Path;
 
 use serde::Serialize;
@@ -11,7 +10,7 @@ pub struct ResourceFileVO {
     pub uuid: String,
     pub name: String,
     pub path: String,
-    pub ext: String,
+    pub ext: Option<String>,
 }
 
 impl ResourceFileVO {
@@ -33,15 +32,16 @@ impl ResourceFileVO {
         }
 
         let ext = match path.is_file() {
-            true => path.extension().unwrap_or(OsStr::new("")),
-            false => OsStr::new("folder"),
+            true => path.extension()
+                .map(|osr| Some(String::from(osr.to_str().unwrap())))
+                .unwrap_or(None),
+            false => Some("folder".to_string()),
         };
 
-        let ext = String::from(ext.to_str().unwrap());
         let name = String::from(path.file_name().unwrap().to_str().unwrap());
         let name = match path.is_file() {
-            true if ext.len() <= 0 => name,
-            true => String::from(name.slice(..name.chars().count() - ext.chars().count() - 1)),
+            true if ext.is_none()=> name,
+            true => String::from(name.slice(..name.chars().count() - ext.as_ref().unwrap().chars().count() - 1)),
             false => name,
         };
 

@@ -70,17 +70,16 @@ impl Resource {
         }
 
         let file_path = String::from(Path::new(&path).file_name().unwrap().to_str().unwrap());
-        let new_path = vec![
-                Path::new(path.slice(..path.chars().count() - file_path.chars().count()))
-                    .join(&new_name)
-                    .to_str()
-                    .unwrap(), 
-                &ext,
-            ]
-            .into_iter()
-            .filter(|v| !v.is_empty())
-            .collect::<Vec<&str>>()
-            .join(".");
+        let new_path = Path::new(path.slice(..path.chars().count() - file_path.chars().count()))
+            .join(&new_name)
+            .to_str()
+            .unwrap()
+            .to_string();
+    
+        let new_path: String = match &ext {
+            Some(ex) => [new_path, ex.to_string()].join("."),
+            None => new_path,
+        };
 
         // check filename is already exist (conflict)
         if Path::new(&self.root_path).join(&new_path).exists() {
