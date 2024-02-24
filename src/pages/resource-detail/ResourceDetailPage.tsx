@@ -10,11 +10,10 @@ import { ModalName, useModelConfirmAction } from '@store/modal';
 import { ResourceMutation, ResourceQuery, ResourceUpdateDto } from '@api/resource';
 import { ResourceDetailParam } from '@router/params';
 import { SubjectQuery } from '@api/subject';
-import { ActionFileIcon, EditableText } from '@components/display';
+import { EditableText } from '@components/display';
 import { ReturnButton } from '@components/input';
 import { showNotification } from '@components/notification';
-import { ResourceAddSubjectSelect, ResourceTagStack } from './components';
-import { ResourceDisplay } from './components/ResourceDisplay';
+import { ResourceAddSubjectSelect, ResourceTagStack, ResourceDisplay, ResourceActionIcons } from './components';
 
 import classes from './ResourceDetailPage.module.scss';
 
@@ -31,6 +30,7 @@ export default function ResourcesDetailPage() {
     const addResourceTag = ResourceMutation.useAddTag();
     const removeResourceTag = ResourceMutation.useRemoveTag();
     const updateResourceTag = ResourceMutation.useUpdateTag();
+    const renameFile = ResourceMutation.useRenameFile();
 
     const {
         data: resourceData,
@@ -42,17 +42,29 @@ export default function ResourcesDetailPage() {
     const { data: subjects } = SubjectQuery.useGetByCategory(activeCategory?.id);
 
     const handleResourceUpdate = useCallback(async (fieldName: keyof ResourceUpdateDto, newVal: string) => {
-        if (resourceId) {
-            await updateResource.mutateAsync({ id: resourceId, [fieldName]: newVal })
-                .then(() => {
-                    showNotification('Update Resource Successful', '', 'success');
-                })
-                .catch((e) => {
-                    showNotification('Update Resource Failed', e.message, 'error');
-                })
-                .finally(() => resourceRefetch());
-        }
+        await updateResource.mutateAsync({ id: resourceId!, [fieldName]: newVal })
+            .then(() => {
+                showNotification('Update Resource Successful', '', 'success');
+            })
+            .catch((e) => {
+                showNotification('Update Resource Failed', e.message, 'error');
+            })
+            .finally(() => resourceRefetch());
     }, [resourceId, updateResource, resourceRefetch]);
+
+    const handleRenameFile = useCallback(async () => {
+        if ((resourceData!.file?.name ?? '') === name) {
+            return;
+        }
+        await renameFile.mutateAsync({ id: resourceId! })
+            .then(() => {
+                showNotification('Rename Resource Successful', '', 'success');
+            })
+            .catch((e) => {
+                showNotification('Rename Resource Failed', e.message, 'error');
+            })
+            .finally(() => resourceRefetch());
+    }, [resourceData, resourceId, name, renameFile, resourceRefetch]);
 
     // refetch when create the new tag & subject
     useModelConfirmAction(ModalName.CreateSubject, resourceRefetch);
@@ -82,11 +94,12 @@ export default function ResourcesDetailPage() {
                                 resourceData.file && <Text component="span" fw={500} fz="sm">{resourceData.file.path}</Text>
                             }
                         </Flex>
-                        {
-                            resourceData.file && (
-                                <ActionFileIcon filePath={resourceData.root_path + resourceData.file.path} pos="absolute" right="30px" variant="subtle" p={0} fz="1.75em" />
-                            )
-                        }
+                        {resourceData.file && (
+                            <ResourceActionIcons.Explore filePath={resourceData.root_path + resourceData.file.path} />
+                        )}
+                        {resourceData.file && (
+                            <ResourceActionIcons.Rename onClick={handleRenameFile} />
+                        )}
                     </Group>
                     <ScrollArea.Autosize mx="auto" mah="600px" type="hover" classNames={{ scrollbar: 'mgra' }}>
                         <EditableText
