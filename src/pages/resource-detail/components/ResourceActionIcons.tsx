@@ -1,11 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { ActionFileIcon, TooltipActionIcon } from '@components/display';
+import { useTranslation } from 'react-i18next';
 import { LuFileType2 } from 'react-icons/lu';
 
 function Rename({ onClick }: { onClick: () => void }) {
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceDetail.Icons' });
     return (
         <TooltipActionIcon
-            label="Rename the file by current name"
+            label={t('rename')}
             color="gold"
             fz="1.25em"
             pos="absolute"

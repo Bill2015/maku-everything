@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { convertFileSrc } from '@tauri-apps/api/tauri';
 import {
     Box, Grid, Text, Flex, ScrollArea, Affix, rem, Divider, Group,
@@ -18,6 +19,7 @@ import { ResourceAddSubjectSelect, ResourceTagStack, ResourceDisplay, ResourceAc
 import classes from './ResourceDetailPage.module.scss';
 
 export default function ResourcesDetailPage() {
+    const { t } = useTranslation('pages', { keyPrefix: 'resourceDetail.Main' });
     const { activeCategory } = useActiveCategoryRedux();
     const { resourceId } = useParams<ResourceDetailParam>();
 
@@ -103,7 +105,7 @@ export default function ResourcesDetailPage() {
                     </Group>
                     <ScrollArea.Autosize mx="auto" mah="600px" type="hover" classNames={{ scrollbar: 'mgra' }}>
                         <EditableText
-                            name="name"
+                            name={t('name')}
                             fz="1.5rem"
                             fw="bold"
                             value={name || resourceData.name}
@@ -116,7 +118,7 @@ export default function ResourcesDetailPage() {
                             }}
                         />
                         <EditableText
-                            name="description"
+                            name={t('description')}
                             fz="1rem"
                             opacity="0.5"
                             fw="initial"

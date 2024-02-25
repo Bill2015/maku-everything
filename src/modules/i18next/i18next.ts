@@ -8,6 +8,7 @@ import commonEN_US from '@assets/locales/common/en-US.json';
 import pageCommonEN_US from '@assets/locales/pages/common/en-US.json';
 import pageCategorylistEN_US from '@assets/locales/pages/category-list/en-US.json';
 import pageResourcelistEN_US from '@assets/locales/pages/resource-list/en-US.json';
+import pageResourceDetailEN_US from '@assets/locales/pages/resource-detail/en-US.json';
 import pageResourceAddEN_US from '@assets/locales/pages/resource-add/en-US.json';
 import modalTagCreateEN_US from '@assets/locales/modal/create-tag/en-US.json';
 
@@ -15,6 +16,7 @@ import commonZH_TW from '@assets/locales/common/zh-TW.json';
 import pageCommonZH_TW from '@assets/locales/pages/common/zh-TW.json';
 import pageCategorylistZH_TW from '@assets/locales/pages/category-list/zh-TW.json';
 import pageResourcelistZH_TW from '@assets/locales/pages/resource-list/zh-TW.json';
+import pageResourceDetailZH_TW from '@assets/locales/pages/resource-detail/zh-TW.json';
 import pageResourceAddZH_TW from '@assets/locales/pages/resource-add/zh-TW.json';
 import modalTagCreateZH_TW from '@assets/locales/modal/create-tag/zh-TW.json';
 
@@ -39,20 +41,22 @@ export const resources = {
     [SupportLangs.enUS.key]: {
         common: commonEN_US,
         pages:  {
-            Common:       pageCommonEN_US,
-            CategoryList: pageCategorylistEN_US,
-            resourceList: pageResourcelistEN_US,
-            resourceAdd:  pageResourceAddEN_US,
+            Common:         pageCommonEN_US,
+            CategoryList:   pageCategorylistEN_US,
+            resourceList:   pageResourcelistEN_US,
+            resourceDetail: pageResourceDetailEN_US,
+            resourceAdd:    pageResourceAddEN_US,
         },
         modal: { createTag: modalTagCreateEN_US },
     },
     [SupportLangs.zhTW.key]: {
         common: commonZH_TW,
         pages:  {
-            Common:       pageCommonZH_TW,
-            CategoryList: pageCategorylistZH_TW,
-            resourceList: pageResourcelistZH_TW,
-            resourceAdd:  pageResourceAddZH_TW,
+            Common:         pageCommonZH_TW,
+            CategoryList:   pageCategorylistZH_TW,
+            resourceList:   pageResourcelistZH_TW,
+            resourceDetail: pageResourceDetailZH_TW,
+            resourceAdd:    pageResourceAddZH_TW,
         },
         modal: { createTag: modalTagCreateZH_TW },
     },

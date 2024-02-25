@@ -1,0 +1,9 @@
+{
+    "Main": {
+        "name": "名稱",
+        "description": "描述"
+    },
+    "Icons": {
+        "rename": "使用現在的名稱重新命名此檔案"
+    }
+}

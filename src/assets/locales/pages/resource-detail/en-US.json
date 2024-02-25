@@ -1,0 +1,9 @@
+{
+    "Main": {
+        "name": "name",
+        "description": "description"
+    },
+    "Icons": {
+        "rename": "Rename the file by current name"
+    }
+}
