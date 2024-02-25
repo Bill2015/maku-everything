@@ -29,7 +29,7 @@ export function ResourceCard(props: ResourceCardProps) {
         <Tooltip label={data.name} disabled={tooltipOn} openDelay={500} color="gray">
             <Card ref={hoverRef} shadow="lg" radius="md" withBorder classNames={{ root: classes.cardroot }}>
                 <Card.Section mb="-10px">
-                    <Box pos="relative">
+                    <Box pos="relative" display="ruby-text">
                         <Stack gap={0} pos="absolute" top="5px" right="5px">
                             {data.file && (
                                 <ActionFileIcon variant="light" color="gray" fz="1.5rem" filePath={data.root_path + data.file.path} onTooltipChange={setTooltipOn} />
