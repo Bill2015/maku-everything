@@ -57,6 +57,17 @@ impl<'a> ResourceService<'a> {
         Ok(result)
     }
 
+    pub async fn rename_file(&self, data: ResourceRenameFileDto) -> Result<ResourceID, ResourceError> {
+        let command = ResourceRenameFileCommand::from(data);
+
+        let result = ResourceRenameFileHandler::register(self.resource_repository)
+            .execute(command)
+            .await
+            .map_err(|err| ResourceError::Rename(anyhow!(err)))?;
+
+        Ok(result)
+    }
+
     pub async fn update_resource(&self, data: UpdateResourceDto) -> Result<ResourceID, ResourceError> {
         let command = UpdateResourceCommand::from(data);
 

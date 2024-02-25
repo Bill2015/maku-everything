@@ -1,16 +1,16 @@
-use std::ffi::OsStr;
 use std::path::Path;
 
 use serde::Serialize;
 
 use crate::modules::resource::domain::ResourceGenericError;
+use crate::utils::StringUtils;
 
 #[derive(Debug, Serialize, Clone)]
 pub struct ResourceFileVO {
     pub uuid: String,
     pub name: String,
     pub path: String,
-    pub ext: String,
+    pub ext: Option<String>,
 }
 
 impl ResourceFileVO {
@@ -32,15 +32,24 @@ impl ResourceFileVO {
         }
 
         let ext = match path.is_file() {
-            true => path.extension().unwrap_or(OsStr::new("txt")),
-            false => OsStr::new("folder"),
+            true => path.extension()
+                .map(|osr| Some(String::from(osr.to_str().unwrap())))
+                .unwrap_or(None),
+            false => Some("folder".to_string()),
+        };
+
+        let name = String::from(path.file_name().unwrap().to_str().unwrap());
+        let name = match path.is_file() {
+            true if ext.is_none()=> name,
+            true => String::from(name.slice(..name.chars().count() - ext.as_ref().unwrap().chars().count() - 1)),
+            false => name,
         };
 
         Ok(
             ResourceFileVO {
                 uuid: String::from("id"),
-                name: String::from(path.file_name().unwrap().to_str().unwrap()),
-                ext: String::from(ext.to_str().unwrap()),
+                name: name,
+                ext: ext,
                 path: String::from(main_path),
             }
         )

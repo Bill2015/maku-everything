@@ -6,7 +6,7 @@ pub struct ResourceFileDo {
     pub uuid: String,
     pub name: String,
     pub path: String,
-    pub ext: String,
+    pub ext: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

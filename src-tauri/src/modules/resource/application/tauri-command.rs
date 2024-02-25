@@ -43,6 +43,15 @@ pub async fn remove_resource_tag(data: ResourceRemoveTagDto) -> Result<ResourceI
 }
 
 #[tauri::command(rename_all = "snake_case")]
+pub async fn rename_resource_file_name(data: ResourceRenameFileDto) -> Result<ResourceID, ResourceError> {
+    let result = RESOURCE_SERVICE
+        .rename_file(data)
+        .await?;
+
+    Ok(result)
+}
+
+#[tauri::command(rename_all = "snake_case")]
 pub async fn update_resource_tag(data: ResourceUpdateTagDto) -> Result<ResourceID, ResourceError> {
     let result = RESOURCE_SERVICE
         .update_resource_tag(data)

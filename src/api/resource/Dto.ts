@@ -48,6 +48,12 @@ export interface ResourceCreateDto {
     url_path?: string | null,
 }
 
+export interface ResourceRenameFileDto {
+    id: string,
+
+    new_name?: string,
+}
+
 export interface ResourceUpdateDto {
     id: string,
 

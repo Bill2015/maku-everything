@@ -22,3 +22,8 @@ impl Into<TaggingAttrPayload> for ResourceTaggingAttrPayloadDto {
         }
     }
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct ResourceIdOnlyDto {
+    id: String,
+}

@@ -1,9 +1,13 @@
+use std::fs;
+use std::path::Path;
+
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use crate::base_aggregate;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::common::domain::ToPlainObject;
 use crate::modules::common::infrastructure::dateutils;
+use crate::utils::StringUtils;
 
 mod id;
 pub use id::ResourceID;
@@ -48,6 +52,54 @@ impl Resource {
             return Err(ResourceGenericError::NameIsEmpty());
         }
         self.name = new_name;
+        Ok(())
+    }
+
+    pub fn rename_file(&mut self, new_name: Option<String>) -> Result<(), ResourceGenericError> {
+        if self.file.is_none() {
+            return Err(ResourceGenericError::FileIsEmpty());
+        }
+
+        // get new name
+        let new_name = new_name.unwrap_or(self.name.clone());
+        let ResourceFileVO { uuid, name, path, ext } = self.file.to_owned().unwrap();
+    
+        // if same as new, do nothing
+        if name == new_name {
+            return Ok(());
+        }
+
+        let file_path = String::from(Path::new(&path).file_name().unwrap().to_str().unwrap());
+        let new_path = Path::new(path.slice(..path.chars().count() - file_path.chars().count()))
+            .join(&new_name)
+            .to_str()
+            .unwrap()
+            .to_string();
+    
+        let new_path: String = match &ext {
+            Some(ex) => [new_path, ex.to_string()].join("."),
+            None => new_path,
+        };
+
+        // check filename is already exist (conflict)
+        if Path::new(&self.root_path).join(&new_path).exists() {
+            return Err(ResourceGenericError::RenameFileFailed());
+        }
+
+        fs::rename(
+            Path::new(&self.root_path).join(&path),
+            Path::new(&self.root_path).join(&new_path)
+        ).or(Err(ResourceGenericError::RenameFileFailed()))?;
+
+        self.file = Some(ResourceFileVO {
+            name: new_name.clone(),
+            path: new_path,
+            uuid: uuid,
+            ext: ext,
+        });
+
+        self.name = new_name;
+
         Ok(())
     }
 

@@ -18,7 +18,7 @@ pub struct ResourceFileDto {
 
     pub path: String,
 
-    pub ext: String,
+    pub ext: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

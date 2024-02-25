@@ -4,6 +4,7 @@ import {
     QueryResoruceDto,
     ResourceCreateDto,
     ResourceDetailDto,
+    ResourceRenameFileDto,
     ResourceResDto,
     ResourceTagOperateDto,
     ResourceUpdateDto,
@@ -38,6 +39,10 @@ export namespace ResourceAPI {
 
     export function update(data: ResourceUpdateDto) {
         return invoke<string>('update_resource', { data });
+    }
+
+    export function renameTheFile(data: ResourceRenameFileDto) {
+        return invoke<string>('rename_resource_file_name', { data });
     }
 
     export function exporeTheFile(filePath: string) {
