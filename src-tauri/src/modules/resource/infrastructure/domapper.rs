@@ -48,12 +48,12 @@ impl DomainModelMapper<ResourceTaggingVO> for ResourceTaggingDo {
 // ====================================================================
 impl DomainModelMapper<ResourceFileVO> for ResourceFileDo {
     fn to_domain(self) -> ResourceFileVO {
-        let Self { uuid, name, path, ext } = self;
-        ResourceFileVO { uuid, name, path, ext }
+        let Self { uuid, name, path, ext, media_type } = self;
+        ResourceFileVO { uuid, name, path, ext, media_type }
     }
     fn from_domain(value: ResourceFileVO) -> Self {
-        let ResourceFileVO { uuid, name, path, ext  } = value;
-        Self { uuid, name, path, ext }
+        let ResourceFileVO { uuid, name, path, ext, media_type } = value;
+        Self { uuid, name, path, ext, media_type }
     }
 }
 

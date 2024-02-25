@@ -38,6 +38,7 @@ regex = "1.10.3"
 paste = "1.0.14"
 strum_macros = "0.26.1"
 strum = "0.26.1"
+file-format = { version = "0.24.0", features = [ "reader" ] }
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem
