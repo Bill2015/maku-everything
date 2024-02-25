@@ -49,7 +49,12 @@ export function ResourceCard(props: ResourceCardProps) {
                             </>
                         )}
                         <UnstyledButton>
-                            <ResourceThumbnailDisplayer url={data.url?.full} filePath={`${data.root_path}${data.file?.path}`} alt={data.name} />
+                            <ResourceThumbnailDisplayer
+                                url={data.url?.full}
+                                filePath={`${data.root_path}${data.file?.path}`}
+                                alt={data.name}
+                                mediaType={data.file?.media_type}
+                            />
                         </UnstyledButton>
                     </Box>
                 </Card.Section>

@@ -55,6 +55,7 @@ export function CategoryCard(props: CategoryCardProps) {
                                 key={data.id}
                                 url={data.url?.full}
                                 filePath={`${data.root_path}${data.file?.path}`}
+                                mediaType={data.file?.media_type}
                                 alt={data.name}
                                 useBackgoundImg
                             />
