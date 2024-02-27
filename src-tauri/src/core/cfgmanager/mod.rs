@@ -63,8 +63,6 @@ impl MakuConfigManager {
         let data = serde_json::to_string(&self.config)
             .unwrap();
 
-        dbg!(&data);
-
         let mut writer = File::create(&self.path)
             .expect("cannot create the file writer");
 

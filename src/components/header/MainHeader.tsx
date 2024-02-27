@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Button, Divider, Group, Image, Menu, Select, Tooltip, UnstyledButton,
@@ -7,7 +7,8 @@ import { LuImport } from 'react-icons/lu';
 import { BsGear } from 'react-icons/bs';
 import { AiOutlineThunderbolt } from 'react-icons/ai';
 import { MdLanguage } from 'react-icons/md';
-import { SupportLangs, defaultLang } from '@modules/i18next';
+import { useConfigRedux } from '@store/global';
+import { SupportLangs, defaultLang, SupportLangsType } from '@modules/i18next';
 import { useHomeNavigate } from '@router/navigateHook';
 import { useImportCategoryModal } from '@store/modal';
 
@@ -55,8 +56,15 @@ function HeaderMenuItem(props: PropsWithChildren) {
 
 export function MainHeader() {
     const { t, i18n } = useTranslation('common', { keyPrefix: 'Header.MainHeader' });
+    const { config, updateConfig } = useConfigRedux();
     const navigateToHome = useHomeNavigate();
     const [_, { open }] = useImportCategoryModal();
+
+    useEffect(() => {
+        if (config) {
+            i18n.changeLanguage(config.lang);
+        }
+    }, [i18n, config]);
 
     return (
         <Group px="sm" gap={5}>
@@ -101,13 +109,16 @@ export function MainHeader() {
                 rightSectionPointerEvents="none"
                 rightSectionWidth={0}
                 styles={{ dropdown: { maxHeight: 200, overflowY: 'auto' } }}
-                defaultValue={defaultLang.key}
+                defaultValue={config?.lang ?? defaultLang.key}
+                value={config?.lang}
                 data={Object.values(SupportLangs).map((val) => ({
                     value:    val.key,
                     label:    val.displayName,
                     disabled: i18n.language === val.key,
                 }))}
-                onChange={(val) => i18n.changeLanguage(val!)}
+                onChange={(val) => {
+                    updateConfig({ lang: val as SupportLangsType });
+                }}
             />
         </Group>
     );

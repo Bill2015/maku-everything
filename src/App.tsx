@@ -3,6 +3,7 @@ import { useRoutes } from 'react-router-dom';
 import { Notifications } from '@mantine/notifications';
 import { Box, MantineProvider, AppShell } from '@mantine/core';
 import { ContextMenuProvider } from 'mantine-contextmenu';
+import { useViewportSize } from '@mantine/hooks';
 
 import { invoke } from '@tauri-apps/api/tauri';
 
@@ -12,7 +13,7 @@ import { CreateTagModal } from '@modals/tag';
 import { CreateResourceModal } from '@modals/resource';
 import { ImportCategoryModal, CreateCategoryModal } from '@modals/category';
 import { MainHeader } from '@components/header';
-import { useViewportSize } from '@mantine/hooks';
+import { useConfigRedux } from '@store/global';
 
 import { ROUTE_OBJECTS } from './router/RoutingTable';
 
@@ -29,9 +30,24 @@ import classes from './App.module.scss';
 
 function App() {
     const routes = useRoutes(ROUTE_OBJECTS);
+    const { configChanged, reloadConfig } = useConfigRedux();
     const [theme, setTheme] = useState<boolean>(false);
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const { height, width } = useViewportSize();
+
+    let isInitial = true;
+
+    useEffect(() => {
+        if (isInitial) {
+            reloadConfig();
+            isInitial = false;
+            return;
+        }
+
+        if (configChanged) {
+            reloadConfig();
+        }
+    }, [configChanged, reloadConfig]);
 
     useEffect(() => {
         if (isConnected === false) {
