@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use core::dbmanager::DatabaseManagerStatus;
+use core::cfgmanager::{self, MakuConfigManager};
+use std::path::PathBuf;
 
 use pretty_env_logger;
 use modules::common::repository;
@@ -43,6 +45,15 @@ fn main() {
                 .lock()
                 .unwrap()
                 .start_db();
+ 
+            // config
+            let config_path = app.app_handle()
+                .path_resolver()
+                .app_local_data_dir()
+                .unwrap_or(PathBuf::new());
+            let config_path = config_path.to_str().unwrap().to_string();
+            MakuConfigManager::init(config_path)?;
+
             match result {
                 Ok(_) => { Ok(()) },
                 Err(err) => panic!("{}", err.to_string()),
@@ -65,6 +76,8 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             connect_db, 
+            core::cfgmanager::update_config,
+            core::cfgmanager::get_config,
             category::application::create_category,
             category::application::update_category,
             category::application::update_mapper_rule_category,
