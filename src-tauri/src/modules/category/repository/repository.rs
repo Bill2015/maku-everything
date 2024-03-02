@@ -4,6 +4,7 @@ use surrealdb::Surreal;
 use surrealdb::engine::remote::ws::Client;
 use surrealdb::sql::{Thing, Datetime, thing};
 
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::domain::DomainModelMapper;
 use crate::modules::common::repository::{env, tablens};
 use crate::modules::category::domain::{Category, CategoryFactory};
@@ -39,6 +40,25 @@ pub struct CategoryRepository<'a> {
 impl<'a> CategoryRepository<'a> {
     pub const fn init(db: &'a Lazy<Surreal<Client>>) -> Self {
         CategoryRepository { db: db }
+    }
+
+    pub async fn get_by(&self, builder_result: QueryBuilderResult) -> surrealdb::Result<Vec<Category>> {
+        let sql = format!(r#"
+            SELECT 
+                *
+            FROM type::table($table) WHERE {}"#, 
+        builder_result.to_string());
+
+        let result: Vec<Category> = self.db
+            .query(sql)
+            .bind(("table", tablens::CATEGORY))
+            .await?
+            .take::<Vec<CategoryDO>>(0)?
+            .into_iter()
+            .map(|val| Self::model_to_entity(val))
+            .collect();
+
+        Ok(result) 
     }
 
     pub async fn is_exist(&self, id: &String) -> bool {
