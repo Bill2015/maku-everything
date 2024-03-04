@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { BoxProps, Popover, Text } from '@mantine/core';
 import { useCallback, useRef, useState } from 'react';
+import { BoxProps, Popover, Text } from '@mantine/core';
 
 import { DatePicker } from '@mantine/dates';
-import { toDate } from '@utils/date';
+import { formatDate, toDateTime } from '@utils/date';
 
 export interface EditableDateProps extends BoxProps {
     value: string;
@@ -52,13 +52,13 @@ export function EditableDate(props: EditableDateProps) {
         >
             <Popover.Target>
                 <Text title="double click to edit" onDoubleClick={handleClick} {...boxProps}>
-                    {value}
+                    {formatDate(value)}
                 </Text>
             </Popover.Target>
             <Popover.Dropdown p={10} pt={5} pb={5}>
                 <Text>{name}</Text>
                 <DatePicker
-                    value={toDate(value)}
+                    value={toDateTime(value)}
                     onChange={(e) => {
                         if (e) {
                             onChange(e.toISOString());
