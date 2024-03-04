@@ -5,11 +5,9 @@ use serde::Deserialize;
 use crate::modules::category::domain::CategoryFactory;
 use crate::modules::category::domain::CategoryGenericError;
 use crate::modules::category::domain::CategoryID;
-use crate::modules::category::infrastructure::CategoryQueryBuilder;
 use crate::modules::category::repository::CategoryRepository;
 use crate::modules::common::application::ICommandHandler;
 use crate::command_from_dto;
-use crate::modules::common::infrastructure::QueryBuilder;
 
 mod dto;
 pub use dto::*;
@@ -52,13 +50,12 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
         } = command;
 
         // check name already existed
-        let count = self.categroy_repo
-            .get_by(CategoryQueryBuilder::new().set_name(name.clone()).build()?)
+        let duplicated = self.categroy_repo
+            .is_duplicate_name(&name)
             .await
-            .or(Err(CategoryGenericError::DBInternalError()))?
-            .len();
+            .or(Err(CategoryGenericError::DBInternalError()))?;
 
-        if count > 0 {
+        if duplicated {
             return Err(CategoryGenericError::NameIsDuplicated { current_name: name }.into());
         }
 

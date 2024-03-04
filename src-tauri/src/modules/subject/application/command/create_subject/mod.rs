@@ -5,9 +5,7 @@ use serde::Deserialize;
 use crate::command_from_dto;
 use crate::modules::category::domain::CategoryID;
 use crate::modules::category::repository::CategoryRepository;
-use crate::modules::common::infrastructure::QueryBuilder;
 use crate::modules::subject::domain::{SubjectFactory, SubjectGenericError, SubjectID};
-use crate::modules::subject::infrastructure::SubjectQueryBuilder;
 use crate::modules::subject::repository::SubjectRepository;
 use crate::modules::common::application::ICommandHandler;
 
@@ -55,28 +53,22 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
             belong_category,
         } = command;
 
+        // check name existed
+        let duplicated = self.subject_repo
+            .is_duplicate_name(&belong_category, &name)
+            .await
+            .or(Err(SubjectGenericError::DBInternalError()))?;
+
+        if duplicated {
+            return Err(SubjectGenericError::NameIsDuplicated { current_name: name }.into());
+        }
+
         // get CategoryID
         let category_id = self.category_repo
             .is_exist(&belong_category)
             .await
-            .then(|| CategoryID::from(belong_category.clone()))
+            .then(|| CategoryID::from(belong_category))
             .ok_or(SubjectGenericError::BelongCategoryNotExists())?;
-
-        // check name existed
-        let count = self.subject_repo
-            .get_by(
-                SubjectQueryBuilder::new()
-                    .set_name(name.clone())
-                    .set_belong_category(belong_category)
-                    .build()?
-            )
-            .await
-            .or(Err(SubjectGenericError::DBInternalError()))?
-            .len();
-
-        if count > 0 {
-            return Err(SubjectGenericError::NameIsDuplicated { current_name: name }.into());
-        }
 
         // create new subject
         let new_subject = SubjectFactory::create(name, description, &category_id)?;
