@@ -1,11 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useMemo, useRef, useState } from 'react';
 import { CiImageOff } from 'react-icons/ci';
 import { Center, Image } from '@mantine/core';
 import { getYoutubeVideoId } from '@utils/urlParser';
 import { useBackGroundImage } from '@hooks/ui-hooks';
-
-import { useMemo, useRef, useState } from 'react';
-import { ResponsiveImageProps } from './ResponsiveImage';
+import { ResponsiveImageProps } from '@components/display';
 
 export interface YoutubeThumbnailProps extends Omit<ResponsiveImageProps, 'src' | 'ref'> {
     url: string;

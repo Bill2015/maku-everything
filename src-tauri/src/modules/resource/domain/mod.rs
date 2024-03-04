@@ -62,7 +62,7 @@ impl Resource {
 
         // get new name
         let new_name = new_name.unwrap_or(self.name.clone());
-        let ResourceFileVO { uuid, name, path, ext } = self.file.to_owned().unwrap();
+        let ResourceFileVO { uuid, name, path, ext, media_type } = self.file.to_owned().unwrap();
     
         // if same as new, do nothing
         if name == new_name {
@@ -96,6 +96,7 @@ impl Resource {
             path: new_path,
             uuid: uuid,
             ext: ext,
+            media_type: media_type,
         });
 
         self.name = new_name;

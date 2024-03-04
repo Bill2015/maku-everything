@@ -19,6 +19,8 @@ pub struct ResourceFileDto {
     pub path: String,
 
     pub ext: Option<String>,
+
+    pub media_type: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

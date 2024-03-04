@@ -1713,6 +1713,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "file-format"
+version = "0.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ba1b81b3c213cf1c071f8bf3b83531f310df99642e58c48247272eef006cae5"
+
+[[package]]
 name = "filetime"
 version = "0.2.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3127,6 +3133,7 @@ dependencies = [
  "cargo-nextest",
  "cargo-tarpaulin",
  "chrono",
+ "file-format",
  "log",
  "once_cell",
  "paste",

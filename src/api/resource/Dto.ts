@@ -14,6 +14,8 @@ export interface ResourceFileDto {
     path: string,
 
     ext: string,
+
+    media_type: string,
 }
 
 export interface ResourceResDto {
