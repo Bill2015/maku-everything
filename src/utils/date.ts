@@ -62,3 +62,7 @@ export function getDateTimeInterval(targetDate: string): DateTimeInterval | null
 export function formatDateTime(str: string): string {
     return format(parseISO(str), 'yyyy-MM-dd HH:mm:ss');
 }
+
+export function toDate(str: string): Date {
+    return parseISO(str);
+}

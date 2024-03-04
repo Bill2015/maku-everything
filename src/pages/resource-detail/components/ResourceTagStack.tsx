@@ -21,10 +21,14 @@ export interface ResourceTagGroupProps {
     onRemoveTag: (tag: Pick<ResourceTagDto, 'id'|'name'>) => void;
 
     onUpdateTag: (tag: Pick<ResourceTagDto, 'id'|'name'>, attrVal: ResourceTagAttrValDto) => void;
+
 }
 
 export function ResourceTagGroup(props: ResourceTagGroupProps) {
-    const { subjectName, autoFocus, subjectId, tags, onSelectNewTag, onRemoveTag, onUpdateTag } = props;
+    const {
+        subjectName, autoFocus, subjectId, tags,
+        onSelectNewTag, onRemoveTag, onUpdateTag,
+    } = props;
     const selectRef = useRef<HTMLInputElement>(null);
     const [searchValue, setSearchValue] = useState<string>('');
     const [selectValue, setSelectValue] = useState<string>('');
@@ -48,7 +52,14 @@ export function ResourceTagGroup(props: ResourceTagGroupProps) {
         }
     };
 
-    const itemChip = tags.map((val) => <ResourceTagPill key={val.id} tag={val} onRemoveTag={onRemoveTag} onUpdateTag={onUpdateTag} />);
+    const itemChip = tags.map((val) => (
+        <ResourceTagPill
+            key={val.id + (val.attrval?.toString() ?? '')}
+            tag={val}
+            onRemoveTag={onRemoveTag}
+            onUpdateTag={onUpdateTag}
+        />
+    ));
 
     const selectableTags = useMemo(() => subjectTags
         .filter((tag) => !tags.find((obj) => obj.id === tag.id)), [tags, subjectTags]);

@@ -1,0 +1,13 @@
+.root {
+    align-self: center;
+    margin-top: 3px;
+}
+
+.input {
+    border: none;
+
+    &:not(:checked) {
+        border: 1px solid teal;
+        border-radius: 100%;
+    }
+}

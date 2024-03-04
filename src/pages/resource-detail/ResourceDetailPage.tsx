@@ -9,6 +9,7 @@ import {
 import { useActiveCategoryRedux } from '@store/global';
 import { ModalName, useModelConfirmAction } from '@store/modal';
 import { ResourceMutation, ResourceQuery, ResourceUpdateDto } from '@api/resource';
+import { ErrorResBody } from '@api/common';
 import { ResourceDetailParam } from '@router/params';
 import { SubjectQuery } from '@api/subject';
 import { EditableText } from '@components/display';
@@ -148,11 +149,18 @@ export default function ResourcesDetailPage() {
                                         resourceRefetch();
                                     }}
                                     onUpdateTag={async (tag, attrVal) => {
-                                        await updateResourceTag.mutateAsync({
-                                            id:      resourceData.id,
-                                            tag_id:  tag.id,
-                                            attrval: attrVal,
-                                        });
+                                        try {
+                                            await updateResourceTag.mutateAsync({
+                                                id:      resourceData.id,
+                                                tag_id:  tag.id,
+                                                attrval: attrVal,
+                                            });
+                                            showNotification('Update Resource Successful', '', 'success');
+                                        }
+                                        catch (e) {
+                                            const error = e as ErrorResBody;
+                                            showNotification('Update Attribute Error', error.message, 'error');
+                                        }
                                         resourceRefetch();
                                     }}
                                 />
