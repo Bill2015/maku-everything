@@ -49,6 +49,16 @@ impl ICommandHandler<CreateCategoryCommand> for CreateCategoryHandler<'_> {
             root_path,
         } = command;
 
+        // check name already existed
+        let duplicated = self.categroy_repo
+            .is_duplicate_name(&name)
+            .await
+            .or(Err(CategoryGenericError::DBInternalError()))?;
+
+        if duplicated {
+            return Err(CategoryGenericError::NameIsDuplicated { current_name: name }.into());
+        }
+
         // create new category
         let new_category = CategoryFactory::create(name, description, root_path)?;
 

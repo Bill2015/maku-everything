@@ -5,10 +5,13 @@ use surrealdb::sql::thing;
 use surrealdb::engine::remote::ws::Client;
 
 use crate::modules::category::domain::CategoryID;
+use crate::modules::common::infrastructure::QueryBuilderResult;
 use crate::modules::common::repository::env;
 use crate::modules::resource::domain::ResourceID;
 use crate::modules::subject::domain::SubjectID;
 use crate::modules::tag::domain::TagID;
+
+use super::CountDO;
 
 pub static COMMON_REPOSITORY: CommonRepository<'_> = CommonRepository::init(&env::DB);
 
@@ -63,6 +66,24 @@ impl<'a> CommonRepository<'a> {
             &subject.to_string()   // out
         ).await?;
         Ok(())
+    }
+
+    pub async fn is_duplicated(&self, ns: &str, builder_result: QueryBuilderResult) -> surrealdb::Result<bool> {
+        let sql = format!(r#"
+            SELECT 
+                COUNT()
+            FROM type::table($table) 
+            WHERE {}"#, 
+            builder_result.to_string());
+        
+        let result = self.db
+            .query(sql)
+            .bind(("table", ns))
+            .await?
+            .take::<Vec<CountDO>>(0)?
+            .pop();
+
+        Ok(result.is_some() && (result.unwrap().count > 0))
     }
 }
 

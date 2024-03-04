@@ -62,6 +62,16 @@ impl ICommandHandler<CreateTagCommand> for CreateTagHandler<'_> {
             attrval,
         } = command;
 
+        // check name duplicated
+        let duplicated = self.tag_repo
+            .is_duplicate_name(&belong_category, &belong_subject, &name)
+            .await
+            .or(Err(TagGenericError::DBInternalError()))?;
+
+        if duplicated {
+            return Err(TagGenericError::NameIsDuplicated { current_name: name }.into());
+        }
+
         // get CategoryID
         let category_id = self.category_repo
             .is_exist(&belong_category)

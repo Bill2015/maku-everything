@@ -5,9 +5,10 @@ use surrealdb::sql::{Datetime, Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
 use crate::modules::common::domain::DomainModelMapper;
-use crate::modules::common::infrastructure::QueryBuilderResult;
-use crate::modules::common::repository::{env, tablens, CommonRepository, COMMON_REPOSITORY};
+use crate::modules::common::infrastructure::{QueryBuilder, QueryBuilderResult};
+use crate::modules::common::repository::{env, tablens, CommonRepository, CountDO, COMMON_REPOSITORY};
 use crate::modules::subject::domain::{Subject, SubjectFactory, SubjectID};
+use crate::modules::subject::infrastructure::SubjectQueryBuilder;
 
 pub static SUBJECT_REPOSITORY: SubjectRepository<'_> = SubjectRepository::init(&env::DB, &COMMON_REPOSITORY);
 
@@ -87,6 +88,19 @@ impl<'a> SubjectRepository<'a> {
             Some(_) => true,
             None => false,
         }
+    }
+
+    pub async fn is_duplicate_name(&self, belong_category: &String, name: &String) -> surrealdb::Result<bool> {
+        let buildres = SubjectQueryBuilder::new()
+            .set_name(name)
+            .set_belong_category(belong_category)
+            .build()
+            .unwrap();
+
+        let result = self.common_repo.is_duplicated(tablens::SUBJECT, buildres)
+            .await?;
+
+        Ok(result)
     }
 
     pub async fn find_by_id(&self, id: &String) -> surrealdb::Result<Option<Subject>> {

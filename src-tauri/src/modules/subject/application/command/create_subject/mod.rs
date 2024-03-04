@@ -53,6 +53,16 @@ impl ICommandHandler<CreateSubjectCommand> for CreateSubjectHandler<'_> {
             belong_category,
         } = command;
 
+        // check name existed
+        let duplicated = self.subject_repo
+            .is_duplicate_name(&belong_category, &name)
+            .await
+            .or(Err(SubjectGenericError::DBInternalError()))?;
+
+        if duplicated {
+            return Err(SubjectGenericError::NameIsDuplicated { current_name: name }.into());
+        }
+
         // get CategoryID
         let category_id = self.category_repo
             .is_exist(&belong_category)

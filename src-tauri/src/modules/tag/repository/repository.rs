@@ -4,11 +4,12 @@ use surrealdb::sql::{Thing, thing};
 use surrealdb::engine::remote::ws::Client;
 
 use crate::modules::common::domain::DomainModelMapper;
-use crate::modules::common::infrastructure::QueryBuilderResult;
+use crate::modules::common::infrastructure::{QueryBuilder, QueryBuilderResult};
 use crate::modules::common::repository::env;
 use crate::modules::common::repository::tablens;
 use crate::modules::common::repository::{CommonRepository, COMMON_REPOSITORY};
 use crate::modules::tag::domain::TagFactory;
+use crate::modules::tag::infrastructure::TagQueryBuilder;
 use crate::tag::domain::{Tag, TagID};
 
 use super::TagDO;
@@ -47,6 +48,20 @@ impl<'a> TagRepository<'a> {
             .collect();
 
         Ok(result) 
+    }
+
+    pub async fn is_duplicate_name(&self, belong_category: &String, belong_subject: &String, name: &String) -> surrealdb::Result<bool> {
+        let buildres = TagQueryBuilder::new()
+            .set_name(name)
+            .set_belong_category(belong_category)
+            .set_belong_subject(belong_subject)
+            .build()
+            .unwrap();
+
+        let result = self.common_repo.is_duplicated(tablens::TAG, buildres)
+            .await?;
+
+        Ok(result)
     }
 
     async fn return_aggregate_by_id(&self, id: &String) -> surrealdb::Result<Option<Tag>> {

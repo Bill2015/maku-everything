@@ -9,3 +9,6 @@ pub use common::CommonRepository;
 
 mod predef;
 pub use predef::*;
+
+mod obj;
+pub use obj::*;
