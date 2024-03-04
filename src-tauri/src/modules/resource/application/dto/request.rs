@@ -8,7 +8,6 @@ pub enum ResourceTaggingAttrPayloadDto {
     None,
     Number(i64),
     Text(String),
-    Date(String),
     Bool(bool),
 }
 impl Into<TaggingAttrPayload> for ResourceTaggingAttrPayloadDto {
@@ -17,7 +16,6 @@ impl Into<TaggingAttrPayload> for ResourceTaggingAttrPayloadDto {
             Self::None => TaggingAttrPayload::None,
             Self::Number(val) => TaggingAttrPayload::Number(val),
             Self::Text(val) => TaggingAttrPayload::Text(val),
-            Self::Date(val) => TaggingAttrPayload::Date(val),
             Self::Bool(val) => TaggingAttrPayload::Bool(val),
         }
     }
