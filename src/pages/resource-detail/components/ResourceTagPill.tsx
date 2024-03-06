@@ -99,7 +99,7 @@ export function ResourceTagPill(props: ResourceTagPillProps) {
             <Group gap={3} align="baseline">
                 {tag.name}
                 {tag.attrval !== null && (
-                    <Group gap={0} align="baseline">
+                    <Group gap={0} align="baseline" style={{ cursor: 'pointer' }}>
                         <Text c="teal" fz="0.8rem">[</Text>
                         {renderAttributeField()}
                         <Text c="teal" fz="0.8rem">]</Text>
