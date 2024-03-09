@@ -51,6 +51,19 @@ export function getDateTimeInterval(targetDate: string): DateTimeInterval | null
 }
 
 /**
+ * Parse the string into general Date \
+ * For examples:
+ * ```ts
+ * const res = toDateTime("2024-01-30T15:30:27.626220600Z");
+ * assert.equal(res, parseISO("2024-01-30T15:30:27.626220600Z"))
+ * ```
+ * @param str target string
+ * @returns datetime object */
+export function toDateTime(str: string): Date {
+    return parseISO(str);
+}
+
+/**
  * Parse the string into general DateTime format \
  * For examples:
  * ```ts
@@ -61,4 +74,17 @@ export function getDateTimeInterval(targetDate: string): DateTimeInterval | null
  * @returns new formated datetime */
 export function formatDateTime(str: string): string {
     return format(parseISO(str), 'yyyy-MM-dd HH:mm:ss');
+}
+
+/**
+ * Parse the string into general Date format \
+ * For examples:
+ * ```ts
+ * const res = formatDateTime("2024-01-30T15:30:27.626220600Z");
+ * assert.equal(res, "2024-01-30")
+ * ```
+ * @param str target string
+ * @returns new formated date */
+export function formatDate(str: string): string {
+    return format(parseISO(str), 'yyyy-MM-dd');
 }

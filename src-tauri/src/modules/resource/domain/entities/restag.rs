@@ -15,8 +15,6 @@ pub enum TaggingAttrPayload {
 
     Text(String),
 
-    Date(String),
-
     Bool(bool),
 }
 
@@ -132,8 +130,8 @@ impl ResourceTaggingEntity {
                 Err(ResourceGenericError::InvalidTaggingAttribute())
             }
             TagAttrVO::Date { .. } => {
-                if let TaggingAttrPayload::Date(val) = payload {
-                    if let Ok(date) = dateutils::parse(val) {
+                if let TaggingAttrPayload::Text(val) = payload {
+                    if let Ok(date) = dateutils::parse(val.clone()) {
                         return Ok(ResourceTaggingAttrVO::Date(date.and_utc()));
                     }
                 }

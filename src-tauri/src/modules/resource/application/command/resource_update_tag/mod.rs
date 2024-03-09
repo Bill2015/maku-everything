@@ -4,11 +4,9 @@ use serde::Deserialize;
 
 use crate::command_from_dto;
 use crate::modules::resource::application::dto::ResourceTaggingAttrPayloadDto;
-use crate::modules::resource::domain::entities::TaggingAttrPayload;
 use crate::modules::resource::domain::{ResourceGenericError, ResourceID};
 use crate::modules::resource::repository::ResourceRepository;
 use crate::modules::common::application::ICommandHandler;
-use crate::modules::tag::domain::TagID;
 use crate::modules::tag::repository::TagRepository;
 
 mod dto;
